@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import Enumeration.MaritalStatus;
+
 public class Main {
     public static void main(String[] args) {
         List<User> users = new ArrayList<>();
@@ -12,7 +14,7 @@ public class Main {
         System.out.println("Welcome to BTO Management System");
 
         while (true) {
-            User loggedInUser = LoginManager.login(users); // User logs in
+            User loggedInUser = UserAuthController.login(users); // User logs in
 
             while (true) {  // User session loop
                 loggedInUser.viewMenu();
@@ -38,8 +40,8 @@ public class Main {
     }
 
     private static boolean processMenuChoice(User user, int choice) {
-        if (user instanceof Applicant) {
-            return processApplicantChoice((Applicant) user, choice);
+        if (user instanceof HDBApplicant) {
+            return processApplicantChoice((HDBApplicant) user, choice);
         } else if (user instanceof HDBOfficer) {
             return processOfficerChoice((HDBOfficer) user, choice);
         } else if (user instanceof HDBManager) {
@@ -50,7 +52,7 @@ public class Main {
         }
     }
 
-    private static boolean processApplicantChoice(Applicant user, int choice) {
+    private static boolean processApplicantChoice(HDBApplicant user, int choice) {
         switch (choice) {
             // case 1 -> user.viewProjects();
             // case 2 -> user.applyForProject();
@@ -107,19 +109,19 @@ public class Main {
         return false;
     }
        
-
     private static void loadUsers(List<User> users) {
-        users.add(new Applicant("John", "S1234567A", "password", 35, "Single"));
-        users.add(new Applicant("Sarah", "T7654321B", "password", 40, "Married"));
-        users.add(new Applicant("Grace", "S9876543C", "password", 37, "Married"));
-        users.add(new Applicant("James", "T2345678D", "password", 30, "Married"));
-        users.add(new Applicant("Rachel", "S3456789E", "password", 25, "Single"));
+        users.add(new HDBApplicant(1, "S1234567A", "password", "John", null, null, 35, MaritalStatus.Single));
+        users.add(new HDBApplicant(2, "T7654321B", "password", "Sarah", null, null, 40, MaritalStatus.Married));
+        users.add(new HDBApplicant(3, "S9876543C", "password", "Grace", null, null, 37, MaritalStatus.Married));
+        users.add(new HDBApplicant(4, "T2345678D", "password", "James", null, null, 30, MaritalStatus.Married));
+        users.add(new HDBApplicant(5, "S3456789E", "password", "Rachel", null, null, 25, MaritalStatus.Single));
 
-        users.add(new HDBOfficer("Daniel", "T2109876H", "password", 36, "Single"));
-        users.add(new HDBOfficer("Emily", "S6543210I", "password", 28, "Single"));
-        users.add(new HDBOfficer("David", "T1234567J", "password", 29, "Married"));
+        users.add(new HDBOfficer(6, "T2109876H", "password", "Daniel", null, null, 36, MaritalStatus.Single));
+        users.add(new HDBOfficer(7, "S6543210I", "password", "Emily", null, null, 28, MaritalStatus.Single));
+        users.add(new HDBOfficer(8, "T1234567J", "password", "David", null, null, 29, MaritalStatus.Married));
 
-        users.add(new HDBManager("Michael", "T8765432F", "password", 36, "Single"));
-        users.add(new HDBManager("Jessica", "S5678901G", "password", 26, "Married"));
+        users.add(new HDBManager(9, "T8765432F", "password", "Michael", null, null, 36, MaritalStatus.Single, 100));
+        users.add(new HDBManager(10, "S5678901G", "password", "Jessica", null, null, 26, MaritalStatus.Married, 200));
+
     }
 }

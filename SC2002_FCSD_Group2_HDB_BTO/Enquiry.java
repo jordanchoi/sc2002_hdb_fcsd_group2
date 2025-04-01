@@ -1,13 +1,41 @@
-class Enquiry {
-    private Applicant applicant;
-    private String message;
+public class Enquiry {
+    private String enquiry;
+    private int enquiryId;
+    private String reply;
+    private HDBApplicant madeBy;
+    private BTOProj forProj;
 
-    public Enquiry(Applicant applicant, String message) {
-        this.applicant = applicant;
-        this.message = message;
+    public Enquiry(int id, String enquiry) {
+        this.enquiryId = id;
+        this.enquiry = enquiry;
     }
 
-    public void setMessage(String newMessage) {
-        this.message = newMessage;
+    public void delete() {
+        this.enquiry = null;
+        this.reply = null;
+    }
+
+    public void setEnquiry(String enquiry) {
+        this.enquiry = enquiry;
+    }
+
+    public String getEnquiry() {
+        return enquiry;
+    }
+
+    public void setReply(String reply) {
+        this.reply = reply;
+    }
+
+    public String getReply() {
+        return reply;
+    }
+
+    public void setEnquiryId(int enquiryId) {
+        this.enquiryId = enquiryId;
+    }
+
+    public int getEnquiryId() {
+        return enquiryId;
     }
 }

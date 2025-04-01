@@ -1,20 +1,48 @@
 import java.util.ArrayList;
 import java.util.List;
 
-class HDBManager extends User {
-    private List<BTOProject> managedProjects;
+import Enumeration.MaritalStatus;
 
-    public HDBManager(String name, String nric, String password, int age, String maritalStatus) {
-        super(name, nric, password, age, maritalStatus);
-        this.managedProjects = new ArrayList<>();
+public class HDBManager extends User {
+    private int managerId;
+    private List<BTOProj> managedProjs;
+
+    public HDBManager(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus, int managerId) {
+        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
+        this.managerId = managerId;
+        managedProjs = new ArrayList<>();
     }
 
-    @Override
-    public void viewProjects() {
-        System.out.println(name + " is managing the following BTO Projects:");
-        for (BTOProject project : managedProjects) {
-            System.out.println("- " + project.getProjectName());
+    public int getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(int id) {
+        this.managerId = id;
+    }
+
+    public void assignProj(BTOProj project) {
+        managedProjs.add(project);
+    }
+
+    public void unAssignProj(BTOProj project) {
+        managedProjs.remove(project);
+    }
+
+    public BTOProj getProj(int id) {
+        for (BTOProj p : managedProjs) {
+            if (p.getProjId() == id) return p;
         }
+        return null;
+    }
+
+    public BTOProj getCurrentProj() {
+        if (managedProjs.isEmpty()) return null;
+        return managedProjs.get(managedProjs.size() - 1);
+    }
+
+    public boolean canBeAssigned() {
+        return managedProjs.size() < 3;
     }
 
     @Override
@@ -34,4 +62,5 @@ class HDBManager extends User {
         System.out.println("13. Change password");
         System.out.println("14. Logout");
     }
+
 }

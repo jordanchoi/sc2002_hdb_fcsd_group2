@@ -1,10 +1,14 @@
-class HDBOfficer extends User {
-    private BTOProject assignedProject;
+import Enumeration.MaritalStatus;
 
-    public HDBOfficer(String name, String nric, String password, int age, String maritalStatus) {
-        super(name, nric, password, age, maritalStatus);
+class HDBOfficer extends User {
+    private BTOProj projectsHandled;
+
+    public HDBOfficer(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
+        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
+        this.projectsHandled = projectsHandled; // initialize subclass field
     }
 
+    /*
     @Override
     public void viewProjects() {
         if (assignedProject != null) {
@@ -13,7 +17,7 @@ class HDBOfficer extends User {
             System.out.println(name + " is not assigned to any project.");
         }
     }
-
+    */
     @Override
     public void viewMenu() {
         System.out.println("\n=== HDB Officer Menu ===");
