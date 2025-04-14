@@ -1,11 +1,20 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import Enumeration.MaritalStatus;
+import model.entities.User;
+import model.entities.HDBApplicant;
+import model.entities.HDBOfficer;
+import model.entities.HDBManager;
 
 public class Main {
     public static void main(String[] args) {
+        /*
+         * The main method serves as the entry point for the BTO Management System.
+         * It initializes a list of users, loads predefined users, and manages user sessions.
+         * The program allows users to log in and interact with the system based on their roles.
+         */
+
+        /* START AFRESH - REMOVED BY JORDAN - REVIEW IF THE CODE IS OK WHOEVER IS DOING
         List<User> users = new ArrayList<>();
         Scanner sc = new Scanner(System.in);
 
@@ -14,9 +23,9 @@ public class Main {
         System.out.println("Welcome to BTO Management System");
 
         while (true) {
-            User loggedInUser = UserAuthController.login(users); // User logs in
+            User loggedInUser = UserAuthController.login(users); // model.entities.User logs in
 
-            while (true) {  // User session loop
+            while (true) {  // model.entities.User session loop
                 loggedInUser.viewMenu();
                 System.out.print("\nEnter your choice: ");
 
@@ -37,9 +46,11 @@ public class Main {
                 }
             }
         }
+        */
     }
 
     private static boolean processMenuChoice(User user, int choice) {
+        /* START AFRESH - REMOVED BY JORDAN
         if (user instanceof HDBApplicant) {
             return processApplicantChoice((HDBApplicant) user, choice);
         } else if (user instanceof HDBOfficer) {
@@ -50,9 +61,12 @@ public class Main {
             System.out.println("Invalid selection. Please try again.");
             return false;
         }
+        */
+        return true; // placeholder return statement
     }
 
     private static boolean processApplicantChoice(HDBApplicant user, int choice) {
+        /* START AFRESH - REMOVED BY JORDAN - REVIEW IF THE CODE IS OK WHOEVER IS DOING
         switch (choice) {
             // case 1 -> user.viewProjects();
             // case 2 -> user.applyForProject();
@@ -64,10 +78,12 @@ public class Main {
             case 8 -> { return true; } // Logout
             default -> System.out.println("Invalid option. Please try again.");
         }
+        */
         return false; // Continue session
     }
 
     private static boolean processOfficerChoice(HDBOfficer user, int choice) {
+        /* START AFRESH - REMOVED BY JORDAN - REVIEW IF THE CODE IS OK WHOEVER IS DOING
         switch (choice) {
             // case 1 -> user.viewProjects();
             // case 2 -> user.applyForProject();
@@ -85,10 +101,12 @@ public class Main {
             case 14 -> { return true; } // Logout
             default -> System.out.println("Invalid option. Please try again.");
         }
+        */
         return false;
     }
 
     private static boolean processManagerChoice(HDBManager user, int choice) {
+        /* START AFRESH - REMOVED BY JORDAN - REVIEW IF THE CODE IS OK WHOEVER IS DOING
         switch (choice) {
             // case 1 -> user.createProject();
             // case 2 -> user.editProject();
@@ -106,22 +124,10 @@ public class Main {
             case 14 -> { return true; } // Logout
             default -> System.out.println("Invalid option. Please try again.");
         }
+        */        // Placeholder return statement
         return false;
     }
        
     private static void loadUsers(List<User> users) {
-        users.add(new HDBApplicant(1, "S1234567A", "password", "John", null, null, 35, MaritalStatus.Single));
-        users.add(new HDBApplicant(2, "T7654321B", "password", "Sarah", null, null, 40, MaritalStatus.Married));
-        users.add(new HDBApplicant(3, "S9876543C", "password", "Grace", null, null, 37, MaritalStatus.Married));
-        users.add(new HDBApplicant(4, "T2345678D", "password", "James", null, null, 30, MaritalStatus.Married));
-        users.add(new HDBApplicant(5, "S3456789E", "password", "Rachel", null, null, 25, MaritalStatus.Single));
-
-        users.add(new HDBOfficer(6, "T2109876H", "password", "Daniel", null, null, 36, MaritalStatus.Single));
-        users.add(new HDBOfficer(7, "S6543210I", "password", "Emily", null, null, 28, MaritalStatus.Single));
-        users.add(new HDBOfficer(8, "T1234567J", "password", "David", null, null, 29, MaritalStatus.Married));
-
-        users.add(new HDBManager(9, "T8765432F", "password", "Michael", null, null, 36, MaritalStatus.Single, 100));
-        users.add(new HDBManager(10, "S5678901G", "password", "Jessica", null, null, 26, MaritalStatus.Married, 200));
-
     }
 }
