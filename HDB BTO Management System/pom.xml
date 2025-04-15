@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>sg.edu.ntu.sc2002.ay2425.fcsd.group2</groupId>
+    <artifactId>SC2002_FCSD_Group2_HDB_BTO</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+      <repositories>
+          <repository>
+              <id>central</id>
+              <url>https://repo.maven.apache.org/maven2</url>
+          </repository>
+          <repository>
+              <id>apache-snapshots</id>
+              <url>https://repository.apache.org/snapshots</url>
+          </repository>
+      </repositories>
+
+    <!-- For Read IO Dependencies -->
+    <dependencies>
+        <!-- For Read IO Dependencies -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.4.1</version>
+        </dependency>
+    </dependencies>
+
+</project>

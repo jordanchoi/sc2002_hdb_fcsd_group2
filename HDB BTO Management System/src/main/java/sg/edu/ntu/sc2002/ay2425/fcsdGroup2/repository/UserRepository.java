@@ -4,9 +4,11 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
+// For Read & Write
 /**
  * UserRepository is responsible for managing the list of users in the system.
  * It provides methods to add users and retrieve lists of different types of users.
