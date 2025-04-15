@@ -8,10 +8,39 @@
     <artifactId>SC2002_FCSD_Group2_HDB_BTO</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+    </build>
+
     <properties>
         <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+      <repositories>
+          <repository>
+              <id>central</id>
+              <url>https://repo.maven.apache.org/maven2</url>
+          </repository>
+          <repository>
+              <id>apache-snapshots</id>
+              <url>https://repository.apache.org/snapshots</url>
+          </repository>
+      </repositories>
+
+    <!-- For Read IO Dependencies -->
+    <dependencies>
+        <!-- For Read IO Dependencies -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.4.1</version>
+        </dependency>
+    </dependencies>
 
 </project>
