@@ -1,13 +1,17 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 import java.util.List;
 import java.util.Optional;
 
-class UserAuthController {
+public class UserAuthController {
 
     // This class handles user authentication and login functionality.
     // It provides methods for user login and validation.
@@ -19,11 +23,11 @@ class UserAuthController {
     // It is used to manage user data and perform CRUD operations on user data.
 
     // This is a static instance of the UserRepository class.
-    private static final UserRepository userRepository = new UserRepository();
-    private static final SessionStateManager session = SessionStateManager.getInstance();
+    private final UserRepository userRepository = new UserRepository();
+    private final SessionStateManager session = SessionStateManager.getInstance();
 
     // This method handles user login and authentication.
-    public static User Login(String nric, String password) {
+    public User login(String nric, String password) {
         // This method handles user login and authentication.
         // It takes a list of users as input and checks if the provided NRIC and password match any user in the list.
         // If a match is found, it returns the corresponding User object.
@@ -32,53 +36,67 @@ class UserAuthController {
         // This method is used to handle user login and authentication.
         // It is used to manage user authentication and login functionality.
 
+        // get the said user from the repository by nric
         Optional<User> user = userRepository.getUserByNric(nric);
+
         // Check if NRIC is valid
         if (user.isPresent()) {
-            if (user.get().getPwd().equals(password)) {
-                session.login(user.get());
-                return user.get();
+            User foundUser = user.get();
+            // check the password if NRIC is valid and user is retrieved
+            if (foundUser.getPwd().equals(password)) {
+                UserRoles userRoles = null;
+                if (foundUser instanceof HDBOfficer) {
+                    userRoles = UserRoles.OFFICER;
+                } else if (foundUser instanceof HDBApplicant) {
+                    userRoles = UserRoles.APPLICANT;
+                } else if (foundUser instanceof HDBManager) {
+                    userRoles = UserRoles.MANAGER;
+                }
+                session.login(foundUser, userRoles);
+                return foundUser;
             } else {
-                System.out.println("Incorrect password. Try again.");
+                // Password is not valid. Comment out the line below to remove the message before submission.
+                System.out.println("Incorrect password.");
             }
         } else {
-            System.out.println("NRIC not found. Try again.");
+            // NRIC is not valid. Comment out the line below to remove the message before submission.
+            System.out.println("NRIC not found.");
         }
-
         return null; // Placeholder return statement
     }
 
-    public static User login(List<User> users) {
-    /* REMOVED BY JORDAN - START FROM AFRESH
-        boolean status = false;
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter NRIC: ");
-        String nric = scanner.nextLine().toUpperCase();
+    public boolean logout() {
+        // This method handles user logout functionality.
+        // It clears the session state and logs out the user.
+        // This method is used to manage user logout functionality.
+        // It is used to manage user authentication and login functionality.
+        session.logout();
+        return true;
+    }
 
-        // Validate NRIC using simple string operations
-        if (!User.isValidNRIC(nric)) {
-            System.out.println("Error: Invalid NRIC format! Example of a correct format: S1234567A.");
-            return login(users); // Retry login
-        }
+    public boolean changePassword(String oldPassword, String newPassword) {
+        // This method handles password change functionality.
+        // It checks if the old password matches the current password and updates it to the new password.
+        // This method is used to manage user password change functionality.
+        // It is used to manage user authentication and login functionality.
 
-        System.out.print("Enter Password: ");
-        String password = scanner.nextLine();
-        for (User user : users) {
-            if (user.getNric().equals(nric) && user.getPwd().equals(password)) {
-                System.out.println("Login successful! Welcome, " + user.getFullName());
-                return user;
+        // Check if user is logged in first.
+        if (session.isLoggedIn()) {
+            User user = session.getLoggedInUser();
+            if (user.getPwd().equals(oldPassword)) {
+                user.setPwd(newPassword);
+                userRepository.updateUserPassword(user);
+                System.out.println("Password changed successfullyTry.");
+                // Need to call to update the data file.
+                return true;
+            } else {
+                System.out.println("Old password is incorrect.  again.");
+                return false;
             }
-            else if(user.getNric().equals(nric) && user.getPwd() != (password)){
-                status = true;
-                System.out.println("Incorrect password. Try again.");
-            }
+        } else {
+            // This shouldn't run.
+            System.out.println("User is not logged in. Please log in first.");
+            return false;
         }
-        if (status != true){
-            System.out.println("NRIC not found. Try again.");
-            status = false;
-        }
-        return login(users);
-     */
-        return null; // Placeholder return statement
     }
 }

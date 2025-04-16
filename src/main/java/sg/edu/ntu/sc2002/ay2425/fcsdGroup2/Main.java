@@ -9,6 +9,7 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.LoginView;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,8 +18,10 @@ public class Main {
          * It initializes a list of users, loads predefined users, and manages user sessions.
          * The program allows users to log in and interact with the system based on their roles.
          */
-        System.out.println("Welcome to BTO Management System");
 
+        System.out.println("Welcome to BTO Management System");
+        LoginView loginView = new LoginView();
+        /*
 
         // Fetch users from the repository, which loads from the Excel file in the constructor.
         UserRepository userRepository = new UserRepository();

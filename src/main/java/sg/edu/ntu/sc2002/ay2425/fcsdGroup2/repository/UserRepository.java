@@ -240,6 +240,13 @@ public class UserRepository {
         return allUsers;
     }
 
-
-
+    public void updateUserPassword(User userToUpdate) {
+        if (userToUpdate instanceof HDBManager) {
+            saveUsersToFile(MANAGER_FILE_PATH, managers, null, null);
+        } else if (userToUpdate instanceof HDBOfficer) {
+            saveUsersToFile(OFFICER_FILE_PATH, null, officers, null);
+        } else if (userToUpdate instanceof HDBApplicant) {
+            saveUsersToFile(APPLICANT_FILE_PATH, null, null, applicants);
+        }
+    }
 }

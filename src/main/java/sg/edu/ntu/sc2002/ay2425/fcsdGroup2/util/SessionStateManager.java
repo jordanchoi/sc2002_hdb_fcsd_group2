@@ -18,7 +18,7 @@ public class SessionStateManager {
     private static final SessionStateManager instance = new SessionStateManager();
 
     private User loggedInUser;
-    private Enumeration<UserRoles> loggedInUserType;
+    private UserRoles loggedInUserType;
     private boolean isLoggedIn;
 
     // private constructor to prevent instantiation
@@ -31,9 +31,10 @@ public class SessionStateManager {
     }
 
     // Set current logged in user
-    public void login(User user) {
+    public void login(User user, UserRoles userType) {
         this.loggedInUser = user;
         this.isLoggedIn = true;
+        this.loggedInUserType = userType;
     }
 
     // Clear session
@@ -53,11 +54,11 @@ public class SessionStateManager {
     }
 
     // Get current logged in user type
-    public Enumeration<UserRoles> getLoggedInUserType() {
+    public UserRoles getLoggedInUserType() {
         return this.loggedInUserType;
     }
     // Set current logged in user type
-    public void setLoggedInUserType(Enumeration<UserRoles> loggedInUserType) {
+    public void setLoggedInUserType(UserRoles loggedInUserType) {
         this.loggedInUserType = loggedInUserType;
     }
 }
