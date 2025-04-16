@@ -1,11 +1,13 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2;
 
 import java.util.List;
+import java.util.Optional;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
 public class Main {
@@ -34,6 +36,14 @@ public class Main {
         }
         for (HDBManager manager : managers) {
             System.out.println("Manager: " + manager.toString());
+        }
+
+        // Try writing to the file by adding users
+        userRepository.addUser(new HDBApplicant("Jordan Choi", "S9876543J", 28, MaritalStatus.MARRIED, "PasswordTest"));
+
+        Optional<User> testUser = userRepository.getUserByNric("S9876543J");
+        if (testUser.isPresent()) {
+            System.out.println(testUser.toString());
         }
 
         // PASSED ABOVE.

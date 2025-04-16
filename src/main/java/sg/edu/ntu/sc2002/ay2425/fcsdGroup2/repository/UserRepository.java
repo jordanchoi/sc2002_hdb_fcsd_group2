@@ -3,12 +3,14 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.FileIO;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // For Read & Write
 /**
@@ -39,8 +41,6 @@ public class UserRepository {
         loadUsersFromFile(MANAGER_FILE_PATH, "Manager");
         loadUsersFromFile(OFFICER_FILE_PATH, "Officer");
         loadUsersFromFile(APPLICANT_FILE_PATH, "Applicant");
-
-        // Placeholder to call the load method
     }
 
     // Constructors with managers, officers, applicants passed in
@@ -48,6 +48,10 @@ public class UserRepository {
         this.managers = managers;
         this.officers = officers;
         this.applicants = applicants;
+
+        loadUsersFromFile(MANAGER_FILE_PATH, "Manager");
+        loadUsersFromFile(OFFICER_FILE_PATH, "Officer");
+        loadUsersFromFile(APPLICANT_FILE_PATH, "Applicant");
     }
 
     // Getters & Setters
@@ -78,7 +82,11 @@ public class UserRepository {
         // This method should be called in the constructor to initialize the lists
         // For example, using Apache POI or any other library to read Excel files
 
-        List<List<String>> data = FileIO.readExcelFile(filePath);
+        // Commented out because this only read original data file
+        //List<List<String>> data = FileIO.readExcelFile(filePath);
+
+        // This reads both original and local data file
+        List<List<String>> data = FileIO.readMergedExcelFile(filePath);
 
         int managerId = 0, officerId = 0, applicantId = 0;
 
@@ -102,5 +110,99 @@ public class UserRepository {
             }
         }
     }
+
+    // Save User to Data File
+    private void saveUsersToFile(String filePath, List<HDBManager> managers, List<HDBOfficer> officers, List<HDBApplicant> applicants) {
+        List<List<String>> data = new ArrayList<>();
+
+        // Check file path and populate data accordingly
+        if (filePath.equals(MANAGER_FILE_PATH)) {
+            // Prepare manager data
+            for (HDBManager manager : managers) {
+                List<String> row = new ArrayList<>();
+                row.add(manager.getFirstName());
+                row.add(manager.getNric());
+                row.add(String.valueOf(manager.getAge()));
+                row.add(manager.getMaritalStatus().name());
+                row.add(manager.getPwd());
+                data.add(row);
+            }
+        } else if (filePath.equals(OFFICER_FILE_PATH)) {
+            // Prepare officer data
+            for (HDBOfficer officer : officers) {
+                List<String> row = new ArrayList<>();
+                row.add(officer.getFirstName());
+                row.add(officer.getNric());
+                row.add(String.valueOf(officer.getAge()));
+                row.add(officer.getMaritalStatus().name());
+                row.add(officer.getPwd());
+                data.add(row);
+            }
+        } else if (filePath.equals(APPLICANT_FILE_PATH)) {
+            // Prepare applicant data
+            for (HDBApplicant applicant : applicants) {
+                List<String> row = new ArrayList<>();
+                row.add(applicant.getFirstName());
+                row.add(applicant.getNric());
+                row.add(String.valueOf(applicant.getAge()));
+                row.add(applicant.getMaritalStatus().name());
+                row.add(applicant.getPwd());
+                data.add(row);
+            }
+        }
+
+        // Write to Excel file using FileIO utility
+        FileIO.writeExcelFile(filePath, data);
+    }
+
+    // Allow user to add users not within the data file to the List, call saveUsersToFile() to save.
+    public void addUser(User user) {
+        if (user instanceof HDBManager) {
+            HDBManager manager = (HDBManager) user;
+            managers.add(manager);
+        } else if (user instanceof HDBOfficer) {
+            HDBOfficer officer = (HDBOfficer) user;
+            officers.add(officer);
+        } else if (user instanceof HDBApplicant) {
+            HDBApplicant applicant = (HDBApplicant) user;
+            applicants.add(applicant);
+        }
+        // Save the updated list to the file
+        if (user instanceof HDBManager) {
+            saveUsersToFile(MANAGER_FILE_PATH, managers, null, null);
+        } else if (user instanceof HDBOfficer) {
+            saveUsersToFile(OFFICER_FILE_PATH, null, officers, null);
+        } else if (user instanceof HDBApplicant) {
+            saveUsersToFile(APPLICANT_FILE_PATH, null, null, applicants);
+        }
+    }
+
+    // Retrieve a user by NRIC, looping through the lists of managers, officers, and applicants.
+    // We will search in applicants first, then officers, and finally managers, since it's more likely that applicants will be required.
+    // This is a simple search, and can be improved with a more efficient data structure if needed. O(n)
+    // Returns an Optional<User> to handle the case where no user is found with the given NRIC.
+    // This method can also be used to check if a user exists in the system.
+    // This method is useful for login and other operations where we need to find a user by their NRIC.
+
+    public Optional<User> getUserByNric(String nric) {
+        for (HDBManager manager : managers) {
+            if (manager.getNric().equals(nric)) {
+                return Optional.of(manager);
+            }
+        }
+        for (HDBOfficer officer : officers) {
+            if (officer.getNric().equals(nric)) {
+                return Optional.of(officer);
+            }
+        }
+        for (HDBApplicant applicant : applicants) {
+            if (applicant.getNric().equals(nric)) {
+                return Optional.of(applicant);
+            }
+        }
+        return Optional.empty();
+    }
+
+
 
 }
