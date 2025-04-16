@@ -21,6 +21,7 @@ public class Main {
 
         System.out.println("Welcome to BTO Management System");
         LoginView loginView = new LoginView();
+        loginView.start();
         /*
 
         // Fetch users from the repository, which loads from the Excel file in the constructor.

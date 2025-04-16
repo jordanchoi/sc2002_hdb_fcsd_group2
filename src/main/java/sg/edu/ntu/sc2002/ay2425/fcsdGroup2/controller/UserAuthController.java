@@ -22,9 +22,23 @@ public class UserAuthController {
     // This is a repository class that handles user data storage and retrieval.
     // It is used to manage user data and perform CRUD operations on user data.
 
+    // Convert to Singleton
+    private static UserAuthController instance;
+
     // This is a static instance of the UserRepository class.
     private final UserRepository userRepository = new UserRepository();
     private final SessionStateManager session = SessionStateManager.getInstance();
+
+    // Private constructor to prevent instantiation
+    private UserAuthController() {}
+
+    // Public accessor
+    public static UserAuthController getInstance() {
+        if (instance == null) {
+            instance = new UserAuthController();
+        }
+        return instance;
+    }
 
     // This method handles user login and authentication.
     public User login(String nric, String password) {
