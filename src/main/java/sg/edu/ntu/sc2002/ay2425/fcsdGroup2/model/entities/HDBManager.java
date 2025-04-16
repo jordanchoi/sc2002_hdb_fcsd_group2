@@ -46,9 +46,12 @@ public class HDBManager extends User {
         return null;
     }
 
-    public BTOProj getCurrentProj() {
-        if (managedProjs.isEmpty()) return null;
-        return managedProjs.get(managedProjs.size() - 1);
+    public List<BTOProj> getCurrentProj() {
+        List<BTOProj> result = new ArrayList<>();
+        for (int i = 0; i < managedProjs.size(); i++) {
+            result.add(managedProjs.get(i));
+        }
+        return result;
     }
 
     public boolean canBeAssigned() {

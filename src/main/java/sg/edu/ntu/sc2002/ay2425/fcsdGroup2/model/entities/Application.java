@@ -1,5 +1,6 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
 
 
 public class Application {

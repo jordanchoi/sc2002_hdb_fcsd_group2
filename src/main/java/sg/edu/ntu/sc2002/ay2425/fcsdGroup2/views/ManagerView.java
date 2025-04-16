@@ -69,7 +69,6 @@ public class ManagerView implements UserView {
             case 4:
                 // Manage All Enquiries
                 System.out.println("Managing All Enquiries...");
-                break;
             case 5:
                 // View All Projects
                 System.out.println("Viewing All Projects...");
