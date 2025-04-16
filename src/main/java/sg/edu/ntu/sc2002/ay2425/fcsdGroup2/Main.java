@@ -2,6 +2,8 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2;
 
 import java.util.List;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
@@ -12,13 +14,15 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.LoginView;
 
 public class Main {
+    private static final Logger logger = LogManager.getLogger(Main.class);
+
     public static void main(String[] args) {
         /*
          * The main method serves as the entry point for the BTO Management System.
          * It initializes a list of users, loads predefined users, and manages user sessions.
          * The program allows users to log in and interact with the system based on their roles.
          */
-
+        logger.info("✅ Log4j config loaded!");
         System.out.println("Welcome to BTO Management System");
         LoginView loginView = new LoginView();
         loginView.start();
