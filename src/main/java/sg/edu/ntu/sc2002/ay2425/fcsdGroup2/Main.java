@@ -19,6 +19,7 @@ public class Main {
          */
         System.out.println("Welcome to BTO Management System");
 
+
         // Fetch users from the repository, which loads from the Excel file in the constructor.
         UserRepository userRepository = new UserRepository();
 
@@ -39,7 +40,7 @@ public class Main {
         }
 
         // Try writing to the file by adding users
-        userRepository.addUser(new HDBApplicant("Jordan Choi", "S9876543J", 28, MaritalStatus.MARRIED, "PasswordTest"));
+        userRepository.addUser(new HDBApplicant("Jordan Chua", "S9876555J", 28, MaritalStatus.MARRIED, "PasswordTest"));
 
         Optional<User> testUser = userRepository.getUserByNric("S9876543J");
         if (testUser.isPresent()) {
@@ -47,7 +48,6 @@ public class Main {
         }
 
         // PASSED ABOVE.
-
 
         /* START AFRESH - REMOVED BY JORDAN - REVIEW IF THE CODE IS OK WHOEVER IS DOING
         List<User> users = new ArrayList<>();

@@ -157,14 +157,11 @@ public class UserRepository {
 
     // Allow user to add users not within the data file to the List, call saveUsersToFile() to save.
     public void addUser(User user) {
-        if (user instanceof HDBManager) {
-            HDBManager manager = (HDBManager) user;
+        if (user instanceof HDBManager manager) {
             managers.add(manager);
-        } else if (user instanceof HDBOfficer) {
-            HDBOfficer officer = (HDBOfficer) user;
+        } else if (user instanceof HDBOfficer officer) {
             officers.add(officer);
-        } else if (user instanceof HDBApplicant) {
-            HDBApplicant applicant = (HDBApplicant) user;
+        } else if (user instanceof HDBApplicant applicant) {
             applicants.add(applicant);
         }
         // Save the updated list to the file
@@ -201,6 +198,46 @@ public class UserRepository {
             }
         }
         return Optional.empty();
+    }
+
+    // Overloaded method to get user by NRIC and role
+    // This method can be used to check if a user exists in the system with a specific role.
+    // This is useful for login and other operations where we need to find a user by their NRIC and role.
+
+    public Optional<User> getUserByNric(String nric, String role) {
+        if (role.equals("Applicant")) {
+            for (HDBApplicant applicant : applicants) {
+                if (applicant.getNric().equals(nric)) {
+                    return Optional.of(applicant);
+                }
+            }
+        } else if (role.equals("Officer")) {
+            for (HDBOfficer officer : officers) {
+                if (officer.getNric().equals(nric)) {
+                    return Optional.of(officer);
+                }
+            }
+        } else if (role.equals("Manager")) {
+            for (HDBManager manager : managers) {
+                if (manager.getNric().equals(nric)) {
+                    return Optional.of(manager);
+                }
+            }
+        }
+        // nothing found
+        return Optional.empty();
+    }
+
+    // Combines the list of managers, officers, and applicants into a single list of users.
+    // This method can be used to get all users in the system, regardless of their role.
+    // This is for displaying all users in the system or performing operations on all users.
+
+    public List<User> getAllUsers() {
+        List<User> allUsers = new ArrayList<>();
+        allUsers.addAll(managers);
+        allUsers.addAll(officers);
+        allUsers.addAll(applicants);
+        return allUsers;
     }
 
 
