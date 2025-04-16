@@ -8,13 +8,13 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import java.util.Scanner;
 
 public class LoginView {
-    private String username;
+    private String nric;
     private String password;
     UserAuthController controller = UserAuthController.getInstance();
     SessionStateManager session = SessionStateManager.getInstance();
 
     public LoginView() {
-        this.username = "";
+        this.nric = "";
         this.password = "";
     }
 
@@ -24,7 +24,7 @@ public class LoginView {
         while (loginAttempts > 0 && session.isLoggedIn() == false) {
             displayLoginScreen();
             handleUserInput();
-            if (controller.login(username, password) != null) {
+            if (controller.login(nric, password) != null) {
                 System.out.println("Login successful!\n");
                 // Proceed to the next screen or functionality
                 if (session.getLoggedInUserType() == UserRoles.APPLICANT) {
@@ -38,10 +38,11 @@ public class LoginView {
                 } else if (session.getLoggedInUserType() == UserRoles.MANAGER) {
                     // Redirect to BTO Officer View
                     System.out.println("Redirecting to Manager View..\n");
-                    System.out.println("Welcome! Manager " + session.getLoggedInUser().getFirstName());
+                    ManagerView managerView = new ManagerView();
+                    managerView.run();
                 }
             } else {
-                System.out.println("Invalid username or password.\n");
+                System.out.println("Invalid NRIC or password.\n");
                 if (loginAttempts > 1) {
                     System.out.println("Please try again.\n");
                 }
@@ -52,20 +53,20 @@ public class LoginView {
     }
 
     public void displayLoginScreen() {
-        System.out.println("Please enter your username and password to login.\n");
+        System.out.println("Please enter your NRIC and password to login.\n");
     }
 
     public void handleUserInput() {
         // Logic to handle user input for login
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Username: ");
-        this.username = scanner.nextLine();
+        System.out.print("NRIC: ");
+        this.nric = scanner.nextLine();
         System.out.print("Password: ");
         this.password = scanner.nextLine();
     }
 
-    public String getUsername() {
-        return username;
+    public String getNric() {
+        return nric;
     }
 
     public String getPassword() {

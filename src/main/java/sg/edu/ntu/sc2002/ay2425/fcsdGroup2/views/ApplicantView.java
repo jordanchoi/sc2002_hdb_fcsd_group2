@@ -12,7 +12,8 @@ public class ApplicantView implements UserView {
     }
 
     @Override
-    public void handleUserInput() {
-
+    public int handleUserInput() {
+        // placeholder return statement
+        return 0;
     }
 }
