@@ -22,7 +22,6 @@ public class Main {
          * It initializes a list of users, loads predefined users, and manages user sessions.
          * The program allows users to log in and interact with the system based on their roles.
          */
-        logger.info("✅ Log4j config loaded!");
         System.out.println("Welcome to BTO Management System");
         LoginView loginView = new LoginView();
         loginView.start();
