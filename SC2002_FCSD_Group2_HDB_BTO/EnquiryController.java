@@ -2,41 +2,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnquiryController {
-    private List<Enquiry> enquiries = new ArrayList<>();
-    private int nextId = 1;
+    private List<Enquiry> enquiries;
 
-    public void createEnquiry(String msg) {
-        Enquiry e = new Enquiry(nextId++, msg);
-        enquiries.add(e);
+    public EnquiryController() {
+        this.enquiries = new ArrayList<>();
     }
 
-    public Enquiry viewEnquiry(int id) {
+    public void createEnquiry(String msg, HDBApplicant applicant, BTOProj project) {
+        Enquiry newEnquiry = new Enquiry(msg, applicant, project);
+        enquiries.add(newEnquiry);
+    }
+
+    public Enquiry getEnquiryById(int id) {
         for (Enquiry e : enquiries) {
-            if (e.getEnquiryId() == id) {
-                return e;
-            }
+            if (e.getEnquiryId() == id) return e;
         }
         return null;
     }
 
-    public void updateEnquiry(int id, String reply) {
-        Enquiry e = viewEnquiry(id);
+    public boolean addMessage(int id, String msg, User sender) {
+        Enquiry e = getEnquiryById(id);
         if (e != null) {
-            e.setReply(reply);
-        }
-    }
-
-    public boolean deleteEnquiry(int id) {
-        for (int i = 0; i < enquiries.size(); i++) {
-            if (enquiries.get(i).getEnquiryId() == id) {
-                enquiries.remove(i);
-                return true; 
-            }
+            e.addMessage(msg, sender);
+            return true;
         }
         return false;
     }
 
-    public List<Enquiry> listEnquiry() {
-        return enquiries;
+    public boolean editMessageById(int enquiryId, int messageId, User currentUser, String newContent) {
+        Enquiry e = getEnquiryById(enquiryId);
+        if (e != null) {
+            return e.editMessageById(messageId, currentUser, newContent);
+        }
+        return false;
+    }
+    
+    
+
+    public boolean deleteEnquiry(int id) {
+        Enquiry e = getEnquiryById(id);
+        if (e != null) {
+            enquiries.remove(e);
+            return true;
+        }
+        return false;
+    }
+
+    public List<Enquiry> listEnquiries() {
+        return new ArrayList<>(enquiries);
+    }
+
+    public List<Enquiry> getEnquiriesByApplicant(HDBApplicant applicant) {
+        List<Enquiry> applicantEnquiries = new ArrayList<>();
+        for (Enquiry e : enquiries) {
+            if (e.getMadeBy().equals(applicant)) {
+                applicantEnquiries.add(e);
+            }
+        }
+        return applicantEnquiries;
     }
 }

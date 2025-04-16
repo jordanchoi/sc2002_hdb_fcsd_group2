@@ -4,7 +4,7 @@ class HDBOfficer extends User {
     private BTOProj projectsHandled;
 
     public HDBOfficer(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
-        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
+        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus, new OfficerCanApply());
         this.projectsHandled = projectsHandled; // initialize subclass field
     }
 

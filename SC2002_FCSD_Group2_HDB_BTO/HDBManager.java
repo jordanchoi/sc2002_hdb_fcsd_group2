@@ -8,7 +8,7 @@ public class HDBManager extends User {
     private List<BTOProj> managedProjs;
 
     public HDBManager(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus, int managerId) {
-        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
+        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus, new CantApply());
         this.managerId = managerId;
         managedProjs = new ArrayList<>();
     }

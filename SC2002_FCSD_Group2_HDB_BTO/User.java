@@ -9,8 +9,9 @@ public abstract class User {
     protected String middleName;
     protected int age;
     protected MaritalStatus maritalStatus;
+    protected CanApplyFlat canApplyStrategy;
     
-    public User(int userId, String nric, String password, String firstName, String lastName, String middleName, int age, MaritalStatus maritalStatus) {
+    public User(int userId, String nric, String password, String firstName, String lastName, String middleName, int age, MaritalStatus maritalStatus, CanApplyFlat strategy) {
         this.userId = userId;
         this.nric = nric;
         this.password = password;
@@ -19,8 +20,12 @@ public abstract class User {
         this.middleName = middleName;
         this.age = age;
         this.maritalStatus = maritalStatus;
+        this.canApplyStrategy = strategy;
     }
 
+    public boolean canApply(BTOProj project) {
+        return canApplyStrategy.canApply(this, project);
+    }
 
     public int getUserId() {
         return userId;

@@ -1,39 +1,147 @@
 import java.util.ArrayList;
 import java.util.List;
-
+import Enumeration.ApplicationStatus;
 import Enumeration.MaritalStatus;
 
 class HDBApplicant extends User {
-    private BTOProj appliedProject;
-    private String applicationStatus;
-    private List<Enquiry> enquiries;
+    private Application currentApplication;
+
+    public Application getCurrentApplication() {
+        return currentApplication;
+    }
+
+    public void setCurrentApplication(Application currentApplication) {
+        this.currentApplication = currentApplication;
+    }
 
     public HDBApplicant(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
-        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
-        this.applicationStatus = "Pending";
-        this.enquiries = new ArrayList<>();
+        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus, new ApplicantCanApply());
+        this.currentApplication = null;
     }
-    /* 
-    @Override
-    public void viewProjects() {
-        System.out.println(name + " is viewing available BTO projects...");
-        for (BTOProj project : BTOProj.getAllProjects()) {
-            if (project.isVisible()) {
-                System.out.println("- " + project.getProjectName() + " (" + project.getNeighborhood() + ")");
+
+   public void applyForProject(BTOProj project) {
+        if (this.currentApplication != null) {
+            if (this.currentApplication.getStatusEnum() == ApplicationStatus.Unsuccessful || this.currentApplication.getStatusEnum() == ApplicationStatus.Withdrawn) {
+                this.currentApplication = new Application(this, project);
+                System.out.println("Application submitted successfully for project: " + project.getProjName());
+                return;
+            }
+            System.out.println("You already have an ongoing application.");
+            return;
+        }
+    
+        this.currentApplication = new Application(this, project);
+        System.out.println("Application submitted successfully for project: " + project.getProjName());
+    }
+    
+
+    public String viewApplicationDetails() {
+        if (this.currentApplication == null) {
+            return "No application found for this applicant.";
+        }
+
+        StringBuilder details = new StringBuilder();
+        details.append("Application ID: ").append(currentApplication.getAppId()).append("\n");
+        details.append("Project: ").append(currentApplication.getAppliedProj().getProjName()).append("\n");
+        details.append("Application Status: ").append(currentApplication.getStatus()).append("\n");
+
+        if (currentApplication.getFlat() != null) {
+            details.append("Chosen Flat: ")
+                   .append("Block ").append(currentApplication.getFlat().getBlock().getBlkNo()).append(", ")
+                   .append(currentApplication.getFlat().getBlock().getStreetAddr()).append(", ")
+                   .append("Postal Code: ").append(currentApplication.getFlat().getBlock().getPostalCode()).append(", ")
+                   .append(currentApplication.getFlat().getFloorUnit()).append("\n");
+        } else {
+            details.append("Chosen Flat: N/A\n");
+        }
+        
+        return details.toString();
+    }
+
+    public ApplicationStatus getApplicationStatus(){
+        return currentApplication.getStatusEnum();
+    }
+
+    public List<Enquiry> getApplicantEnquiries(EnquiryController enquiryController) {
+        return enquiryController.getEnquiriesByApplicant(this);
+    }
+
+    public List<BTOProj> getEligibleProjs() {
+        List<BTOProj> allProjs = BTORepository.getAllProjs();
+        List<BTOProj> eligibleProjects = new ArrayList<>();
+    
+        for (BTOProj project : allProjs) {
+            if (this.canApplyStrategy.canApply(this, project)) {
+                eligibleProjects.add(project);
             }
         }
-    }*/
+        return eligibleProjects;
+    }
 
-    @Override
-    public void viewMenu(){
-        System.out.println("\n=== Applicant Menu ===");
-        System.out.println("1. View available BTO projects");
-        System.out.println("2. Apply for a BTO project");
-        System.out.println("3. View applied project status");
-        System.out.println("4. Withdraw application");
-        System.out.println("5. Submit enquiry");
-        System.out.println("6. View/Edit/Delete enquiries");
-        System.out.println("7. Change password");
-        System.out.println("8. Logout");
+
+    public boolean canSelectFlat(String chosenFlatType) {
+        if (this.currentApplication == null || this.currentApplication.getStatusEnum() != ApplicationStatus.Successful) {
+            return false;
+        }
+    
+        if (this.getMaritalStatus() == MaritalStatus.Married) {
+            return true; 
+        } else if (this.getMaritalStatus() == MaritalStatus.Single) {
+            return "2-Room".equals(chosenFlatType);
+        }
+    
+        return false;
+    }
+    
+
+    public List<Enquiry> getMyEnquiries(EnquiryController enquiryController) {
+        return enquiryController.getEnquiriesByApplicant(this);
+    }
+
+    public void submitEnquiry(EnquiryController enquiryController, String message, BTOProj project) {
+        enquiryController.createEnquiry(message, this, project);
+    }
+
+    public void submitExistingEnquiry(EnquiryController enquiryController, int enquiryId, String newMessage) {
+        Enquiry enquiry = enquiryController.getEnquiryById(enquiryId);  // Get the existing enquiry
+        if (enquiry != null) {
+            enquiry.addMessage(newMessage, this); // Add the new message to the enquiry
+            System.out.println("Message added successfully to the enquiry.");
+        } else {
+            System.out.println("Enquiry not found.");
+        }
+    }
+
+    public boolean editEnquiryMessage(EnquiryController enquiryController, int enquiryId, int messageId, String newMessage) {
+        Enquiry enquiry = enquiryController.getEnquiryById(enquiryId);
+        if (enquiry != null) {
+            return enquiry.editMessageById(messageId, this, newMessage);  // sender check happens inside
+        }
+        return false;
+    }
+    
+
+    public void removeEnquiry(EnquiryController enquiryController, int enquiryID) {
+        enquiryController.deleteEnquiry(enquiryID);
+    }
+
+    public void withdrawApplication() {
+        if (this.currentApplication == null) {
+            System.out.println("You do not have an ongoing application.");
+            return;
+        }
+
+        if (this.currentApplication.getStatusEnum() == ApplicationStatus.Withdrawn) {
+            System.out.println("This application has already been withdrawn.");
+            return;
+        }
+
+        if (this.currentApplication.getStatusEnum() == ApplicationStatus.withdrawRequested) {
+            System.out.println("This application has already been requested to withdraw.");
+            return;
+        }
+
+        this.currentApplication.requestWithdrawal();
+        System.out.println("Withdrawal request has been made for application ID: " + currentApplication.getAppId());
     }
 }

@@ -2,23 +2,33 @@ import Enumeration.ApplicationStatus;
 
 public class Application {
     private static int idCounter = 1;
-
     private int applicationID;
     private HDBApplicant applicant;
     private BTOProj project;
     private ApplicationStatus status;
     private FlatType flatType;
+    private Flat flatBooked;
+    private ApplicationStatus previousStatus;
 
-    // Constructor
-    public Application(HDBApplicant applicant, BTOProj project, ApplicationStatus status, FlatType flatType) {
+    Application(HDBApplicant applicant, BTOProj project){
         this.applicationID = idCounter++;
         this.applicant = applicant;
         this.project = project;
-        this.status = status;
-        this.flatType = flatType;
+        this.status = ApplicationStatus.Pending;
+        this.flatType = null;
     }
 
-    // Getters
+
+    public void approve(){
+        this.status = ApplicationStatus.Successful;
+    }
+    public void reject(){
+        this.status = ApplicationStatus.Unsuccessful;
+    }
+    public void booked(){
+        this.status = ApplicationStatus.Booked;
+    }
+
     public int getAppId() {
         return applicationID;
     }
@@ -27,37 +37,33 @@ public class Application {
         return applicant;
     }
 
-    public BTOProj getProject() {
-        return project;
+    public ApplicationStatus getStatusEnum() {
+        return this.status;
+    }
+
+    public BTOProj getAppliedProj(){
+        return this.project;
     }
 
     public FlatType getFlatType() {
-        return flatType;
+        return this.flatType;
     }
 
-    public ApplicationStatus getStatusEnum() {
-        return status;
+    public Flat getFlat() {
+        return this.flatBooked;
     }
 
-    // Methods
-    public void approve() {
-        this.status = ApplicationStatus.Successful;
-    }
-    
-    public void reject() {
-        this.status = ApplicationStatus.Unsuccessful;
-    }
-    
-    public void booked() {
-        this.status = ApplicationStatus.Booked;
+    public void requestWithdrawal() {
+        this.previousStatus = this.status;
+        this.status = ApplicationStatus.withdrawRequested;
     }
 
     public void approveWithdrawal() {
         this.status = ApplicationStatus.Withdrawn;
     }
 
-    public void requestWithdrawal() {
-        this.status = ApplicationStatus.withdrawRequested;
+    public void rejectWithdrawal() {
+        this.status = this.previousStatus;
     }
 
     public String getStatus() {
