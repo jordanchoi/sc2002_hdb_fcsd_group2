@@ -10,8 +10,8 @@ import java.util.Scanner;
 public class LoginView {
     private String nric;
     private String password;
-    UserAuthController controller = UserAuthController.getInstance();
-    SessionStateManager session = SessionStateManager.getInstance();
+    private UserAuthController controller = UserAuthController.getInstance();
+    private SessionStateManager session = SessionStateManager.getInstance();
 
     public LoginView() {
         this.nric = "";

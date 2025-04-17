@@ -17,8 +17,8 @@ public class ManagerView implements UserView {
      * user information.
      */
 
-    SessionStateManager session = SessionStateManager.getInstance();
-    UserAuthController controller = UserAuthController.getInstance();
+    private SessionStateManager session = SessionStateManager.getInstance();
+    private UserAuthController controller = UserAuthController.getInstance();
 
     public ManagerView() {
         // Constructor logic if needed
