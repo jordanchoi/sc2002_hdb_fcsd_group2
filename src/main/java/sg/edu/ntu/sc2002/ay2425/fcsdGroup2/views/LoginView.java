@@ -39,7 +39,7 @@ public class LoginView {
                     // Redirect to BTO Officer View
                     System.out.println("Redirecting to Manager View..\n");
                     ManagerView managerView = new ManagerView();
-                    managerView.run();
+                    managerView.start();
                 }
             } else {
                 System.out.println("Invalid NRIC or password.\n");

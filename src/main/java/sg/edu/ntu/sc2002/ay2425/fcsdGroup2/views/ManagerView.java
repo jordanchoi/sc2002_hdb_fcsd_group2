@@ -24,19 +24,19 @@ public class ManagerView implements UserView {
         // Constructor logic if needed
     }
 
-    public void run() {
-        System.out.println("Welcome! Manager " + session.getLoggedInUser().getFirstName());
+    public void start() {
+        System.out.println("Welcome! Manager " + session.getLoggedInUser().getFirstName() + "!\nYou are in the Manager Main Menu.\n");
         int choice = 0;
         do {
             displayMenu();
             choice = handleUserInput();
         } while (choice != 10); // Assuming 10 is the exit option
-
     }
 
 
     @Override
     public void displayMenu() {
+        System.out.println("What would you like to do?\n");
         System.out.println("1. Manage BTO Exercises");
         System.out.println("2. Manage BTO Projects");
         System.out.println("3. Manage BTO Applications");
@@ -49,44 +49,41 @@ public class ManagerView implements UserView {
 
     @Override
     public int handleUserInput() {
-        System.out.print("Please select an option: ");
+        System.out.print("\nPlease select an option: ");
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
 
         switch (choice) {
-            case 1:
+            case 1-> {
                 // Manage BTO Exercises
                 System.out.println("Managing BTO Exercises...");
-                break;
-            case 2:
+                BTOExercisesView exercisesView = new BTOExercisesView();
+                exercisesView.start();
+            } case 2-> {
                 // Manage BTO Projects
                 System.out.println("Managing BTO Projects...");
-                break;
-            case 3:
+            } case 3-> {
                 // Manage BTO Applications
                 System.out.println("Managing BTO Applications...");
-                break;
-            case 4:
+            } case 4-> {
                 // Manage All Enquiries
                 System.out.println("Managing All Enquiries...");
-            case 5:
+            } case 5-> {
                 // View All Projects
                 System.out.println("Viewing All Projects...");
-                break;
-            case 6:
+            } case 6-> {
                 // Change Password
                 System.out.println("Changing Password...");
                 //changePassword();
-                break;
-            case 7:
+            } case 7-> {
                 // Logout
                 System.out.println("Logging out...");
                 session.logout();
-                break; // Exit the menu
-            case 10:
+            } case 10-> {
                 // Exit
+                session.logout();
                 System.out.println("Exiting...");
-                break; // Exit the menu
+            }
         }
         return choice;
     }
