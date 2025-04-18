@@ -39,5 +39,13 @@ public class HDBBTOExerciseController {
         return new ArrayList<>(exercises); // Return a copy to avoid direct modification
     }
 
+    public boolean isExerciseIdUnique(int id) {
+        for (BTOExercise exercise : viewAllExercises()) {
+            if (exercise.getExerciseId() == id) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

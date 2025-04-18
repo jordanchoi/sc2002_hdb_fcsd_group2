@@ -78,12 +78,12 @@ public class BTOExercisesView implements UserView {
         }
 
         System.out.println("=== List of All BTO Exercises ===");
-        System.out.printf("%-4s %-20s %-12s %-10s%n",
+        System.out.printf("%-4s %-22s %-12s %-10s%n",
                 "ID", "Name", "Status", "Applicants");
         System.out.println("-------------------------------------------------");
 
         for (BTOExercise exercise : exerciseList) {
-            System.out.printf("%-4d %-20s %-12s %-10d%n",
+            System.out.printf("%-4d %-22s %-12s %-10d%n",
                     exercise.getExerciseId(),
                     exercise.getExerciseName(),
                     exercise.getProjStatus(),
@@ -92,40 +92,90 @@ public class BTOExercisesView implements UserView {
     }
 
     // Option 2
-    public void createBTOExercise(HDBBTOExerciseController exerciseController){
+    public void createBTOExercise(HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter Exercise ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+        // Exercise ID (validated)
+        int id;
+        while (true) {
+            System.out.print("Enter Exercise ID: ");
+            if (scanner.hasNextInt()) {
+                id = scanner.nextInt();
+                scanner.nextLine(); // consume newline
 
-        System.out.print("Enter Exercise Name: ");
-        String name = scanner.nextLine();
+                if (exerciseController.isExerciseIdUnique(id)) {
+                    break;
+                } else {
+                    System.out.println("This Exercise ID already exists. Please enter a unique ID.");
+                }
 
-        System.out.print("Enter Total Applicants: ");
-        int totalApplicants = scanner.nextInt();
-        scanner.nextLine();
-
-        ProjStatus status = null;
-        System.out.println("Select Project Status:");
-        System.out.println("1. OPEN");
-        System.out.println("2. CLOSED");
-        System.out.println("3. BOOKING");
-        System.out.println("4. COMPLETED");
-        System.out.print("Enter your choice (1-4): ");
-        int choice = scanner.nextInt();
-        switch (choice) {
-            case 1 -> status = ProjStatus.OPEN;
-            case 2 -> status = ProjStatus.CLOSED;
-            case 3 -> status = ProjStatus.BOOKING;
-            case 4 -> status = ProjStatus.COMPLETED;
-            default -> System.out.println("Invalid choice. Defaulting to OPEN.");
+            } else {
+                System.out.println("Invalid input. Please enter a valid integer.");
+                scanner.nextLine(); // clear invalid input
+            }
         }
 
-        List<BTOProj> ProjList = new ArrayList<>();
+        // Exercise Name (non-empty)
+        String name;
+        while (true) {
+            System.out.print("Enter Exercise Name: ");
+            name = scanner.nextLine().trim();
+            if (!name.isEmpty()) break;
+            System.out.println("Exercise name cannot be empty. Please try again.");
+        }
 
-        exerciseController.createExercise(id, name, totalApplicants, status, ProjList);
-        System.out.println("\nExercise created.");
+        // Total Applicants (non-negative)
+        int totalApplicants;
+        while (true) {
+            System.out.print("Enter Total Applicants: ");
+            if (scanner.hasNextInt()) {
+                totalApplicants = scanner.nextInt();
+                scanner.nextLine(); // consume newline
+                if (totalApplicants >= 0) break;
+                else System.out.println("Total applicants cannot be negative.");
+            } else {
+                System.out.println("Invalid input. Please enter a non-negative integer.");
+                scanner.nextLine(); // discard invalid input
+            }
+        }
+
+        // Status selection
+        ProjStatus status = null;
+        while (status == null) {
+            System.out.println("Select Project Status:");
+            System.out.println("1. OPEN");
+            System.out.println("2. CLOSED");
+            System.out.println("3. BOOKING");
+            System.out.println("4. COMPLETED");
+            System.out.print("Enter your choice (1-4): ");
+
+            if (scanner.hasNextInt()) {
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                switch (choice) {
+                    case 1 -> status = ProjStatus.OPEN;
+                    case 2 -> status = ProjStatus.CLOSED;
+                    case 3 -> status = ProjStatus.BOOKING;
+                    case 4 -> status = ProjStatus.COMPLETED;
+                    default -> System.out.println("Invalid choice. Please enter a number between 1 and 4.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+        }
+
+        // Create empty project list
+        List<BTOProj> projList = new ArrayList<>();
+
+        // Create the exercise
+        exerciseController.createExercise(id, name, totalApplicants, status, projList);
+        System.out.println("\nExercise created successfully.");
+    }
+
+    public void INSERTDUMMYVALUE(HDBBTOExerciseController exerciseController) {
+        List<BTOProj> projList = new ArrayList<>();
+        exerciseController.createExercise(1, "Bedok Green", 500, ProjStatus.OPEN, projList);
     }
 
 
