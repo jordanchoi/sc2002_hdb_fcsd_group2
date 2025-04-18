@@ -6,6 +6,7 @@ import java.util.List;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 public class BTOProjsController {
@@ -13,6 +14,8 @@ public class BTOProjsController {
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
     public BTOProjsController() {}
+    private boolean projectsLoaded = false;
+    private final BTORepository btoRepo = new BTORepository();
 
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;
@@ -158,6 +161,18 @@ public class BTOProjsController {
             }
         }
         return true;
+    }
+
+    public void insertProjectsFromRepo() {
+        List<BTOProj> repoProjects = new ArrayList<>(btoRepo.getAllProjects());
+        for (BTOProj project : repoProjects) {
+            addProject(project);
+        }
+    }
+
+    public void addProject(BTOProj project) {
+        projects.add(project);
+        System.out.println("Loaded Project ID: " + project.getProjId()); // for debug
     }
 }
 

@@ -5,9 +5,11 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.LoginView;
 
@@ -24,67 +26,6 @@ public class Main {
         LoginView loginView = new LoginView();
         loginView.start();
 
-/*
-        // TESTING FOR BTORepository - fetching projects & exercises. - Initial test passed.
-        // Initialize repository (this triggers loading from Excel)
-        BTORepository repo = new BTORepository();
-
-        // Fetch loaded projects
-        List<BTOProj> projects = repo.getAllProjects();
-
-        // Check and print
-        if (projects.isEmpty()) {
-            System.out.println("X No projects loaded.");
-        } else {
-            System.out.println("Loaded " + projects.size() + " BTO project(s):");
-            for (BTOProj proj : projects) {
-                System.out.println("— " + proj.getProjId() + ": " + proj.getProjName() +
-                        " | Neighbourhood: " + proj.getProjNbh() +
-                        " | Flat Types: " + proj.getAvailableFlatTypes().size() +
-                        " | Officers: " + proj.getOfficersList().size());
-
-                for (FlatType flatType : proj.getAvailableFlatTypes()) {
-                    System.out.println("  — Flat Type: " + flatType.getTypeName() +
-                            " | Units Available: " + flatType.getUnitsAvail() +
-                            " | Price: " + flatType.getSellingPrice());
-                }
-
-                for (HDBOfficer officer : proj.getOfficersList()) {
-                    System.out.println("  — Officer: " + officer.getFirstName() +
-                            " | NRIC: " + officer.getNric() +
-                            " | Age: " + officer.getAge());
-                }
-                System.out.println(proj.toString());
-            }
-
-        }
-
-        BTORepository exRepo = new BTORepository();
-        List<BTOExercise> exercises = exRepo.getAllExercises();
-
-        if (exercises.isEmpty()) {
-            System.out.println("❌ No BTO Exercises loaded.");
-        } else {
-            System.out.println("✅ Loaded " + exercises.size() + " BTO Exercise(s):");
-            for (BTOExercise ex : exercises) {
-                System.out.println("— " + ex.getExerciseId() + ": " + ex.getExerciseName() +
-                        " | Applicants: " + ex.getTotalApplicants() +
-                        " | Status: " + ex.getProjStatus() +
-                        " | Projects: " + ex.getExerciseProjs().size());
-            }
-
-            for (BTOExercise ex : exercises) {
-                System.out.println("Exercise ID: " + ex.getExerciseId() +
-                        " | Exercise Name: " + ex.getExerciseName() +
-                        " | Total Applicants: " + ex.getTotalApplicants() +
-                        " | Status: " + ex.getProjStatus());
-                for (BTOProj proj : ex.getExerciseProjs()) {
-                    System.out.println("  — Project: " + proj.getProjName() +
-                            " | Neighbourhood: " + proj.getProjNbh() +
-                            " | Flat Types: " + proj.getAvailableFlatTypes().toString() + " | Exercise Name: " + proj.getExercise().getExerciseName() + " | Manager Name: " + proj.getManagerIC().getFirstName());
-                }
-            }
-        }
         /*
 
         // Fetch users from the repository, which loads from the Excel file in the constructor.

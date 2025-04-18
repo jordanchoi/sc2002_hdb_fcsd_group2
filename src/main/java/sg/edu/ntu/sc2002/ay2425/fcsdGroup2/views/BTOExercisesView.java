@@ -70,24 +70,33 @@ public class BTOExercisesView implements UserView {
 
     // Option 1
     public void viewAllExercises(HDBBTOExerciseController exerciseController) {
-        List<BTOExercise> exerciseList = exerciseController.viewAllExercises(); // you must implement this method
+        exerciseController.insertExercisesFromRepo();
+        List<BTOExercise> exercises = exerciseController.viewAllExercises();
 
-        if (exerciseList.isEmpty()) {
+        if (exercises.isEmpty()) {
             System.out.println("No BTO exercises found.");
             return;
         }
 
-        System.out.println("=== List of All BTO Exercises ===");
-        System.out.printf("%-4s %-22s %-12s %-10s%n",
-                "ID", "Name", "Status", "Applicants");
-        System.out.println("-------------------------------------------------");
+        System.out.println("=== All BTO Exercises ===");
+        System.out.printf("%-5s %-27s %-10s %-15s %-20s%n",
+                "ID", "Name", "Status", "Applicants", "Projects");
 
-        for (BTOExercise exercise : exerciseList) {
-            System.out.printf("%-4d %-22s %-12s %-10d%n",
-                    exercise.getExerciseId(),
-                    exercise.getExerciseName(),
-                    exercise.getProjStatus(),
-                    exercise.getTotalApplicants());
+        System.out.println("----------------------------------------------------------------------------------");
+
+        for (BTOExercise ex : exercises) {
+            StringBuilder projectNames = new StringBuilder();
+            for (BTOProj proj : ex.getExerciseProjs()) {
+                if (!projectNames.isEmpty()) projectNames.append(", ");
+                projectNames.append(proj.getProjName());
+            }
+
+            System.out.printf("%-5d %-27s %-10s %-15d %-20s%n",
+                    ex.getExerciseId(),
+                    ex.getExerciseName(),
+                    ex.getProjStatus(),
+                    ex.getTotalApplicants(),
+                    projectNames.toString());
         }
     }
 

@@ -53,20 +53,20 @@ public class BTOProjectsView implements UserView {
 
         switch (choice) {
             case 1-> {
-                // View BTO Exercises
+                // View BTO Project
                 System.out.println("Viewing all BTO Project...\n");
                 manageBTOProject();
             } case 2-> {
-                // Create New BTO Exercise
+                // Create New BTO Project
                 System.out.println("Creating BTO Project...\n");
                 createBTOProjects(projsController, exerciseController);
             } case 3-> {
-                // Editing BTO Exercise
+                // Editing BTO Project
                 System.out.println("Editing BTO Project...\n");
             } case 4-> {
-                // Deleting BTO Exercise
+                // Deleting BTO Project
                 System.out.println("Deleting BTO Project\n");
-                // Logic to delete a BTO exercise
+                // Logic to delete a BTO Project
             } case 5-> {
                 // View All Projects
                 System.out.println("Exiting to Main Manager Console...\n");
@@ -79,6 +79,8 @@ public class BTOProjectsView implements UserView {
 
     //Option 1
     public void viewAllProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
+        projsController.insertProjectsFromRepo();
+
         List<BTOProj> projectList = projsController.viewAllProjs();
         List<BTOExercise> exerciseList = exerciseController.viewAllExercises();
 
@@ -90,9 +92,10 @@ public class BTOProjectsView implements UserView {
         System.out.println("=== List of All BTO Projects ===");
         System.out.printf("%-5s %-22s %-12s %-12s %-8s %-15s %-10s %-10s %-15s %-15s%n",
                 "ID", "Name", "Open", "Close", "Visible", "Neighbourhood", "2-Room", "3-Room", "Exercise", "Manager IC");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------");
 
         for (BTOProj proj : projectList) {
+            // Check which exercise the project belongs to
             String exerciseName = "Unassigned";
             for (BTOExercise exercise : exerciseList) {
                 for (BTOProj p : exercise.getExerciseProjs()) {
@@ -106,10 +109,7 @@ public class BTOProjectsView implements UserView {
             int twoRoom = proj.getFlatUnits().getOrDefault(FlatTypes.TWO_ROOM, 0);
             int threeRoom = proj.getFlatUnits().getOrDefault(FlatTypes.THREE_ROOM, 0);
 
-            // Manager in charge
-            String managerName = (proj.getManagerIC() != null)
-                    ? proj.getManagerIC().getFirstName()
-                    : "N/A";
+            String managerName = (proj.getManagerIC() != null) ? proj.getManagerIC().getFirstName() : "N/A";
 
             System.out.printf("%-5d %-22s %-12s %-12s %-8s %-15s %-10d %-10d %-15s %-15s%n",
                     proj.getProjId(),
@@ -165,7 +165,7 @@ public class BTOProjectsView implements UserView {
                 id = scanner.nextInt();
                 scanner.nextLine(); // consume newline
 
-                // ✅ Ask controller to check for uniqueness
+                // Ask controller to check for uniqueness
                 if (projsController.isProjectIdUnique(id)) {
                     break; // valid and unique
                 } else {
@@ -328,4 +328,6 @@ public class BTOProjectsView implements UserView {
             }
         } while (choice != 4);
     }
+
+
 }

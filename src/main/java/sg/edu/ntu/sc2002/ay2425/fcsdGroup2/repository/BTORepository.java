@@ -180,6 +180,8 @@ public class BTORepository implements BTOStorageProvider {
                 e.printStackTrace();
             }
         }
+
+        System.out.println("Loaded " + exercises.size() + " exercises from file.");
     }
 
 

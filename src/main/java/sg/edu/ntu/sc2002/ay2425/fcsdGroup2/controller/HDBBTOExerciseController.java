@@ -2,12 +2,14 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOExercise;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HDBBTOExerciseController {
     private List<BTOExercise> exercises = new ArrayList<>();
+    private final BTORepository btoRepo = new BTORepository();
 
     // Create a new exercise
     public HDBBTOExerciseController() {}
@@ -48,4 +50,15 @@ public class HDBBTOExerciseController {
         return true;
     }
 
+    public void insertExercisesFromRepo() {
+        List<BTOExercise> repoExercises = new ArrayList<>(btoRepo.getAllExercises());
+        for (BTOExercise exercise : repoExercises) {
+            addExercise(exercise); // controller’s method that stores it in-memory or triggers logic
+        }
+    }
+
+    public void addExercise(BTOExercise exercise) {
+        exercises.add(exercise);
+        System.out.println(exercise.getExerciseId());
+    }
 }

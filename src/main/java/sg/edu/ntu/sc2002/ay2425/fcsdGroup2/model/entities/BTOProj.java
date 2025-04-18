@@ -389,7 +389,4 @@ public class BTOProj {
     public void setExercise(BTOExercise exercise) {
         this.exercise = exercise;
     }
-
-
-
 }
