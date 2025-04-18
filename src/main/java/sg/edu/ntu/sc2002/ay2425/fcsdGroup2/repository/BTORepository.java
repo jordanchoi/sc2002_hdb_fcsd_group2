@@ -206,16 +206,77 @@ public class BTORepository implements BTOStorageProvider {
 
     @Override
     public void saveProject() {
+        List<List<String>> rows = new ArrayList<>();
 
+        for (BTOProj proj : projects) {
+            List<String> row = new ArrayList<>();
+
+            // Column indices based on loading
+            row.add(proj.getProjName());
+            row.add(proj.getProjNbh().name());
+
+            // Type 1
+            FlatType type1 = proj.getAvailableFlatTypes().size() > 0 ? proj.getAvailableFlatTypes().get(0) : null;
+            row.add(type1 != null ? type1.getTypeName() : "");
+            row.add(type1 != null ? String.valueOf(type1.getTotalUnits()) : "");
+            row.add(type1 != null ? String.valueOf(type1.getSellingPrice()) : "");
+
+            // Type 2
+            FlatType type2 = proj.getAvailableFlatTypes().size() > 1 ? proj.getAvailableFlatTypes().get(1) : null;
+            row.add(type2 != null ? type2.getTypeName() : "");
+            row.add(type2 != null ? String.valueOf(type2.getTotalUnits()) : "");
+            row.add(type2 != null ? String.valueOf(type2.getSellingPrice()) : "");
+
+            row.add(String.valueOf(convertLocalDateToExcelDate(proj.getAppOpenDate().toLocalDate())));
+            row.add(String.valueOf(convertLocalDateToExcelDate(proj.getAppCloseDate().toLocalDate())));
+
+            row.add(proj.getManagerIC() != null ? proj.getManagerIC().getFirstName() : "");
+            row.add(String.valueOf(proj.getOfficerSlots()));
+
+            StringBuilder officers = new StringBuilder();
+            for (HDBOfficer o : proj.getOfficersList()) {
+                if (!officers.isEmpty()) officers.append(",");
+                officers.append(o.getFirstName());
+            }
+            row.add(officers.toString());
+
+            rows.add(row);
+        }
+
+        FileIO.writeExcelFile(PROJECTS_FILE_PATH, rows);
     }
 
     @Override
     public void saveExercise() {
+        List<List<String>> rows = new ArrayList<>();
 
+        for (BTOExercise ex : exercises) {
+            List<String> row = new ArrayList<>();
+            row.add(String.valueOf(ex.getExerciseId()));        // 0
+            row.add(ex.getExerciseName());                     // 1
+            row.add(String.valueOf(ex.getTotalApplicants()));  // 2
+            row.add(ex.getProjStatus().name());                // 3
+
+            // Save project names as comma-separated
+            StringBuilder projectNames = new StringBuilder();
+            for (BTOProj proj : ex.getExerciseProjs()) {
+                if (!projectNames.isEmpty()) projectNames.append(",");
+                projectNames.append(proj.getProjName());
+            }
+            row.add(projectNames.toString());                  // 4
+
+            rows.add(row);
+        }
+
+        FileIO.writeExcelFile(EXERCISES_FILE_PATH, rows);
     }
 
     private LocalDateTime convertExcelDateToLocalDateTime(double excelDate) {
         return LocalDate.of(1899, 12, 30).plusDays((long) excelDate).atStartOfDay();
+    }
+
+    private double convertLocalDateToExcelDate(LocalDate date) {
+        return (double) date.toEpochDay() - LocalDate.of(1899, 12, 30).toEpochDay();
     }
 
 
