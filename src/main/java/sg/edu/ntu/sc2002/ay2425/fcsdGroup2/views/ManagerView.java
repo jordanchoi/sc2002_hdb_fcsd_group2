@@ -62,7 +62,6 @@ public class ManagerView implements UserView {
             case 4 -> System.out.println("Managing All Enquiries...");
             case 5 -> {
                 System.out.println("Viewing All Projects...");
-                projectsView.viewAllProjects(projsController); // optional shortcut
             }
             case 6 -> {
                 System.out.println("Changing password...");

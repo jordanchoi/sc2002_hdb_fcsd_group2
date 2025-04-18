@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplication;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
@@ -57,15 +54,14 @@ public class BTOProjsController {
         return false; // Project not found
     }
 
-    public void toggleProjVisibility(int btoProjId, boolean visible) {
-        // This method updates the visibility status of a BTO project based on its ID.
-        // It searches the list and sets the visibility if the project is found.
-        for (BTOProj proj : projects) {
-            if (proj.getProjId() == btoProjId) {
-                proj.setVisibility(visible);
-                break;
+    public boolean toggleVisibilityById(int id) {
+        for (BTOProj proj : viewAllProjs()) {
+            if (proj.getProjId() == id) {
+                proj.setVisibility(!proj.getVisibility());
+                return true; // toggled successfully
             }
         }
+        return false; // project not found
     }
 
     public void toggleProjVisibility(BTOProj proj) {
@@ -139,6 +135,29 @@ public class BTOProjsController {
     // Not completed
     public void generateReport() {
 
+    }
+
+    public boolean isManagerAvailable(HDBManager manager, LocalDateTime newOpen, LocalDateTime newClose, List<BTOExercise> allExercises) {
+        for (BTOExercise ex : allExercises) {
+            for (BTOProj proj : ex.getExerciseProjs()) {
+                if (proj.getManagerIC() == manager) {
+                    LocalDateTime existingOpen = proj.getAppOpenDate();
+                    LocalDateTime existingClose = proj.getAppCloseDate();
+                    boolean overlaps = !newClose.isBefore(existingOpen) && !newOpen.isAfter(existingClose);
+                    if (overlaps) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean isProjectIdUnique(int id) {
+        for (BTOProj proj : viewAllProjs()) {
+            if (proj.getProjId() == id) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

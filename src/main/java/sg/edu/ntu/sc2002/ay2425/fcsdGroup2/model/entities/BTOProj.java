@@ -2,8 +2,11 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
@@ -23,6 +26,9 @@ public class BTOProj {
     private List<FlatType> flatTypesAvail;
     private List<Enquiry> enquiries;
     private List<HDBOfficer> officersList;
+<<<<<<< HEAD
+    private Map<FlatTypes, Integer> flatUnits = new HashMap<>();
+=======
     private int officerSlots;
 
     @Override
@@ -66,6 +72,7 @@ public class BTOProj {
         blocks = new ArrayList<>();
         enquiries = new ArrayList<>();
     }
+>>>>>>> fc1d97aedc9b9bf64232ce2d8e3540c87fc7a56c
 
     public BTOProj() {
         blocks = new ArrayList<>();
@@ -230,7 +237,18 @@ public class BTOProj {
         flatTypesAvail.add(type);
     }
 
+<<<<<<< HEAD
+    public void addFlatType(FlatTypes type, int units) {
+        flatUnits.put(type, units);
+    }
+
+    public Map<FlatTypes, Integer> getFlatUnits() {
+        return flatUnits;
+    }
+
+=======
     /*
+>>>>>>> fc1d97aedc9b9bf64232ce2d8e3540c87fc7a56c
     public boolean removeAvailFlatType(int typeId) {
         for (int i = 0; i < flatTypesAvail.size(); i++) {
             if (flatTypesAvail.get(i).getFlatTypeId() == typeId) {
@@ -302,6 +320,9 @@ public class BTOProj {
         return false;
     }
 
+<<<<<<< HEAD
+    public void setOfficerSlotLimit(int maxOfficerSlots) {
+=======
     public int getBtoProjId() {
         return btoProjId;
     }
@@ -376,5 +397,6 @@ public class BTOProj {
 
     public void setExercise(BTOExercise exercise) {
         this.exercise = exercise;
+>>>>>>> fc1d97aedc9b9bf64232ce2d8e3540c87fc7a56c
     }
 }
