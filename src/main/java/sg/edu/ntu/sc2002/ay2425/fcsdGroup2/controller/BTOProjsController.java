@@ -2,7 +2,10 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
@@ -164,15 +167,23 @@ public class BTOProjsController {
     }
 
     public void insertProjectsFromRepo() {
-        List<BTOProj> repoProjects = new ArrayList<>(btoRepo.getAllProjects());
-        for (BTOProj project : repoProjects) {
-            addProject(project);
+        if (!projectsLoaded) {
+            List<BTOProj> repoProjects = btoRepo.getAllProjects();
+            for (BTOProj proj : repoProjects) {
+                addProject(proj);
+            }
+            projectsLoaded = true;
         }
     }
 
     public void addProject(BTOProj project) {
         projects.add(project);
-        System.out.println("Loaded Project ID: " + project.getProjId()); // for debug
+    }
+
+    public List<BTOProj> getProjectsByManagerName(String name) {
+        return viewAllProjs().stream()
+                .filter(p -> p.getManagerIC() != null && p.getManagerIC().getFirstName() == name)
+                .collect(Collectors.toList());
     }
 }
 

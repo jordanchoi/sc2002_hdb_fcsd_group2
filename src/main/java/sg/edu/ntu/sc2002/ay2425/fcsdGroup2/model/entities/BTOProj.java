@@ -27,8 +27,7 @@ public class BTOProj {
     private List<Enquiry> enquiries;
     private List<HDBOfficer> officersList;
     private int officerSlots;
-    private Map<FlatTypes, Integer> flatUnits = new HashMap<>();
-
+    private Map<FlatTypes, FlatType> flatUnits = new HashMap<>();
     @Override
     public String toString() {
         return "BTOProj{" +
@@ -234,11 +233,11 @@ public class BTOProj {
         flatTypesAvail.add(type);
     }
 
-    public void addFlatType(FlatTypes type, int units) {
-        flatUnits.put(type, units);
+    public void addFlatTypeWithPrice(FlatTypes type, int units, float sellingPrice) {
+        flatUnits.put(type, new FlatType(type.name(), units, sellingPrice));
     }
 
-    public Map<FlatTypes, Integer> getFlatUnits() {
+    public Map<FlatTypes, FlatType> getFlatUnits() {
         return flatUnits;
     }
 
