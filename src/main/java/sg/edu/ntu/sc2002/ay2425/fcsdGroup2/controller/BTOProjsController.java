@@ -12,13 +12,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 public class BTOProjsController {
-    private List<BTOProj> projects;
+    private List<BTOProj> projects = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
-
-    public BTOProjsController() {
-        this.projects = new ArrayList<>(); // ✅ this prevents the crash
-    }
+    public BTOProjsController() {}
 
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;

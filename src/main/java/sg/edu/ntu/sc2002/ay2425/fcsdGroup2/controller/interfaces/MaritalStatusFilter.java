@@ -1,24 +1,19 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MaritalStatusFilter implements ReportFilter {
-    private String status;
+    private MaritalStatus maritalStatus;
 
-    public MaritalStatusFilter(String status) {
-        this.status = status;
+    public MaritalStatusFilter(MaritalStatus MaritalStatus) {
+        this.maritalStatus = maritalStatus;
     }
 
     @Override
-    public List<Application> filteredReport(List<Application> apps) {
-        List<Application> result = new ArrayList<>();
-
-        for (Application app : apps) {
-            if (app.getApplicant().getMaritalStatus().equals(status)) {
-                result.add(app);
-            }
-        }
-        return result;
+    public boolean matches(Application app) {
+        return app.getApplicant().getMaritalStatus() == maritalStatus;
     }
 }

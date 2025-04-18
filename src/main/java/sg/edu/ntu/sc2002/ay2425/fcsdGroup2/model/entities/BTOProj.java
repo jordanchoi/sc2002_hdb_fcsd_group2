@@ -191,7 +191,7 @@ public class BTOProj {
      * }
      **/
 
-    public List<Application> getAllApps() {
+     public List<Application> getAllApp() {
         return applications;
     }
 

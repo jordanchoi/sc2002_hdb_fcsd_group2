@@ -19,10 +19,12 @@ public class BTOExercise {
     }
 
     // Overloaded constructor
-    public BTOExercise(int id, String name) {
+    public BTOExercise(int id, String name, int totalApplicants, ProjStatus status, List<BTOProj> projects) {
         this.exerciseId = id;
         this.exerciseName = name;
-        this.projects = new ArrayList<>();
+        this.totalApplicants = totalApplicants;
+        this.status = status;
+        this.projects = projects;
     }
 
     // Getters
@@ -66,4 +68,9 @@ public class BTOExercise {
     public void setExerciseProjs(List<BTOProj> exerciseProjs) {
         this.projects = exerciseProjs;
     }
+
+    public void addProject(BTOProj proj) {
+        projects.add(proj);
+    }
+
 }
