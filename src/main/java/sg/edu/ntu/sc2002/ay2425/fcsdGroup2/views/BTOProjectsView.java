@@ -90,7 +90,7 @@ public class BTOProjectsView implements UserView {
         System.out.println("=== List of All BTO Projects ===");
         System.out.printf("%-5s %-22s %-12s %-12s %-8s %-15s %-10s %-10s %-15s %-15s%n",
                 "ID", "Name", "Open", "Close", "Visible", "Neighbourhood", "2-Room", "3-Room", "Exercise", "Manager IC");
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
 
         for (BTOProj proj : projectList) {
             String exerciseName = "Unassigned";
@@ -273,7 +273,7 @@ public class BTOProjectsView implements UserView {
         newProj.addFlatType(FlatTypes.TWO_ROOM, twoRoomUnits);
         newProj.addFlatType(FlatTypes.THREE_ROOM, threeRoomUnits);
         newProj.setManagerIC(manager);
-        newProj.setOfficerSlotLimit(maxOfficerSlots);
+        newProj.setOfficerSlots(maxOfficerSlots);
 
         // Step 9: Link to Exercise
         selectedExercise.addProject(newProj);

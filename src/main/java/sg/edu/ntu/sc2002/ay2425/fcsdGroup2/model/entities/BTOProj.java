@@ -2,8 +2,11 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
@@ -24,6 +27,7 @@ public class BTOProj {
     private List<Enquiry> enquiries;
     private List<HDBOfficer> officersList;
     private int officerSlots;
+    private Map<FlatTypes, Integer> flatUnits = new HashMap<>();
 
     @Override
     public String toString() {
@@ -230,6 +234,14 @@ public class BTOProj {
         flatTypesAvail.add(type);
     }
 
+    public void addFlatType(FlatTypes type, int units) {
+        flatUnits.put(type, units);
+    }
+
+    public Map<FlatTypes, Integer> getFlatUnits() {
+        return flatUnits;
+    }
+
     /*
     public boolean removeAvailFlatType(int typeId) {
         for (int i = 0; i < flatTypesAvail.size(); i++) {
@@ -377,4 +389,7 @@ public class BTOProj {
     public void setExercise(BTOExercise exercise) {
         this.exercise = exercise;
     }
+
+
+
 }
