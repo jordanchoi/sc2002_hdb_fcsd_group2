@@ -16,6 +16,10 @@ public class BTOProjsController {
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
 
+    public BTOProjsController() {
+        this.projects = new ArrayList<>(); // ✅ this prevents the crash
+    }
+
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;
         this.managers = m;

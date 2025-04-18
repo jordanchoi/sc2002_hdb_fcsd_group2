@@ -1,10 +1,14 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
-import java.util.Scanner;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 
+import java.util.List;
+import java.util.Scanner;
+import java.time.LocalDateTime;
 public class ManagerView implements UserView {
     /*
      * This class is responsible for displaying the manager menu and handling user input.
@@ -19,6 +23,7 @@ public class ManagerView implements UserView {
 
     private SessionStateManager session = SessionStateManager.getInstance();
     private UserAuthController controller = UserAuthController.getInstance();
+    private BTOProjsController projsController = new BTOProjsController();
 
     public ManagerView() {
         // Constructor logic if needed
@@ -52,16 +57,14 @@ public class ManagerView implements UserView {
         System.out.print("\nPlease select an option: ");
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
-
         switch (choice) {
             case 1-> {
                 // Manage BTO Exercises
                 System.out.println("Managing BTO Exercises...");
-                BTOExercisesView exercisesView = new BTOExercisesView();
-                exercisesView.start();
             } case 2-> {
                 // Manage BTO Projects
                 System.out.println("Managing BTO Projects...");
+                manageProjects(projsController);
             } case 3-> {
                 // Manage BTO Applications
                 System.out.println("Managing BTO Applications...");
@@ -71,6 +74,7 @@ public class ManagerView implements UserView {
             } case 5-> {
                 // View All Projects
                 System.out.println("Viewing All Projects...");
+                viewAllProjects(projsController);
             } case 6-> {
                 // Change Password
                 System.out.println("Changing Password...");
@@ -86,5 +90,75 @@ public class ManagerView implements UserView {
             }
         }
         return choice;
+    }
+
+    // Option 2
+    public void manageProjects(BTOProjsController projsController){
+        while (true) {
+            System.out.println("\n=== BTO Project Management ===");
+            System.out.println("1. Create BTO Project");
+            System.out.println("2. Edit BTO Project");
+            System.out.println("3. Delete BTO Project");
+            System.out.println("0. Back to Main Menu");
+            System.out.print("Select an option: ");
+            Scanner scanner = new Scanner(System.in);
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Project ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.print("Enter Project Name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter Project Open Year-Month-Day (e.g., 2025-01-01): ");
+                    String openDateStr = scanner.nextLine();
+                    System.out.print("Enter Project Close Year-Month-Day (e.g., 2025-12-31): ");
+                    String closeDateStr = scanner.nextLine();
+                    System.out.print("Is project visible? (true/false): ");
+                    boolean visible = scanner.nextBoolean();
+
+                    LocalDateTime open = LocalDateTime.parse(openDateStr + "T00:00:00");
+                    LocalDateTime close = LocalDateTime.parse(closeDateStr + "T23:59:59");
+
+                    projsController.CreateProj(id, name, open, close, visible);
+                    System.out.println("Project created.");
+                    return;
+
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 0:
+
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    //Option 5
+    public void viewAllProjects(BTOProjsController projsController){
+        List<BTOProj> projectList = projsController.viewAllProjs();
+        if (projectList.isEmpty()) {
+            System.out.println("No BTO projects found.");
+            return;
+        }
+
+        System.out.println("\n=== List of All BTO Projects ===");
+        System.out.printf("%-5s %-20s %-18s %-18s %-10s%n",
+                "ID", "Name", "Open Date", "Close Date", "Visible");
+        System.out.println("----------------------------------------------------------------------");
+
+        // Project list
+        for (BTOProj proj : projectList) {
+            System.out.printf("%-5d %-20s %-18s %-18s %-10s%n",
+                    proj.getProjId(),
+                    proj.getProjName(),
+                    proj.getAppOpenDate().toLocalDate(),
+                    proj.getAppCloseDate().toLocalDate(),
+                    proj.getVisibility());
+        }
     }
 }
