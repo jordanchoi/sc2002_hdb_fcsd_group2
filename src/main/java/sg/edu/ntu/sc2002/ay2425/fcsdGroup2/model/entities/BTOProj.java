@@ -11,7 +11,6 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
 
-
 public class BTOProj {
     private int btoProjId;
     private String projectName;
@@ -19,8 +18,7 @@ public class BTOProj {
     private LocalDateTime appCloseDate;
     private boolean isVisible;
     private ProjStatus status;
-
-    private List<MaritalStatus> openTo;
+    private BTOExercise exercise;
     private Neighbourhoods neighbourhood;
     private HDBManager managerIC;
     private List<Block> blocks;
@@ -28,10 +26,55 @@ public class BTOProj {
     private List<FlatType> flatTypesAvail;
     private List<Enquiry> enquiries;
     private List<HDBOfficer> officersList;
+<<<<<<< HEAD
     private Map<FlatTypes, Integer> flatUnits = new HashMap<>();
+=======
+    private int officerSlots;
+
+    @Override
+    public String toString() {
+        return "BTOProj{" +
+                "btoProjId=" + btoProjId +
+                ", projectName='" + projectName + '\'' +
+                ", appOpenDate=" + appOpenDate +
+                ", appCloseDate=" + appCloseDate +
+                ", isVisible=" + isVisible +
+                ", status=" + status +
+                ", neighbourhood=" + neighbourhood +
+                ", managerIC=" + managerIC +
+                ", blocks=" + blocks +
+                ", applications=" + applications +
+                ", flatTypesAvail=" + flatTypesAvail +
+                ", enquiries=" + enquiries +
+                ", officersList=" + officersList +
+                ", officerSlots=" + officerSlots +
+                '}';
+    }
+
+    // Constructor for loading from file
+    public BTOProj(int id, String name, Neighbourhoods nbh, List<FlatType> flatTypesAvail, LocalDateTime open, LocalDateTime close, HDBManager manager, int officerSlots, List<HDBOfficer> officerList) {
+        this.btoProjId = id;
+        this.projectName = name;
+        this.neighbourhood = nbh;
+        this.flatTypesAvail = flatTypesAvail;
+        this.appOpenDate = open;
+        this.appCloseDate = close;
+        this.managerIC = manager;
+        this.officerSlots = officerSlots;
+        this.officersList = officerList;
+
+        this.isVisible = open.isBefore(LocalDateTime.now()) && close.isAfter(LocalDateTime.now()) ? true : false;
+        this.status = open.isBefore(LocalDateTime.now()) && close.isAfter(LocalDateTime.now()) ? ProjStatus.OPEN : ProjStatus.CLOSED;
+
+
+        // Need to fetch all these from file for persistent storage - placeholder for now, empty list
+        applications = new ArrayList<>();
+        blocks = new ArrayList<>();
+        enquiries = new ArrayList<>();
+    }
+>>>>>>> fc1d97aedc9b9bf64232ce2d8e3540c87fc7a56c
 
     public BTOProj() {
-        openTo = new ArrayList<>();
         blocks = new ArrayList<>();
         applications = new ArrayList<>();
         flatTypesAvail = new ArrayList<>();
@@ -80,24 +123,6 @@ public class BTOProj {
 
     public void setAppCloseDate(LocalDateTime datetime) {
         this.appCloseDate = datetime;
-    }
-
-    // Marital Status eligibility
-    public List<MaritalStatus> getOpenTo() {
-        return openTo;
-    }
-
-    public void setOpenTo(List<MaritalStatus> list) {
-        this.openTo = list;
-    }
-
-    public void addOpenTo(MaritalStatus status) {
-        if (!openTo.contains(status))
-            openTo.add(status);
-    }
-
-    public void removeOpenTo(MaritalStatus status) {
-        openTo.remove(status);
     }
 
     // Visibility
@@ -212,6 +237,7 @@ public class BTOProj {
         flatTypesAvail.add(type);
     }
 
+<<<<<<< HEAD
     public void addFlatType(FlatTypes type, int units) {
         flatUnits.put(type, units);
     }
@@ -220,6 +246,9 @@ public class BTOProj {
         return flatUnits;
     }
 
+=======
+    /*
+>>>>>>> fc1d97aedc9b9bf64232ce2d8e3540c87fc7a56c
     public boolean removeAvailFlatType(int typeId) {
         for (int i = 0; i < flatTypesAvail.size(); i++) {
             if (flatTypesAvail.get(i).getFlatTypeId() == typeId) {
@@ -229,6 +258,7 @@ public class BTOProj {
         }
         return false;
     }
+    */
 
     // Enquiries
     public List<Enquiry> getAllEnquiries() {
@@ -290,6 +320,83 @@ public class BTOProj {
         return false;
     }
 
+<<<<<<< HEAD
     public void setOfficerSlotLimit(int maxOfficerSlots) {
+=======
+    public int getBtoProjId() {
+        return btoProjId;
+    }
+
+    public void setBtoProjId(int btoProjId) {
+        this.btoProjId = btoProjId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public void setAppOpenDate(LocalDateTime appOpenDate) {
+        this.appOpenDate = appOpenDate;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
+
+    public ProjStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProjStatus status) {
+        this.status = status;
+    }
+
+    public Neighbourhoods getNeighbourhood() {
+        return neighbourhood;
+    }
+
+    public void setNeighbourhood(Neighbourhoods neighbourhood) {
+        this.neighbourhood = neighbourhood;
+    }
+
+    public List<Application> getApplications() {
+        return applications;
+    }
+
+    public List<FlatType> getFlatTypesAvail() {
+        return flatTypesAvail;
+    }
+
+    public void setFlatTypesAvail(List<FlatType> flatTypesAvail) {
+        this.flatTypesAvail = flatTypesAvail;
+    }
+
+    public List<Enquiry> getEnquiries() {
+        return enquiries;
+    }
+
+    public int getOfficerSlots() {
+        return officerSlots;
+    }
+
+    public void setOfficerSlots(int officerSlots) {
+        this.officerSlots = officerSlots;
+    }
+
+    public BTOExercise getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(BTOExercise exercise) {
+        this.exercise = exercise;
+>>>>>>> fc1d97aedc9b9bf64232ce2d8e3540c87fc7a56c
     }
 }
