@@ -172,11 +172,4 @@ public class BTOExercisesView implements UserView {
         exerciseController.createExercise(id, name, totalApplicants, status, projList);
         System.out.println("\nExercise created successfully.");
     }
-
-    public void INSERTDUMMYVALUE(HDBBTOExerciseController exerciseController) {
-        List<BTOProj> projList = new ArrayList<>();
-        exerciseController.createExercise(1, "Bedok Green", 500, ProjStatus.OPEN, projList);
-    }
-
-
 }
