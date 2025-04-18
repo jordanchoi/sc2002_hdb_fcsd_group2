@@ -1,10 +1,14 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
+
 public interface canApplyFlat {
-    /**
-     * This method checks if the applicant is eligible to apply for a flat.
+    /*
+     * This method checks if the user can apply for a flat.
      *
-     * @return true if the applicant is eligible, false otherwise
+     * @return true if the user can apply for a flat, false otherwise.
      */
-    boolean canApplyFlat();
+    public boolean checkEligibility();
+    public boolean submitApplication();
+    public Application applyFlat();
 }
