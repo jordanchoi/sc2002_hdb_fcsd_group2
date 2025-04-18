@@ -11,7 +11,26 @@ public class FlatType {
     private int unitsBooked;
     private int unitsAvail;
     private List<Flat> flats;
+    private BTOProj inProj;
+    private float sellingPrice;
 
+    // Constructor for Given Data in Provided Excel File
+
+    // This constructor is used to create a FlatType object with the given parameters
+    public FlatType(int id, String name, int totalUnits, float sellingPrice) {
+        this.flatTypeId = id;
+        this.typeName = name;
+        this.sqm = (name.equals("2-Room Flat") ? 45 : name.equals("3-Room Flat") ? 65 : name.equals("4-Room Flat") ? 93 : name.equals("5-Room Flat") ? 110 : 0);
+        this.totalUnits = totalUnits;
+        this.unitsBooked = 0;
+        this.unitsAvail = this.totalUnits-unitsBooked;
+        this.sellingPrice = sellingPrice;
+
+        this.flats = new ArrayList<>();
+
+        // need to initialize the flats for FlatType
+
+    }
     // Constructor 1
     public FlatType(int id, String name, int sqm, int totalUnits) {
         this.flatTypeId = id;
@@ -111,4 +130,21 @@ public class FlatType {
     private void recalculateAvailability() {
         this.unitsAvail = totalUnits - unitsBooked;
     }
+
+    public BTOProj getInProj() {
+        return inProj;
+    }
+
+    public void setInProj(BTOProj inProj) {
+        this.inProj = inProj;
+    }
+
+    public float getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public void setSellingPrice(float sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
+
 }

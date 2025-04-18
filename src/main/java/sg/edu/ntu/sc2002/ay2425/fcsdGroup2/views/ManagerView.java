@@ -30,7 +30,7 @@ public class ManagerView implements UserView {
         do {
             displayMenu();
             choice = handleUserInput();
-        } while (choice != 10); // Assuming 10 is the exit option
+        } while (choice != 10 && choice != 7); // Assuming 10 is the exit option
     }
 
 
@@ -82,6 +82,7 @@ public class ManagerView implements UserView {
             } case 10-> {
                 // Exit
                 session.logout();
+                System.exit(0);
                 System.out.println("Exiting...");
             }
         }
