@@ -64,7 +64,8 @@ public class ManagerView implements UserView {
                 System.out.println("Viewing All Projects...");
             }
             case 6 -> {
-                System.out.println("Changing Password...");
+                System.out.println("Changing password...");
+                changePassword();
             }
             case 7 -> {
                 System.out.println("Logging out...");
@@ -76,5 +77,32 @@ public class ManagerView implements UserView {
             }
         }
         return choice;
+    }
+
+    public void changePassword() {
+        Scanner scanner = new Scanner(System.in);
+
+        // Change Password Attempt Count
+        int attempts = 3;
+
+        do {
+            System.out.println("You have " + attempts + " attempts left to change your password.");
+            System.out.print("Please enter your current password: ");
+            String currentPassword = scanner.next();
+
+            if (!controller.validatePassword(currentPassword)) {
+                System.out.println("Current password is incorrect. Please try again.");
+                attempts--;
+            } else {
+                System.out.print("Please enter your new password: ");
+                String newPassword = scanner.next();
+                if (controller.changePassword(currentPassword, newPassword)) {
+                    System.out.println("Password changed successfully!");
+                } else {
+                    System.out.println("Failed to change password.");
+                }
+                break;
+            }
+        } while (attempts > 0);
     }
 }

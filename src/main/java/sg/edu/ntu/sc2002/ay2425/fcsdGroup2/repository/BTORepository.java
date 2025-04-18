@@ -184,7 +184,6 @@ public class BTORepository implements BTOStorageProvider {
         System.out.println("Loaded " + exercises.size() + " exercises from file.");
     }
 
-
     @Override
     public List<BTOProj> getAllProjects() {
         return projects;
@@ -254,10 +253,10 @@ public class BTORepository implements BTOStorageProvider {
 
         for (BTOExercise ex : exercises) {
             List<String> row = new ArrayList<>();
-            row.add(String.valueOf(ex.getExerciseId()));        // 0
-            row.add(ex.getExerciseName());                     // 1
-            row.add(String.valueOf(ex.getTotalApplicants()));  // 2
-            row.add(ex.getProjStatus().name());                // 3
+            row.add(String.valueOf(ex.getExerciseId()));
+            row.add(ex.getExerciseName());
+            row.add(String.valueOf(ex.getTotalApplicants()));
+            row.add(ex.getProjStatus().name());
 
             // Save project names as comma-separated
             StringBuilder projectNames = new StringBuilder();
@@ -265,7 +264,7 @@ public class BTORepository implements BTOStorageProvider {
                 if (!projectNames.isEmpty()) projectNames.append(",");
                 projectNames.append(proj.getProjName());
             }
-            row.add(projectNames.toString());                  // 4
+            row.add(projectNames.toString());
 
             rows.add(row);
         }
