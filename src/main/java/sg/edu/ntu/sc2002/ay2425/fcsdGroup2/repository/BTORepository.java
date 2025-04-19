@@ -39,104 +39,107 @@ public class BTORepository implements BTOStorageProvider {
 
     private void loadProjectsFromFile(String filePath) {
         List<List<String>> data = FileIO.readMergedExcelFile(filePath);
-        Logger logger = LogManager.getLogger(BTORepository.class);
 
         if (data == null || data.isEmpty()) {
-            logger.debug("Data is null or empty – file not read or no content.");
+            System.out.println("There are no projects in the file.");
             return;
         }
 
-        for (int i = 0; i < data.size(); i++) {
-            List<String> row = data.get(i);
+        // Counter for projectId
+        int projectIdCounter = 1;
 
-            try {
-                // === Column 0: Project Name ===
-                String projectName = row.get(0);
-
-                // === Column 1: Neighbourhood ===
-                Neighbourhoods neighborhood;
-                try {
-                    neighborhood = Neighbourhoods.valueOf(row.get(1).toUpperCase());
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Unknown neighbourhood: " + row.get(1));
-                    continue;
-                }
-
-                // === Column 8–9: Dates ===
-                double excelDateOpen = Double.parseDouble(row.get(8));
-                double excelDateClose = Double.parseDouble(row.get(9));
-                LocalDateTime appOpenDate = convertExcelDateToLocalDateTime(excelDateOpen);
-                LocalDateTime appCloseDate = convertExcelDateToLocalDateTime(excelDateClose).withHour(23).withMinute(59).withSecond(59);
-
-                // === Column 10: Manager ===
-                Optional<User> manager = userRepo.getUserByName(row.get(10), UserRoles.MANAGER);
-                HDBManager assignedManager = manager.isPresent() ? (HDBManager) manager.get() : null;
-
-                // === Column 11: Officer Slot Limit ===
-                int officerSlot = 0;
-                try {
-                    officerSlot = (int) Double.parseDouble(row.get(11));
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid officer slot value in row " + i + ": " + row.get(11));
-                    continue;
-                }
-
-                // === Column 12: Officer List ===
-                List<HDBOfficer> officerList = new ArrayList<>();
-                String officerString = row.get(12);
-                if (!officerString.isEmpty()) {
-                    String[] officerNames = officerString.split(",");
-                    for (String name : officerNames) {
-                        Optional<User> user = userRepo.getUserByName(name.trim(), UserRoles.OFFICER);
-                        user.ifPresent(u -> officerList.add((HDBOfficer) u));
-                    }
-                }
-
-                // === Create project with empty flat type list ===
-                BTOProj project = new BTOProj(i, projectName, neighborhood, new ArrayList<>(), appOpenDate, appCloseDate, assignedManager, officerSlot, officerList);
-
-                // === Flat Type 1 ===
-                boolean type1Valid = !row.get(2).isEmpty() && !row.get(3).isEmpty() && !row.get(4).isEmpty();
-                if (type1Valid) {
-                    try {
-                        FlatTypes type1 = FlatTypes.fromDisplayName(row.get(2));
-                        int units1 = (int) Double.parseDouble(row.get(3));
-                        float price1 = (float) Double.parseDouble(row.get(4));
-                        project.addFlatTypeWithPrice(type1, units1, price1);
-                    } catch (Exception e) {
-                        System.out.println("Invalid Type 1 format at row " + i);
-                    }
-                }
-
-                // === Flat Type 2 ===
-                boolean type2Valid = !row.get(5).isEmpty() && !row.get(6).isEmpty() && !row.get(7).isEmpty();
-                if (type2Valid) {
-                    try {
-                        FlatTypes type2 = FlatTypes.fromDisplayName(row.get(5));
-                        int units2 = (int) Double.parseDouble(row.get(6));
-                        float price2 = (float) Double.parseDouble(row.get(7));
-                        project.addFlatTypeWithPrice(type2, units2, price2);
-                    } catch (Exception e) {
-                        System.out.println("Invalid Type 2 format at row " + i);
-                    }
-                }
-
-                // === Add to repository memory ===
-                projects.add(project);
-
-            } catch (Exception e) {
-                System.out.println("Error reading project at row " + i + ": " + e.getMessage());
-                e.printStackTrace();
+        for (List<String> row : data) {
+            // === Validate Project Name ===
+            String projectName = row.get(0);
+            if (projectName == null || projectName.trim().isEmpty()) {
+                System.out.println("⚠ Skipping row with invalid project name: " + row);
+                continue;
             }
+            projectName = projectName.trim();
+
+            // === Parse Neighbourhood ===
+            String projectNeighborhood = row.get(1).trim();
+            Neighbourhoods neighborhood;
+            try {
+                neighborhood = Neighbourhoods.valueOf(projectNeighborhood.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("⚠ Invalid neighbourhood: \"" + projectNeighborhood + "\" in row: " + row);
+                continue;
+            }
+
+            // === Flat Types ===
+            FlatType type1 = null;
+            FlatType type2 = null;
+
+            if (!row.get(2).isEmpty()) {
+                try {
+                    type1 = FlatTypeFactory.fromRow(row, 2); // 2-Room
+                } catch (Exception e) {
+                    System.out.println("⚠ Error parsing 2-Room: " + e.getMessage());
+                }
+            }
+
+            if (!row.get(5).isEmpty()) {
+                try {
+                    type2 = FlatTypeFactory.fromRow(row, 5); // 3-Room
+                } catch (Exception e) {
+                    System.out.println("⚠ Error parsing 3-Room: " + e.getMessage());
+                }
+            }
+
+            List<FlatType> flatTypes = new ArrayList<>();
+            if (type1 != null) flatTypes.add(type1);
+            if (type2 != null) flatTypes.add(type2);
+
+            // === Dates ===
+            LocalDateTime appOpenDate = convertExcelDateToLocalDateTime(Double.parseDouble(row.get(8)));
+            LocalDateTime appCloseDate = convertExcelDateToLocalDateTime(Double.parseDouble(row.get(9)))
+                    .withHour(23).withMinute(59).withSecond(59);
+
+            // === Manager ===
+            Optional<User> manager = userRepo.getUserByName(row.get(10), UserRoles.MANAGER);
+            HDBManager assignedManager = manager.isPresent() ? (HDBManager) manager.get() : null;
+
+            // === Officer Slot ===
+            int officerSlot = 0;
+            try {
+                officerSlot = (int) Double.parseDouble(row.get(11));
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid officer slot value: " + row.get(11));
+            }
+
+            // === Officer List ===
+            List<HDBOfficer> officerList = new ArrayList<>();
+            if (row.size() > 12 && !row.get(12).isEmpty()) {
+                String[] officerNames = row.get(12).split(",");
+                for (String name : officerNames) {
+                    Optional<User> user = userRepo.getUserByName(name.trim(), UserRoles.OFFICER);
+                    user.ifPresent(u -> officerList.add((HDBOfficer) u));
+                }
+            }
+
+            // === Create and Add Project ===
+            BTOProj project = new BTOProj(projectIdCounter++, projectName, neighborhood, flatTypes, appOpenDate, appCloseDate, assignedManager, officerSlot, officerList);
+
+
+            for (FlatType ft : new ArrayList<>(flatTypes)) {
+                try {
+                    FlatTypes type = FlatTypes.fromDisplayName(ft.getTypeName());
+                    project.addFlatTypeWithPrice(type, ft.getTotalUnits(), ft.getSellingPrice());
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Could not map flat type: " + ft.getTypeName());
+                }
+            }
+
+            projects.add(project);
+
+
         }
     }
 
 
-
     private void loadExercisesFromFile(String filePath) {
         List<List<String>> data = FileIO.readMergedExcelFile(filePath);
-
-        // column structure as follows
 
         if (data == null || data.isEmpty()) {
             System.out.println("No BTO Exercises found in file.");
@@ -159,12 +162,20 @@ public class BTORepository implements BTOStorageProvider {
 
                     // Loop through the project names and find the corresponding BTOProj objects
                     for (String projectName : projectNames) {
+                        String trimmedName = projectName.trim();
+
                         Optional<BTOProj> project = projects.stream()
-                                .filter(p -> p.getProjectName().equalsIgnoreCase(projectName.trim()))
+                                .filter(p -> p.getProjName() != null && p.getProjName().equalsIgnoreCase(trimmedName))
                                 .findFirst();
-                        project.ifPresent(projectsInExercise::add);
+
+                        if (project.isPresent()) {
+                            projectsInExercise.add(project.get());
+                        } else {
+                            System.out.println("⚠ Project name not found: " + trimmedName);
+                        }
                     }
                 }
+
                 // Create the BTOExercise object
                 BTOExercise exercise = new BTOExercise(exerciseId, exerciseName, totalApplicants, status, projectsInExercise);
                 exercises.add(exercise);
@@ -174,13 +185,14 @@ public class BTORepository implements BTOStorageProvider {
                     project.setExercise(exercise);
                 }
             } catch (Exception e) {
-                System.out.println("Error parsing exercise data: " + e.getMessage());
+                System.out.println("Error parsing exercise row: " + row);
                 e.printStackTrace();
             }
         }
 
         System.out.println("Loaded " + exercises.size() + " exercises from file.");
     }
+
 
     @Override
     public List<BTOProj> getAllProjects() {
@@ -205,37 +217,50 @@ public class BTORepository implements BTOStorageProvider {
 
     @Override
     public void saveProject() {
+        System.out.println("Saving project...");
         List<List<String>> rows = new ArrayList<>();
 
         for (BTOProj proj : projects) {
             List<String> row = new ArrayList<>();
 
-            // Column indices based on loading
+            // A - Project Name
             row.add(proj.getProjName());
-            row.add(proj.getProjNbh().name());
 
-            // Type 1
-            FlatType type1 = proj.getAvailableFlatTypes().size() > 0 ? proj.getAvailableFlatTypes().get(0) : null;
+            // B - Neighbourhood
+            row.add(proj.getProjNbh() != null ? proj.getProjNbh().name() : "");
+
+            // C-E - Type 1: Name, Units, Price
+            FlatType type1 = proj.getFlatUnits().get(FlatTypes.TWO_ROOM);
             row.add(type1 != null ? type1.getTypeName() : "");
             row.add(type1 != null ? String.valueOf(type1.getTotalUnits()) : "");
             row.add(type1 != null ? String.valueOf(type1.getSellingPrice()) : "");
 
-            // Type 2
-            FlatType type2 = proj.getAvailableFlatTypes().size() > 1 ? proj.getAvailableFlatTypes().get(1) : null;
+            // F-H - Type 2: Name, Units, Price
+            FlatType type2 = proj.getFlatUnits().get(FlatTypes.THREE_ROOM);
             row.add(type2 != null ? type2.getTypeName() : "");
             row.add(type2 != null ? String.valueOf(type2.getTotalUnits()) : "");
             row.add(type2 != null ? String.valueOf(type2.getSellingPrice()) : "");
 
+            // I - Application Open Date (Excel numeric format)
             row.add(String.valueOf(convertLocalDateToExcelDate(proj.getAppOpenDate().toLocalDate())));
+
+            // J - Application Close Date (Excel numeric format)
             row.add(String.valueOf(convertLocalDateToExcelDate(proj.getAppCloseDate().toLocalDate())));
 
+            // K - Manager
             row.add(proj.getManagerIC() != null ? proj.getManagerIC().getFirstName() : "");
+
+            // L - Officer Slot Limit
             row.add(String.valueOf(proj.getOfficerSlots()));
 
+            // M - Officers (comma separated)
             StringBuilder officers = new StringBuilder();
-            for (HDBOfficer o : proj.getOfficersList()) {
-                if (!officers.isEmpty()) officers.append(",");
-                officers.append(o.getFirstName());
+            HDBOfficer[] officerArray = proj.getOfficersList();
+            if (officerArray != null) {
+                for (HDBOfficer o : officerArray) {
+                    if (!officers.isEmpty()) officers.append(",");
+                    officers.append(o.getFirstName());
+                }
             }
             row.add(officers.toString());
 
@@ -244,6 +269,7 @@ public class BTORepository implements BTOStorageProvider {
 
         FileIO.writeExcelFile(PROJECTS_FILE_PATH, rows);
     }
+
 
     @Override
     public void saveExercise() {
@@ -277,6 +303,4 @@ public class BTORepository implements BTOStorageProvider {
     private double convertLocalDateToExcelDate(LocalDate date) {
         return (double) date.toEpochDay() - LocalDate.of(1899, 12, 30).toEpochDay();
     }
-
-
 }

@@ -1,13 +1,12 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
@@ -17,8 +16,8 @@ public class BTOProjsController {
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
     public BTOProjsController() {}
-    private boolean projectsLoaded = false;
-    private final BTORepository btoRepo = new BTORepository();
+    private BTORepository btoRepo = new BTORepository();
+    // Create a new exercise
 
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;
@@ -26,11 +25,36 @@ public class BTOProjsController {
         this.enquiries = e;
     }
 
-    public BTOProj CreateProj(int id, String name, LocalDateTime appOpenDate, LocalDateTime appCloseDate, boolean isVisible) {
-        // This method handles full creation of a BTO project.
-        // It initializes core project details and sets up empty lists for related entities.
+    public BTOProj CreateProj(
+            int id,
+            String name,
+            Neighbourhoods nbh,
+            Map<FlatTypes, FlatType> flatUnits,
+            LocalDateTime appOpenDate,
+            LocalDateTime appCloseDate,
+            boolean isVisible,
+            HDBManager manager,
+            int officerSlots,
+            HDBOfficer[] officers
+    ) {
+        // Create base project
         BTOProj proj = new BTOProj(id, name, appOpenDate, appCloseDate, isVisible);
-        projects.add(proj);
+
+        // Set core attributes
+        proj.setProjNbh(nbh);
+        proj.setManagerIC(manager);
+        proj.setOfficerSlots(officerSlots);
+        proj.setOfficersList(officers);
+
+        // Add flat types to internal map
+        for (Map.Entry<FlatTypes, FlatType> entry : flatUnits.entrySet()) {
+            FlatTypes type = entry.getKey();
+            FlatType ft = entry.getValue();
+            proj.addFlatTypeWithPrice(type, ft.getTotalUnits(), ft.getSellingPrice());
+        }
+
+        // Save into memory and persist
+        btoRepo.addProject(proj);  // this calls saveProject()
         return proj;
     }
 
@@ -167,12 +191,10 @@ public class BTOProjsController {
     }
 
     public void insertProjectsFromRepo() {
-        if (!projectsLoaded) {
-            List<BTOProj> repoProjects = btoRepo.getAllProjects();
-            for (BTOProj proj : repoProjects) {
-                addProject(proj);
-            }
-            projectsLoaded = true;
+        projects.clear();
+        List<BTOProj> repoProjects = btoRepo.getAllProjects();
+        for (BTOProj proj : repoProjects) {
+            addProject(proj);
         }
     }
 

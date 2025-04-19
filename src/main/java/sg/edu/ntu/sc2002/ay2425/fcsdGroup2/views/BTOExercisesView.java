@@ -39,33 +39,53 @@ public class BTOExercisesView implements UserView {
 
     @Override
     public int handleUserInput() {
-        System.out.print("\nPlease select an option: ");
         Scanner scanner = new Scanner(System.in);
-        int choice = scanner.nextInt();
+        int choice = -1;
+
+        while (true) {
+            System.out.print("\nPlease select an option (1–5): ");
+
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // consume leftover newline
+
+                if (choice >= 1 && choice <= 5) {
+                    break; // valid input
+                } else {
+                    System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a valid number.");
+                scanner.nextLine(); // discard invalid token
+            }
+        }
 
         switch (choice) {
-            case 1-> {
-                // View BTO Exercises
+            case 1 -> {
                 System.out.println("Viewing all BTO Exercises...\n");
                 viewAllExercises(exerciseController);
-            } case 2-> {
-                // Create New BTO Exercise
+            }
+            case 2 -> {
                 System.out.println("Creating BTO Exercise...\n");
                 createBTOExercise(exerciseController);
-            } case 3-> {
-                // Editing BTO Exercise
+            }
+            case 3 -> {
                 System.out.println("Editing BTO Exercise...\n");
-            } case 4-> {
-                // Deleting BTO Exercise
+                // TODO: Add logic
+            }
+            case 4 -> {
                 System.out.println("Deleting BTO Exercises\n");
-            } case 5-> {
-                // View All Projects
+                // TODO: Add logic
+            }
+            case 5 -> {
                 System.out.println("Exiting to Main Manager Console...\n");
             }
         }
+
         System.out.println();
         return choice;
     }
+
 
     // Option 1
     public void viewAllExercises(HDBBTOExerciseController exerciseController) {
@@ -108,7 +128,7 @@ public class BTOExercisesView implements UserView {
             System.out.print("Enter Exercise ID: ");
             if (scanner.hasNextInt()) {
                 id = scanner.nextInt();
-                scanner.nextLine();
+                scanner.nextLine(); // consume newline
 
                 if (exerciseController.isExerciseIdUnique(id)) {
                     break;
@@ -117,7 +137,7 @@ public class BTOExercisesView implements UserView {
                 }
             } else {
                 System.out.println("Invalid input. Please enter a valid integer.");
-                scanner.nextLine();
+                scanner.nextLine(); // clear buffer
             }
         }
 
@@ -150,7 +170,7 @@ public class BTOExercisesView implements UserView {
             System.out.println("2. CLOSED");
             System.out.println("3. BOOKING");
             System.out.println("4. COMPLETED");
-            System.out.print("Enter your choice (1-4): ");
+            System.out.print("Enter your choice (1–4): ");
 
             if (scanner.hasNextInt()) {
                 int choice = scanner.nextInt();
@@ -160,7 +180,7 @@ public class BTOExercisesView implements UserView {
                     case 2 -> status = ProjStatus.CLOSED;
                     case 3 -> status = ProjStatus.BOOKING;
                     case 4 -> status = ProjStatus.COMPLETED;
-                    default -> System.out.println("Invalid choice. Please enter a number between 1 and 4.");
+                    default -> System.out.println("Invalid choice. Please enter 1–4.");
                 }
             } else {
                 System.out.println("Invalid input. Please enter a number.");
@@ -168,10 +188,11 @@ public class BTOExercisesView implements UserView {
             }
         }
 
+
         List<BTOProj> projList = new ArrayList<>();
+
         exerciseController.createExercise(id, name, totalApplicants, status, projList);
 
-        System.out.println("\nExercise created successfully.");
-        exerciseController.saveAllExercisesToFile();
+        System.out.println("\nExercise created");
     }
 }

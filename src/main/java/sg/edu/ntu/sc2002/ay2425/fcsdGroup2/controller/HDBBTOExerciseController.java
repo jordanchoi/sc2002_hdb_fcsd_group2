@@ -9,24 +9,14 @@ import java.util.List;
 
 public class HDBBTOExerciseController {
     private List<BTOExercise> exercises = new ArrayList<>();
-    private final BTORepository btoRepo = new BTORepository() {
-        @Override
-        public void saveProject() {
-
-        }
-
-        @Override
-        public void saveExercise() {
-
-        }
-    };
+    private BTORepository btoRepo = new BTORepository();
 
     // Create a new exercise
     public HDBBTOExerciseController() {}
 
     public BTOExercise createExercise(int id, String name, int totalApplicants, ProjStatus status, List<BTOProj> projList) {
         BTOExercise newExercise = new BTOExercise(id, name, totalApplicants, status, projList);
-        exercises.add(newExercise);
+        btoRepo.addExercise(newExercise);
         return newExercise;
     }
 
@@ -72,5 +62,4 @@ public class HDBBTOExerciseController {
         exercises.add(exercise);
     }
 
-    public void saveAllExercisesToFile() {btoRepo.saveExercise();}
 }

@@ -11,10 +11,7 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.time.LocalDateTime;
 
 public class BTOProjectsView implements UserView {
@@ -48,31 +45,43 @@ public class BTOProjectsView implements UserView {
 
     @Override
     public int handleUserInput() {
-        System.out.print("\nPlease select an option: ");
         Scanner scanner = new Scanner(System.in);
-        int choice = scanner.nextInt();
+        int choice = -1;
+
+        while (true) {
+            System.out.print("\nPlease select an option: ");
+
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+
+                if (choice >= 1 && choice <= 5) break; // ✅ Valid range
+                else System.out.println("Invalid option. Please enter a number between 1 and 5.");
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Clear the invalid input
+            }
+        }
 
         switch (choice) {
-            case 1-> {
-                // View BTO Project
-                System.out.println("Viewing all BTO Project...\n");
+            case 1 -> {
+                System.out.println("Choose projects to view...\n");
                 manageBTOProject();
-            } case 2-> {
-                // Create New BTO Project
+            }
+            case 2 -> {
                 System.out.println("Creating BTO Project...\n");
                 createBTOProjects(projsController, exerciseController);
-            } case 3-> {
-                // Editing BTO Project
+            }
+            case 3 -> {
                 System.out.println("Editing BTO Project...\n");
-            } case 4-> {
-                // Deleting BTO Project
+            }
+            case 4 -> {
                 System.out.println("Deleting BTO Project\n");
-                // Logic to delete a BTO Project
-            } case 5-> {
-                // View All Projects
+            }
+            case 5 -> {
                 System.out.println("Exiting to Main Manager Console...\n");
             }
         }
+
         System.out.println();
         return choice;
     }
@@ -81,7 +90,6 @@ public class BTOProjectsView implements UserView {
     //Option 1
     public void viewAllProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         projsController.insertProjectsFromRepo();
-
         List<BTOProj> projectList = projsController.viewAllProjs();
         List<BTOExercise> exerciseList = exerciseController.viewAllExercises();
 
@@ -146,17 +154,30 @@ public class BTOProjectsView implements UserView {
         System.out.println("Visibility       : " + selected.getVisibility());
         System.out.println("Neighbourhood    : " + selected.getProjNbh());
 
-        FlatType twoRoom = selected.getFlatUnits().get(FlatTypes.TWO_ROOM);
-        FlatType threeRoom = selected.getFlatUnits().get(FlatTypes.THREE_ROOM);
+        // Flat type details from map
+        System.out.println("Flat Types");
 
-        System.out.println("2-Room Units     : " + (twoRoom != null ? twoRoom.getTotalUnits() : 0));
-        System.out.println("2-Room Price     : $" + (twoRoom != null ? String.format("%.2f", twoRoom.getSellingPrice()) : "0.00"));
-        System.out.println("3-Room Units     : " + (threeRoom != null ? threeRoom.getTotalUnits() : 0));
-        System.out.println("3-Room Price     : $" + (threeRoom != null ? String.format("%.2f", threeRoom.getSellingPrice()) : "0.00"));
+        List<FlatType> flatTypes = selected.getAvailableFlatTypes();
+
+        if (flatTypes == null || flatTypes.isEmpty()) {
+            System.out.println("                    None");
+        } else {
+            Set<String> printed = new HashSet<>();
+            for (FlatType type : flatTypes) {
+                String key = type.getTypeName() + ":" + type.getTotalUnits() + ":" + type.getSellingPrice();
+                if (!printed.contains(key)) {
+                    System.out.printf("  - %-12s : %d units at $%.2f%n",
+                            type.getTypeName(),
+                            type.getTotalUnits(),
+                            type.getSellingPrice());
+                    printed.add(key);
+                }
+            }
+        }
 
         System.out.println("Officer Slots    : " + selected.getOfficerSlots());
 
-        if (selected.getOfficersList() != null && !selected.getOfficersList().isEmpty()) {
+        if (selected.getOfficersList() != null && selected.getOfficersList().length > 0) {
             System.out.print("Assigned Officers: ");
             for (HDBOfficer officer : selected.getOfficersList()) {
                 System.out.print(officer.getFirstName() + " ");
@@ -167,13 +188,13 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+
     // Option 2
     public void createBTOProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
         SessionStateManager session = SessionStateManager.getInstance();
         HDBManager manager = (HDBManager) session.getLoggedInUser();
 
-        // Step 1: Select BTO Exercise
         List<BTOExercise> exercises = exerciseController.viewAllExercises();
         if (exercises.isEmpty()) {
             System.out.println("No BTO exercises found. Please create one first.");
@@ -199,7 +220,6 @@ public class BTOProjectsView implements UserView {
         scanner.nextLine();
         BTOExercise selectedExercise = exercises.get(choice - 1);
 
-        // Step 2: Project ID
         int id;
         while (true) {
             System.out.print("Enter Project ID: ");
@@ -217,7 +237,6 @@ public class BTOProjectsView implements UserView {
         System.out.print("Enter Project Name: ");
         String name = scanner.nextLine();
 
-        // Step 3: Dates
         LocalDateTime open = null, close = null;
         while (open == null) {
             try {
@@ -236,19 +255,13 @@ public class BTOProjectsView implements UserView {
             }
         }
 
-        // Step 4: Visibility
-        boolean visible = false;
-        LocalDateTime now = LocalDateTime.now();
-        if ((open.isBefore(now) || open.isEqual(now)) && (close.isAfter(now) || close.isEqual(now))) {
-            visible = true;
-        }
+        boolean visible = !open.isAfter(LocalDateTime.now()) && !close.isBefore(LocalDateTime.now());
 
         if (!projsController.isManagerAvailable(manager, open, close, exerciseController.viewAllExercises())) {
             System.out.println("\nYou are already managing a project within this time period.");
             return;
         }
 
-        // Step 5: Neighbourhood
         Neighbourhoods[] allHoods = Neighbourhoods.values();
         System.out.println("Select Neighbourhood:");
         for (int i = 0; i < allHoods.length; i++) {
@@ -271,55 +284,16 @@ public class BTOProjectsView implements UserView {
             }
         }
 
-        // Step 6: Flat Units and Selling Prices
-        int twoRoomUnits = -1, threeRoomUnits = -1;
-        float twoRoomPrice = -1, threeRoomPrice = -1;
-
-        while (twoRoomUnits < 0) {
-            System.out.print("Enter number of 2-Room units: ");
-            if (scanner.hasNextInt()) {
-                twoRoomUnits = scanner.nextInt();
-                if (twoRoomUnits < 0) System.out.println("Cannot be negative.");
-            } else {
-                System.out.println("Invalid input.");
-                scanner.nextLine();
-            }
+        Map<FlatTypes, FlatType> flatUnitMap = new HashMap<>();
+        for (FlatTypes type : FlatTypes.values()) {
+            System.out.printf("Enter number of %s units: ", type.getDisplayName());
+            int units = scanner.nextInt();
+            System.out.printf("Enter selling price for %s units: ", type.getDisplayName());
+            float price = scanner.nextFloat();
+            flatUnitMap.put(type, new FlatType(type.getDisplayName(), units, price));
         }
+        scanner.nextLine();
 
-        while (twoRoomPrice < 0) {
-            System.out.print("Enter selling price for 2-Room units: ");
-            if (scanner.hasNextFloat()) {
-                twoRoomPrice = scanner.nextFloat();
-                if (twoRoomPrice < 0) System.out.println("Cannot be negative.");
-            } else {
-                System.out.println("Invalid input.");
-                scanner.nextLine();
-            }
-        }
-
-        while (threeRoomUnits < 0) {
-            System.out.print("Enter number of 3-Room units: ");
-            if (scanner.hasNextInt()) {
-                threeRoomUnits = scanner.nextInt();
-                if (threeRoomUnits < 0) System.out.println("Cannot be negative.");
-            } else {
-                System.out.println("Invalid input.");
-                scanner.nextLine();
-            }
-        }
-
-        while (threeRoomPrice < 0) {
-            System.out.print("Enter selling price for 3-Room units: ");
-            if (scanner.hasNextFloat()) {
-                threeRoomPrice = scanner.nextFloat();
-                if (threeRoomPrice < 0) System.out.println("Cannot be negative.");
-            } else {
-                System.out.println("Invalid input.");
-                scanner.nextLine();
-            }
-        }
-
-        // Step 7: Officer Slot Input
         int officerSlots = -1;
         while (officerSlots < 0 || officerSlots > 10) {
             System.out.print("Enter number of available officer slots (max 10): ");
@@ -331,30 +305,25 @@ public class BTOProjectsView implements UserView {
                 scanner.nextLine();
             }
         }
-        scanner.nextLine(); // clear newline
+        scanner.nextLine();
 
-        // Step 8: Create Project
-        BTOProj newProj = projsController.CreateProj(id, name, open, close, visible);
-        newProj.setProjNbh(selectedNeighbourhood);
-        newProj.addFlatTypeWithPrice(FlatTypes.TWO_ROOM, twoRoomUnits, twoRoomPrice);
-        newProj.addFlatTypeWithPrice(FlatTypes.THREE_ROOM, threeRoomUnits, threeRoomPrice);
-        newProj.setManagerIC(manager);
-        newProj.setOfficerSlots(officerSlots);
+        // Create project and save
+        BTOProj newProj = projsController.CreateProj(
+                id,
+                name,
+                selectedNeighbourhood,
+                flatUnitMap,
+                open,
+                close,
+                visible,
+                manager,
+                officerSlots,
+                new HDBOfficer[0]
+        );
 
-        // Step 9: Assign Officers
-        System.out.println("Enter officer names to assign (comma-separated, max " + officerSlots + "):");
-        String[] names = scanner.nextLine().split(",");
-        int assignedCount = 0;
-        for (String n : names) {
-            Optional<User> officerUser = new UserRepository().getUserByName(n.trim(), UserRoles.OFFICER);
-            if (officerUser.isPresent() && assignedCount < officerSlots) {
-                newProj.assignOfficer((HDBOfficer) officerUser.get());
-                assignedCount++;
-            }
-        }
-
-        // Step 10: Link to Exercise
+        // Link to Exercise and save
         selectedExercise.addProject(newProj);
+        projsController.addProject(newProj);
 
         System.out.println("\nProject created and assigned to: " + selectedExercise.getExerciseName());
     }
