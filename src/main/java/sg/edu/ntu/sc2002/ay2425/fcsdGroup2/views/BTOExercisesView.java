@@ -58,7 +58,6 @@ public class BTOExercisesView implements UserView {
             } case 4-> {
                 // Deleting BTO Exercise
                 System.out.println("Deleting BTO Exercises\n");
-                // Logic to delete a BTO exercise
             } case 5-> {
                 // View All Projects
                 System.out.println("Exiting to Main Manager Console...\n");
@@ -104,27 +103,24 @@ public class BTOExercisesView implements UserView {
     public void createBTOExercise(HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
 
-        // Exercise ID (validated)
         int id;
         while (true) {
             System.out.print("Enter Exercise ID: ");
             if (scanner.hasNextInt()) {
                 id = scanner.nextInt();
-                scanner.nextLine(); // consume newline
+                scanner.nextLine();
 
                 if (exerciseController.isExerciseIdUnique(id)) {
                     break;
                 } else {
                     System.out.println("This Exercise ID already exists. Please enter a unique ID.");
                 }
-
             } else {
                 System.out.println("Invalid input. Please enter a valid integer.");
-                scanner.nextLine(); // clear invalid input
+                scanner.nextLine();
             }
         }
 
-        // Exercise Name (non-empty)
         String name;
         while (true) {
             System.out.print("Enter Exercise Name: ");
@@ -133,22 +129,20 @@ public class BTOExercisesView implements UserView {
             System.out.println("Exercise name cannot be empty. Please try again.");
         }
 
-        // Total Applicants (non-negative)
         int totalApplicants;
         while (true) {
             System.out.print("Enter Total Applicants: ");
             if (scanner.hasNextInt()) {
                 totalApplicants = scanner.nextInt();
-                scanner.nextLine(); // consume newline
+                scanner.nextLine();
                 if (totalApplicants >= 0) break;
                 else System.out.println("Total applicants cannot be negative.");
             } else {
                 System.out.println("Invalid input. Please enter a non-negative integer.");
-                scanner.nextLine(); // discard invalid input
+                scanner.nextLine();
             }
         }
 
-        // Status selection
         ProjStatus status = null;
         while (status == null) {
             System.out.println("Select Project Status:");
@@ -174,11 +168,10 @@ public class BTOExercisesView implements UserView {
             }
         }
 
-        // Create empty project list
         List<BTOProj> projList = new ArrayList<>();
-
-        // Create the exercise
         exerciseController.createExercise(id, name, totalApplicants, status, projList);
+
         System.out.println("\nExercise created successfully.");
+        exerciseController.saveAllExercisesToFile();
     }
 }

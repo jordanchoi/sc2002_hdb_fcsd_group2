@@ -1,15 +1,13 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.FileIO;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 

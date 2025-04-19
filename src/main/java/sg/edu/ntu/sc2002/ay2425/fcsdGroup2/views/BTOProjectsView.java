@@ -119,11 +119,11 @@ public class BTOProjectsView implements UserView {
         }
 
         // Prompt for more detail
-        System.out.print("\nEnter Project ID to view more details (or 0 to return): ");
+        System.out.print("\nEnter Project ID to view more details and manage (or -1 to return): ");
         int targetId = scanner.nextInt();
         scanner.nextLine(); // consume newline
 
-        if (targetId == 0) return;
+        if (targetId == -1) return;
 
         BTOProj selected = null;
         for (BTOProj proj : projectList) {

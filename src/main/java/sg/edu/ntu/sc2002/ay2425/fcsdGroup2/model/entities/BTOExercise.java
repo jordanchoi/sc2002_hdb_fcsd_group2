@@ -1,5 +1,6 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class BTOExercise {
     private int totalApplicants;
     private ProjStatus status;
     private List<BTOProj> projects;
+    private BTORepository btoRepo;
 
     // Default constructor
     public BTOExercise() {
@@ -72,5 +74,4 @@ public class BTOExercise {
     public void addProject(BTOProj proj) {
         projects.add(proj);
     }
-
 }
