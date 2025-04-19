@@ -15,7 +15,7 @@ class HDBApplicant extends User {
     }
 
     public HDBApplicant(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
-        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus, new ApplicantCanApply());
+        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
         this.currentApplication = null;
     }
 
@@ -71,32 +71,13 @@ class HDBApplicant extends User {
         List<BTOProj> eligibleProjects = new ArrayList<>();
     
         for (BTOProj project : allProjs) {
-            if (this.canApplyStrategy.canApply(this, project)) {
+            if (checkEligibility(this, project)) {
                 eligibleProjects.add(project);
             }
         }
         return eligibleProjects;
     }
 
-
-    public boolean canSelectFlat(String chosenFlatType) {
-        if (this.currentApplication == null || this.currentApplication.getStatusEnum() != ApplicationStatus.Successful) {
-            return false;
-        }
-    
-        if (this.getMaritalStatus() == MaritalStatus.Married) {
-            return true; 
-        } else if (this.getMaritalStatus() == MaritalStatus.Single) {
-            return "2-Room".equals(chosenFlatType);
-        }
-    
-        return false;
-    }
-    
-
-    public List<Enquiry> getMyEnquiries(EnquiryController enquiryController) {
-        return enquiryController.getEnquiriesByApplicant(this);
-    }
 
     public void submitEnquiry(EnquiryController enquiryController, String message, BTOProj project) {
         enquiryController.createEnquiry(message, this, project);
@@ -143,5 +124,32 @@ class HDBApplicant extends User {
 
         this.currentApplication.requestWithdrawal();
         System.out.println("Withdrawal request has been made for application ID: " + currentApplication.getAppId());
+    }
+
+
+    public boolean checkEligibility(User user, BTOProj project) {
+        if (!project.getVisibility()) {
+            return false;
+        }
+
+        if (user instanceof HDBOfficer) {
+            HDBOfficer officer = (HDBOfficer) user;
+            if (officer.getProj().getProjId() == project.getProjId()){
+                return false;
+            }
+        }
+
+        HDBApplicant applicant = (HDBApplicant) user;
+        int age = applicant.getAge();
+        MaritalStatus maritalStatus = applicant.getMaritalStatus();
+
+        if (maritalStatus == MaritalStatus.Married && age >= 21) {
+            return true;
+        } else if (maritalStatus == MaritalStatus.Single && age >= 35) {
+            if(project.getAvailableFlatTypes().contains("2-Room")){
+                return true;
+            }
+        }
+        return false;
     }
 }

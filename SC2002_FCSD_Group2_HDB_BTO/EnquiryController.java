@@ -2,10 +2,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnquiryController {
+    private static EnquiryController instance;
     private List<Enquiry> enquiries;
 
     public EnquiryController() {
         this.enquiries = new ArrayList<>();
+    }
+
+    public static EnquiryController getInstance() {
+        if (instance == null) {
+            instance = new EnquiryController();
+        }
+        return instance;
     }
 
     public void createEnquiry(String msg, HDBApplicant applicant, BTOProj project) {

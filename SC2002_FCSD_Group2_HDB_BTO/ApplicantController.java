@@ -9,7 +9,7 @@ public class ApplicantController {
     public ApplicantController(HDBApplicant model, ApplicantView view){
         this.model = model;
         this.view = view;
-        this.enquiryController = new EnquiryController();
+        this.enquiryController = EnquiryController.getInstance();
     }
 
     public void applyProjs() {
@@ -26,7 +26,7 @@ public class ApplicantController {
     }
 
     public void viewSubmittedEnquiries() {
-        List<Enquiry> enquiries = model.getMyEnquiries(enquiryController);
+        List<Enquiry> enquiries = model.getApplicantEnquiries(enquiryController);
         if (enquiries.isEmpty()) {
             System.out.println("No enquiries found.");
         } else {
@@ -139,53 +139,5 @@ public class ApplicantController {
 
     public void withdrawApplication() {
         model.withdrawApplication();
-    }
-
-    public void handleMenu() {
-        int userChoice = -1;
-
-        while (userChoice != 11) {
-            view.viewMenu();
-            userChoice = view.getUserChoice();
-
-            switch (userChoice) {
-                case 1:
-                    viewEligibleProjects();
-                    break;
-                case 2:
-                    applyProjs();
-                    break;
-                case 3:
-                    showApplicantApplicationDetails();
-                    break;
-                case 4:
-                    withdrawApplication();
-                    break;
-                case 5:
-                    submitEnquiry();
-                    break;
-                case 6:
-                    submitExisting();
-                    break;
-                case 7:
-                    viewSubmittedEnquiries();
-                    break;
-                case 8:
-                    editMessageInEnquiry();
-                    break;
-                case 9:
-                    deleteEnquiry();
-                    break;
-                case 10:
-                    model.setPwd("password");
-                    break;
-                case 11:
-                    System.out.println("Logging out...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-                    break;
-            }
-        }
     }
 }

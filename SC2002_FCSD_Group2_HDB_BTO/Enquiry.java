@@ -44,10 +44,5 @@ public class Enquiry {
             }
         }
         return false;
-    }
-    
-    
-    public void delete() { 
-        thread.clear();
-    }
+    } 
 }
