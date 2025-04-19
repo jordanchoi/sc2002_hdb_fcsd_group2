@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
@@ -15,9 +16,12 @@ public class BTOProjsController {
     private List<BTOProj> projects = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
-    public BTOProjsController() {}
     private BTORepository btoRepo = new BTORepository();
     // Create a new exercise
+
+    public BTOProjsController() {
+        this.managers = new ArrayList<>();
+    }
 
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;
@@ -53,8 +57,11 @@ public class BTOProjsController {
             proj.addFlatTypeWithPrice(type, ft.getTotalUnits(), ft.getSellingPrice());
         }
 
-        // Save into memory and persist
-        btoRepo.addProject(proj);  // this calls saveProject()
+        if (!managers.contains(manager)) {
+            managers.add(manager);
+        }
+        manager.getCurrentProj().add(proj);
+        btoRepo.addProject(proj);
         return proj;
     }
 
@@ -120,31 +127,35 @@ public class BTOProjsController {
 
     public List<BTOProj> viewOwnProjs() {
         SessionStateManager session = SessionStateManager.getInstance();
-        if (session.getLoggedInUserType() == UserRoles.MANAGER) {
-            HDBManager manager = (HDBManager) session.getLoggedInUser();
-            int managerId = manager.getManagerId();
-            for (HDBManager m : managers) {
-                if (m.getManagerId() == managerId){
-                    return m.getCurrentProj();
-                }
+
+        if (session.getLoggedInUserType() != UserRoles.MANAGER) {
+            return Collections.emptyList();
+        }
+
+        HDBManager currentManager = (HDBManager) session.getLoggedInUser();
+        String loggedManagerName = currentManager.getFirstName();
+
+        List<BTOProj> myProjects = new ArrayList<>();
+        for (BTOProj project : projects) {
+            if (project.getManagerIC() != null &&
+                    project.getManagerIC().getFirstName().equalsIgnoreCase(loggedManagerName)) {
+                myProjects.add(project);
             }
         }
-        return null;
+
+        return myProjects;
     }
 
-    // Officer - Not completed
-    public List<OfficerProjectApplication> getApplicationsFromProjs(){
-        return null;
+    public void approveOfficerApplication(OfficerProjectApplication app, BTOProj proj) {
+
     }
 
-    // Officer - Not completed
-    public boolean addOfficersToProj() {
-        return true;
+    public void rejectOfficerApplication(OfficerProjectApplication app) {
+
     }
 
-    // Officer - Not completed
-    public boolean updateBTOApplicationStatus(boolean outcome, BTOProj proj) {
-        return true;
+    public void processApplicantDecision(Application app, BTOProj proj, boolean approve) {
+
     }
 
     public List<Enquiry> getAllEnq() {

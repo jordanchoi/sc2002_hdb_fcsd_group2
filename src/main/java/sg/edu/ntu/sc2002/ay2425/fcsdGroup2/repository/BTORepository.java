@@ -52,7 +52,7 @@ public class BTORepository implements BTOStorageProvider {
             // === Validate Project Name ===
             String projectName = row.get(0);
             if (projectName == null || projectName.trim().isEmpty()) {
-                System.out.println("⚠ Skipping row with invalid project name: " + row);
+                System.out.println("Skipping row with invalid project name: " + row);
                 continue;
             }
             projectName = projectName.trim();
@@ -63,7 +63,7 @@ public class BTORepository implements BTOStorageProvider {
             try {
                 neighborhood = Neighbourhoods.valueOf(projectNeighborhood.toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.out.println("⚠ Invalid neighbourhood: \"" + projectNeighborhood + "\" in row: " + row);
+                System.out.println("Invalid neighbourhood: \"" + projectNeighborhood + "\" in row: " + row);
                 continue;
             }
 
@@ -75,7 +75,7 @@ public class BTORepository implements BTOStorageProvider {
                 try {
                     type1 = FlatTypeFactory.fromRow(row, 2); // 2-Room
                 } catch (Exception e) {
-                    System.out.println("⚠ Error parsing 2-Room: " + e.getMessage());
+                    System.out.println("Error parsing 2-Room: " + e.getMessage());
                 }
             }
 
@@ -83,7 +83,7 @@ public class BTORepository implements BTOStorageProvider {
                 try {
                     type2 = FlatTypeFactory.fromRow(row, 5); // 3-Room
                 } catch (Exception e) {
-                    System.out.println("⚠ Error parsing 3-Room: " + e.getMessage());
+                    System.out.println("Error parsing 3-Room: " + e.getMessage());
                 }
             }
 

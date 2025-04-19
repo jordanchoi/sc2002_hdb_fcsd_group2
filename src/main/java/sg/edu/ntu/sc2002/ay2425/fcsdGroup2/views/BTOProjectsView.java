@@ -64,7 +64,6 @@ public class BTOProjectsView implements UserView {
 
         switch (choice) {
             case 1 -> {
-                System.out.println("Choose projects to view...\n");
                 manageBTOProject();
             }
             case 2 -> {
@@ -86,110 +85,6 @@ public class BTOProjectsView implements UserView {
         return choice;
     }
 
-
-    //Option 1
-    public void viewAllProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
-        projsController.insertProjectsFromRepo();
-        List<BTOProj> projectList = projsController.viewAllProjs();
-        List<BTOExercise> exerciseList = exerciseController.viewAllExercises();
-
-        if (projectList.isEmpty()) {
-            System.out.println("No BTO projects found.");
-            return;
-        }
-
-        Scanner scanner = new Scanner(System.in);
-
-        // Display basic project info
-        System.out.println("=== List of BTO Projects ===");
-        System.out.printf("%-5s %-25s %-15s %-20s %-20s%n", "ID", "Project Name", "Neighbourhood", "Manager IC", "Exercise");
-        System.out.println("----------------------------------------------------------------------------------------");
-
-        for (BTOProj proj : projectList) {
-            String exerciseName = "Unassigned";
-            for (BTOExercise exercise : exerciseList) {
-                for (BTOProj p : exercise.getExerciseProjs()) {
-                    if (p.getProjId() == proj.getProjId()) {
-                        exerciseName = exercise.getExerciseName();
-                        break;
-                    }
-                }
-            }
-
-            String managerName = (proj.getManagerIC() != null) ? proj.getManagerIC().getFirstName() : "N/A";
-
-            System.out.printf("%-5d %-25s %-15s %-20s %-20s%n",
-                    proj.getProjId(),
-                    proj.getProjName(),
-                    proj.getProjNbh(),
-                    managerName,
-                    exerciseName);
-        }
-
-        // Prompt for more detail
-        System.out.print("\nEnter Project ID to view more details and manage (or -1 to return): ");
-        int targetId = scanner.nextInt();
-        scanner.nextLine(); // consume newline
-
-        if (targetId == -1) return;
-
-        BTOProj selected = null;
-        for (BTOProj proj : projectList) {
-            if (proj.getProjId() == targetId) {
-                selected = proj;
-                break;
-            }
-        }
-
-        if (selected == null) {
-            System.out.println("No project found with that ID.");
-            return;
-        }
-
-        // Show full details
-        System.out.println("\n=== Project Details ===");
-        System.out.println("Project Name     : " + selected.getProjName());
-        System.out.println("Open Date        : " + selected.getAppOpenDate().toLocalDate());
-        System.out.println("Close Date       : " + selected.getAppCloseDate().toLocalDate());
-        System.out.println("Visibility       : " + selected.getVisibility());
-        System.out.println("Neighbourhood    : " + selected.getProjNbh());
-
-        // Flat type details from map
-        System.out.println("Flat Types");
-
-        List<FlatType> flatTypes = selected.getAvailableFlatTypes();
-
-        if (flatTypes == null || flatTypes.isEmpty()) {
-            System.out.println("                    None");
-        } else {
-            Set<String> printed = new HashSet<>();
-            for (FlatType type : flatTypes) {
-                String key = type.getTypeName() + ":" + type.getTotalUnits() + ":" + type.getSellingPrice();
-                if (!printed.contains(key)) {
-                    System.out.printf("  - %-12s : %d units at $%.2f%n",
-                            type.getTypeName(),
-                            type.getTotalUnits(),
-                            type.getSellingPrice());
-                    printed.add(key);
-                }
-            }
-        }
-
-        System.out.println("Officer Slots    : " + selected.getOfficerSlots());
-
-        if (selected.getOfficersList() != null && selected.getOfficersList().length > 0) {
-            System.out.print("Assigned Officers: ");
-            for (HDBOfficer officer : selected.getOfficersList()) {
-                System.out.print(officer.getFirstName() + " ");
-            }
-            System.out.println();
-        } else {
-            System.out.println("Assigned Officers: None");
-        }
-    }
-
-
-    // Option 2
     public void createBTOProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
         SessionStateManager session = SessionStateManager.getInstance();
@@ -328,39 +223,137 @@ public class BTOProjectsView implements UserView {
         System.out.println("\nProject created and assigned to: " + selectedExercise.getExerciseName());
     }
 
-    // NEED FIX
-    public void viewMyProjects(BTOProjsController projsController) {
-        SessionStateManager session = SessionStateManager.getInstance();
-        User currentUser = session.getLoggedInUser();
+    // Displays all BTO projects in the system (regardless of manager or visibility).
+    // Shows a table view with basic info, allows user to select a project,
+    // then displays its full details and opens the management menu.
+    public void viewAllProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
+        projsController.insertProjectsFromRepo();
+        List<BTOProj> allProjects = projsController.viewAllProjs();
+        List<BTOExercise> exercises = exerciseController.viewAllExercises();
 
-        if (!(currentUser instanceof HDBManager manager)) {
-            System.out.println("Access denied. Only managers can view their own projects.");
+        if (allProjects == null || allProjects.isEmpty()) {
+            System.out.println("No BTO projects found.");
             return;
         }
 
-        // Get by manager ID instead of object equality
-        List<BTOProj> myProjects = projsController.getProjectsByManagerName(manager.getFirstName());
+        BTOProj selected = selectProjectFromTable(allProjects, exercises);
+        if (selected != null) {
+            displayProjectDetails(selected);
+            manageSelectedProject(selected);
+        }
+    }
 
-        if (myProjects.isEmpty()) {
-            System.out.println("You have not created any projects yet.");
+    // Displays only BTO projects created by the currently logged-in HDB Manager.
+    // Uses the SessionStateManager to identify the manager.
+    // If any are found, displays a table and allows selection for details and management.
+    public void viewMyProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
+        projsController.insertProjectsFromRepo();
+        List<BTOProj> myProjects = projsController.viewOwnProjs();
+        List<BTOExercise> exercises = exerciseController.viewAllExercises();
+
+        if (myProjects == null || myProjects.isEmpty()) {
+            System.out.println("You have not created any projects.");
             return;
         }
 
-        System.out.println("=== Your BTO Projects ===");
-        System.out.printf("%-5s %-25s %-15s %-20s%n", "ID", "Project Name", "Neighbourhood", "Visible");
-        System.out.println("---------------------------------------------------------------");
+        BTOProj selected = selectProjectFromTable(myProjects, exercises);
+        if (selected != null) {
+            displayProjectDetails(selected);
+            manageSelectedProject(selected);
+        }
+    }
 
-        for (BTOProj proj : myProjects) {
-            System.out.printf("%-5d %-25s %-15s %-20s%n",
+    // Displays a formatted table of BTO projects along with their associated exercises,
+    // prompts the user to select a project by ID, and returns the selected project.
+    // If -1 is entered, returns null to indicate no selection.
+    private BTOProj selectProjectFromTable(List<BTOProj> projects, List<BTOExercise> exercises) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== List of BTO Projects ===");
+        System.out.printf("%-5s %-25s %-15s %-20s %-20s%n", "ID", "Project Name", "Neighbourhood", "Manager IC", "Exercise");
+        System.out.println("----------------------------------------------------------------------------------------");
+
+        for (BTOProj proj : projects) {
+            String exerciseName = "Unassigned";
+            for (BTOExercise exercise : exercises) {
+                for (BTOProj p : exercise.getExerciseProjs()) {
+                    if (p.getProjId() == proj.getProjId()) {
+                        exerciseName = exercise.getExerciseName();
+                        break;
+                    }
+                }
+            }
+
+            HDBManager managerIC = proj.getManagerIC();
+            String managerName = (managerIC != null && managerIC.getFirstName() != null)
+                    ? managerIC.getFirstName()
+                    : "N/A";
+
+            System.out.printf("%-5d %-25s %-15s %-20s %-20s%n",
                     proj.getProjId(),
                     proj.getProjName(),
                     proj.getProjNbh(),
-                    proj.getVisibility());
+                    managerName,
+                    exerciseName);
+        }
+
+        System.out.print("\nEnter Project ID to view more details and manage (or -1 to return): ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        if (id == -1) return null;
+
+        for (BTOProj proj : projects) {
+            if (proj.getProjId() == id) return proj;
+        }
+
+        System.out.println("No project found with that ID.");
+        return null;
+    }
+
+    // Prints detailed information about a single BTO project, including:
+    // - Project name, dates, visibility, and neighbourhood
+    // - Unique flat types offered
+    // - Officer slot information
+    // - Assigned officer names
+    private void displayProjectDetails(BTOProj selected) {
+        System.out.println("\n=== Project Details ===");
+        System.out.println("Project Name     : " + selected.getProjName());
+        System.out.println("Open Date        : " + selected.getAppOpenDate().toLocalDate());
+        System.out.println("Close Date       : " + selected.getAppCloseDate().toLocalDate());
+        System.out.println("Visibility       : " + selected.getVisibility());
+        System.out.println("Neighbourhood    : " + selected.getProjNbh());
+
+        System.out.println("Flat Types");
+        List<FlatType> flatTypes = selected.getAvailableFlatTypes();
+        if (flatTypes == null || flatTypes.isEmpty()) {
+            System.out.println("                    None");
+        } else {
+            Set<String> printed = new HashSet<>();
+            for (FlatType type : flatTypes) {
+                String key = type.getTypeName() + ":" + type.getTotalUnits() + ":" + type.getSellingPrice();
+                if (printed.add(key)) {
+                    System.out.printf("  - %-12s : %d units at $%.2f%n",
+                            type.getTypeName(), type.getTotalUnits(), type.getSellingPrice());
+                }
+            }
+        }
+
+        System.out.println("Officer Slots    : " + selected.getOfficerSlots());
+        if (selected.getOfficersList() != null && selected.getOfficersList().length > 0) {
+            System.out.print("Assigned Officers: ");
+            for (HDBOfficer officer : selected.getOfficersList()) {
+                System.out.print(officer.getFirstName() + " ");
+            }
+            System.out.println();
+        } else {
+            System.out.println("Assigned Officers: None");
         }
     }
 
     public void manageBTOProject(){
         Scanner scanner = new Scanner(System.in);
+        System.out.println("Choose projects to view...\n");
         System.out.println("1. View All Projects");
         System.out.println("2. View My Project");
         System.out.print("Enter choice: ");
@@ -371,8 +364,44 @@ public class BTOProjectsView implements UserView {
                 viewAllProjects(projsController, exerciseController);
                 break;
             case 2:
-                viewMyProjects(projsController);
+                viewMyProjects(projsController, exerciseController);
             default:
+        }
+    }
+
+    public void manageSelectedProject(BTOProj selected){
+        System.out.println("\nWhat would you like to do next?");
+        System.out.println("1. Toggle Project Visibility");
+        System.out.println("2. Manage HDB Officer ");
+        System.out.println("3. Manage Applicant");
+        System.out.println("4. Exit to main menu");
+        Scanner scanner = new Scanner(System.in);
+        int choice = -1;
+        while (choice < 1 || choice > 4) {
+            System.out.print("Enter choice: ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+            } else {
+                System.out.println("Invalid input. Try again.");
+                scanner.nextLine();
+            }
+        }
+
+        switch (choice) {
+            case 1 -> {
+                projsController.toggleProjVisibility(selected);
+                System.out.println("Visibility updated: " + (selected.getVisibility() ? "ON" : "OFF"));
+            }
+            case 2 -> {
+                System.out.println("Managing HDB Officer...");
+            }
+            case 3 -> {
+                System.out.println("Managing Applicant...");
+            }
+            case 4 -> {
+                System.out.println("Returning to project list...");
+            }
         }
 
     }
