@@ -75,7 +75,7 @@ public class BTOExercisesView implements UserView {
             }
             case 4 -> {
                 System.out.println("Deleting BTO Exercises\n");
-                // TODO: Add logic
+                deleteExercise();
             }
             case 5 -> {
                 System.out.println("Exiting to Main Manager Console...\n");
@@ -86,8 +86,7 @@ public class BTOExercisesView implements UserView {
         return choice;
     }
 
-
-    // Option 1
+    // Displays all BTO exercises by fetching from the controller.
     public void viewAllExercises(HDBBTOExerciseController exerciseController) {
         exerciseController.insertExercisesFromRepo();
         List<BTOExercise> exerciseList = exerciseController.viewAllExercises();
@@ -100,6 +99,7 @@ public class BTOExercisesView implements UserView {
         printAllExercises(exerciseList);
     }
 
+    // Helper method to format and print a list of BTO exercises in tabular format.
     private void printAllExercises(List<BTOExercise> exercises) {
         System.out.println("=== All BTO Exercises ===");
         System.out.printf("%-5s %-27s %-10s %-15s %-20s%n",
@@ -123,7 +123,7 @@ public class BTOExercisesView implements UserView {
         }
     }
 
-    // Option 2
+    // Creates a new BTO exercise by prompting the user for ID, name, applicants, and status.
     public void createBTOExercise(HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
 
@@ -196,6 +196,8 @@ public class BTOExercisesView implements UserView {
         System.out.println("\nExercise created");
     }
 
+    // Allows the user to edit a selected BTO exercise's name, applicants, and status.
+    // Changes are saved using the controller.
     private void editBTOExercise() {
         Scanner scanner = new Scanner(System.in);
         exerciseController.insertExercisesFromRepo();
@@ -280,7 +282,32 @@ public class BTOExercisesView implements UserView {
         }
     }
 
+    // Deletes a BTO exercise selected by ID after user confirmation.
+    // The controller removes the exercise and persists changes to Excel.
+    private void deleteExercise() {
+        exerciseController.insertExercisesFromRepo();
+        List<BTOExercise> exercises = exerciseController.viewAllExercises();
 
+        if (exercises.isEmpty()) {
+            System.out.println("No exercises available to delete.");
+            return;
+        }
 
+        printAllExercises(exercises);
 
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\nEnter Exercise ID to delete: ");
+        int id = Integer.parseInt(scanner.nextLine().trim());
+
+        System.out.print("Are you sure you want to delete this exercise? (yes/no): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+
+        if (!confirm.equals("yes")) {
+            System.out.println("Deletion cancelled.");
+            return;
+        }
+
+        boolean success = exerciseController.deleteExerciseId(id);
+        System.out.println(success ? "Exercise deleted successfully." : "No exercise found with the given ID.");
+    }
 }

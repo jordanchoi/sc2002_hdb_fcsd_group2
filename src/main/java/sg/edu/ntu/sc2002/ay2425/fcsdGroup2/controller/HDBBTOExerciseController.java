@@ -5,13 +5,13 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class HDBBTOExerciseController {
     private List<BTOExercise> exercises = new ArrayList<>();
     private BTORepository btoRepo = new BTORepository();
 
-    // Create a new exercise
     public HDBBTOExerciseController() {}
 
     public BTOExercise createExercise(int id, String name, int totalApplicants, ProjStatus status, List<BTOProj> projList) {
@@ -26,22 +26,34 @@ public class HDBBTOExerciseController {
                 ex.setExerciseName(newName);
                 ex.setTotalApplicants(newApplicants);
                 ex.setProjStatus(newStatus);
-                btoRepo.saveExercise(); // persist update
+                btoRepo.saveExercise();
                 return true;
             }
         }
         return false;
     }
 
-    // Delete exercise by ID
-    public boolean deleteExercise(String exerciseId) {
-        return exercises.removeIf(ex -> String.valueOf(ex.getExerciseId()).equals(exerciseId));
+    public boolean deleteExerciseId(int id) {
+        List<BTOExercise> repoExercises = btoRepo.getAllExercises();
+        Iterator<BTOExercise> iterator = repoExercises.iterator();
+        boolean deleted = false;
+
+        while (iterator.hasNext()) {
+            BTOExercise ex = iterator.next();
+            if (ex.getExerciseId() == id) {
+                iterator.remove();
+                deleted = true;
+                break;
+            }
+        }
+        if (deleted) {
+            btoRepo.saveExercise();
+        }
+        return deleted;
     }
 
     public List<BTOExercise> viewAllExercises() {
-        // This method returns all BTO projects stored in the controller.
-        // It provides access to the full list of project records.
-        return new ArrayList<>(exercises); // Return a copy to avoid direct modification
+        return new ArrayList<>(exercises);
     }
 
     public boolean isExerciseIdUnique(int id) {
@@ -64,5 +76,4 @@ public class HDBBTOExerciseController {
     public void addExercise(BTOExercise exercise) {
         exercises.add(exercise);
     }
-
 }

@@ -17,7 +17,6 @@ public class BTOProjsController {
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
     private BTORepository btoRepo = new BTORepository();
-    // Create a new exercise
 
     public BTOProjsController() {
         this.managers = new ArrayList<>();
@@ -39,18 +38,15 @@ public class BTOProjsController {
             boolean isVisible,
             HDBManager manager,
             int officerSlots,
-            HDBOfficer[] officers
-    ) {
-        // Create base project
+            HDBOfficer[] officers) {
+
         BTOProj proj = new BTOProj(id, name, appOpenDate, appCloseDate, isVisible);
 
-        // Set core attributes
         proj.setProjNbh(nbh);
         proj.setManagerIC(manager);
         proj.setOfficerSlots(officerSlots);
         proj.setOfficersList(officers);
 
-        // Add flat types to internal map
         for (Map.Entry<FlatTypes, FlatType> entry : flatUnits.entrySet()) {
             FlatTypes type = entry.getKey();
             FlatType ft = entry.getValue();
@@ -91,49 +87,48 @@ public class BTOProjsController {
                 }
             }
         }
-
         btoRepo.saveProject();
         return true;
     }
 
-    public boolean deleteProj(int btoProjId) {
-        // This method handles deletion of a BTO project by its ID.
-        // It searches the project list and removes the matching project directly.
-        // This supports project removal from the system for cleanup or archiving.
-        for (int i = 0; i < projects.size(); i++) {
-            if (projects.get(i).getProjId() == btoProjId) {
-                projects.remove(i);
-                return true;
+    public boolean deleteProjId(int id) {
+        List<BTOProj> repoProj = btoRepo.getAllProjects();
+        Iterator<BTOProj> iterator = repoProj.iterator();
+        boolean found = false;
+
+        while (iterator.hasNext()) {
+            BTOProj proj = iterator.next();
+            if (proj.getProjId() == id) {
+                iterator.remove();
+                found = true;
+                break;
             }
         }
-        return false; // Project not found
+        if (found) {
+            btoRepo.saveProject();
+        }
+        return found;
     }
 
     public boolean toggleVisibilityById(int id) {
         for (BTOProj proj : viewAllProjs()) {
             if (proj.getProjId() == id) {
                 proj.setVisibility(!proj.getVisibility());
-                return true; // toggled successfully
+                return true;
             }
         }
-        return false; // project not found
+        return false;
     }
 
     public void toggleProjVisibility(BTOProj proj) {
-        // This method toggles the visibility of a BTO project object.
-        // It inverts the current visibility status of the given project.
         proj.setVisibility(!proj.getVisibility());
     }
 
     public List<BTOProj> viewAllProjs() {
-        // This method returns all BTO projects stored in the controller.
-        // It provides access to the full list of project records.
-        return new ArrayList<>(projects); // Return a copy to avoid direct modification
+         return new ArrayList<>(projects); // Return a copy to avoid direct modification
     }
 
     public List<BTOProj> viewProjsByAllManagers() {
-        // This method returns a list of all BTO projects managed by every manager in the system.
-        // It loops through each manager and each of their managed projects, adding them one by one.
         List<BTOProj> result = new ArrayList<>();
         for (HDBManager manager : managers) {
             for (BTOProj proj : manager.getCurrentProj()) {
@@ -177,13 +172,10 @@ public class BTOProjsController {
     }
 
     public List<Enquiry> getAllEnq() {
-        // This method returns the full list of all enquiries.
-        // It allows external access to all recorded enquiry objects.
         return enquiries;
     }
 
     public void replyEnq(int enquiryId, String string){
-        // This method replies to an enquiry based on an input string format.
         for(Enquiry enquiry : enquiries){
             if(enquiry.getEnquiryId() == enquiryId){
                 enquiry.setReply(string);
@@ -229,12 +221,6 @@ public class BTOProjsController {
 
     public void addProject(BTOProj project) {
         projects.add(project);
-    }
-
-    public List<BTOProj> getProjectsByManagerName(String name) {
-        return viewAllProjs().stream()
-                .filter(p -> p.getManagerIC() != null && p.getManagerIC().getFirstName() == name)
-                .collect(Collectors.toList());
     }
 }
 

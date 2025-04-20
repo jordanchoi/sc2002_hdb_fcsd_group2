@@ -34,9 +34,8 @@ public class ManagerView implements UserView {
         System.out.println("2. Manage BTO Projects");
         System.out.println("3. Manage BTO Applications");
         System.out.println("4. Manage All Enquiries");
-        System.out.println("5. View All Projects");
-        System.out.println("6. Change Password");
-        System.out.println("7. Logout");
+        System.out.println("5. Change Password");
+        System.out.println("6. Logout");
         System.out.println("10. Exit");
     }
 
@@ -61,13 +60,10 @@ public class ManagerView implements UserView {
             case 3 -> System.out.println("Managing BTO Applications...");
             case 4 -> System.out.println("Managing All Enquiries...");
             case 5 -> {
-                System.out.println("Viewing All Projects...");
-            }
-            case 6 -> {
                 System.out.println("Changing password...");
                 changePassword();
             }
-            case 7 -> {
+            case 6 -> {
                 System.out.println("Logging out...");
                 session.logout();
             }

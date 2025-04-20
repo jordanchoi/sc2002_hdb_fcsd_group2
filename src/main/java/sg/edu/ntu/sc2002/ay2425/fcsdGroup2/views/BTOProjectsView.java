@@ -76,6 +76,7 @@ public class BTOProjectsView implements UserView {
             }
             case 4 -> {
                 System.out.println("Deleting BTO Project\n");
+                deleteBTOProject();
             }
             case 5 -> {
                 System.out.println("Exiting to Main Manager Console...\n");
@@ -86,6 +87,7 @@ public class BTOProjectsView implements UserView {
         return choice;
     }
 
+    // Allows the user to create a new BTO project and assign it to a selected BTO exercise.
     public void createBTOProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
         SessionStateManager session = SessionStateManager.getInstance();
@@ -407,6 +409,8 @@ public class BTOProjectsView implements UserView {
 
     }
 
+    // Allows the user to edit a selected BTO project.
+    // Supports editing name, neighbourhood, dates, officer slots, and flat type details.
     private void editBTOProject() {
         Scanner scanner = new Scanner(System.in);
         projsController.insertProjectsFromRepo();
@@ -518,4 +522,33 @@ public class BTOProjectsView implements UserView {
             }
         }
     }
+
+    // Allows the user to delete a BTO project after selecting from the list.
+    // Confirms the action before delegating to the controller to persist changes.
+    private void deleteBTOProject() {
+        projsController.insertProjectsFromRepo();
+        List<BTOProj> allProjects = projsController.viewAllProjs();
+        List<BTOExercise> exercises = exerciseController.viewAllExercises();
+
+        if (allProjects == null || allProjects.isEmpty()) {
+            System.out.println("No BTO projects found.");
+            return;
+        }
+
+        BTOProj selected = selectProjectFromTable(allProjects, exercises);
+        if (selected == null) return;
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Are you sure you want to delete this project? (yes/no): ");
+        String confirm = scanner.nextLine().trim();
+
+        if (!confirm.equalsIgnoreCase("yes")) {
+            System.out.println("Deletion cancelled.");
+            return;
+        }
+
+        boolean success = projsController.deleteProjId(selected.getProjId());
+        System.out.println(success ? "Project deleted successfully." : "Project not found.");
+    }
+
 }
