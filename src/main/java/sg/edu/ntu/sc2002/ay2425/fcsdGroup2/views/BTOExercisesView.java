@@ -71,7 +71,7 @@ public class BTOExercisesView implements UserView {
             }
             case 3 -> {
                 System.out.println("Editing BTO Exercise...\n");
-                // TODO: Add logic
+                editBTOExercise();
             }
             case 4 -> {
                 System.out.println("Deleting BTO Exercises\n");
@@ -90,13 +90,17 @@ public class BTOExercisesView implements UserView {
     // Option 1
     public void viewAllExercises(HDBBTOExerciseController exerciseController) {
         exerciseController.insertExercisesFromRepo();
-        List<BTOExercise> exercises = exerciseController.viewAllExercises();
+        List<BTOExercise> exerciseList = exerciseController.viewAllExercises();
 
-        if (exercises.isEmpty()) {
-            System.out.println("No BTO exercises found.");
+        if (exerciseList.isEmpty()) {
+            System.out.println("No exercises found.");
             return;
         }
 
+        printAllExercises(exerciseList);
+    }
+
+    private void printAllExercises(List<BTOExercise> exercises) {
         System.out.println("=== All BTO Exercises ===");
         System.out.printf("%-5s %-27s %-10s %-15s %-20s%n",
                 "ID", "Name", "Status", "Applicants", "Projects");
@@ -187,12 +191,96 @@ public class BTOExercisesView implements UserView {
                 scanner.nextLine();
             }
         }
-
-
         List<BTOProj> projList = new ArrayList<>();
-
         exerciseController.createExercise(id, name, totalApplicants, status, projList);
-
         System.out.println("\nExercise created");
     }
+
+    private void editBTOExercise() {
+        Scanner scanner = new Scanner(System.in);
+        exerciseController.insertExercisesFromRepo();
+        List<BTOExercise> exercises = exerciseController.viewAllExercises();
+
+        if (exercises.isEmpty()) {
+            System.out.println("No exercises found.");
+            return;
+        }
+
+        printAllExercises(exercises);
+
+        System.out.print("\nEnter Exercise ID to edit: ");
+        int id = Integer.parseInt(scanner.nextLine().trim());
+
+        BTOExercise selected = null;
+        for (BTOExercise ex : exercises) {
+            if (ex.getExerciseId() == id) {
+                selected = ex;
+                break;
+            }
+        }
+
+        if (selected == null) {
+            System.out.println("No exercise found with that ID.");
+            return;
+        }
+
+        boolean done = false;
+        String newName = selected.getExerciseName();
+        int newApplicants = selected.getTotalApplicants();
+        ProjStatus newStatus = selected.getProjStatus();
+
+        while (!done) {
+            System.out.println("\nEditing Exercise: " + selected.getExerciseName());
+            System.out.println("Select field to edit:");
+            System.out.println("1. Name (current: " + newName + ")");
+            System.out.println("2. Total Applicants (current: " + newApplicants + ")");
+            System.out.println("3. Status (current: " + newStatus + ")");
+            System.out.println("4. Save and Exit");
+            System.out.print("Your choice: ");
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1" -> {
+                    System.out.print("Enter new name: ");
+                    String input = scanner.nextLine().trim();
+                    if (!input.isEmpty()) newName = input;
+                }
+                case "2" -> {
+                    System.out.print("Enter new total applicants: ");
+                    try {
+                        newApplicants = Integer.parseInt(scanner.nextLine().trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid number.");
+                    }
+                }
+                case "3" -> {
+                    System.out.println("Select new status:");
+                    System.out.println("1. OPEN");
+                    System.out.println("2. CLOSED");
+                    System.out.println("3. BOOKING");
+                    System.out.println("4. COMPLETED");
+                    System.out.print("Your choice: ");
+                    String statusInput = scanner.nextLine().trim();
+
+                    switch (statusInput) {
+                        case "1" -> newStatus = ProjStatus.OPEN;
+                        case "2" -> newStatus = ProjStatus.CLOSED;
+                        case "3" -> newStatus = ProjStatus.BOOKING;
+                        case "4" -> newStatus = ProjStatus.COMPLETED;
+                        default -> System.out.println("Invalid choice.");
+                    }
+                }
+                case "4" -> {
+                    boolean updated = exerciseController.editExercise(id, newName, newApplicants, newStatus);
+                    System.out.println(updated ? "Exercise updated successfully." : "Update failed.");
+                    done = true;
+                }
+                default -> System.out.println("Invalid option. Try again.");
+            }
+        }
+    }
+
+
+
+
 }

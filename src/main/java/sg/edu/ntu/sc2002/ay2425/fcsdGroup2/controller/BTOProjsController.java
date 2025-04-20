@@ -65,17 +65,35 @@ public class BTOProjsController {
         return proj;
     }
 
-    public BTOProj editProj(int btoProjId) {
-        // This method handles editing of an existing BTO project by its ID.
-        // It locates the project and updates its visibility status as an example.
-        // This supports managing project visibility in the BTO system.
-        for (BTOProj proj : projects) {
-            if (proj.getProjId() == btoProjId) {
-                proj.setVisibility(!proj.getVisibility());
-                return proj;
+    public boolean editProj(BTOProj proj,
+                                 String newName,
+                                 Neighbourhoods newNbh,
+                                 LocalDateTime newOpen,
+                                 LocalDateTime newClose,
+                                 int newSlots,
+                                 Map<String, FlatType> updatedFlatTypes) {
+        if (proj == null) return false;
+
+        proj.setProjName(newName);
+        proj.setProjNbh(newNbh);
+        proj.setApplicationOpenDate(newOpen);
+        proj.setAppCloseDate(newClose);
+        proj.setOfficerSlots(newSlots);
+
+        // Apply flat type edits
+        if (updatedFlatTypes != null) {
+            List<FlatType> flatList = proj.getAvailableFlatTypes();
+            for (FlatType ft : flatList) {
+                FlatType updated = updatedFlatTypes.get(ft.getTypeName());
+                if (updated != null) {
+                    ft.setTotalUnits(updated.getTotalUnits());
+                    ft.setSellingPrice(updated.getSellingPrice());
+                }
             }
         }
-        return null; 
+
+        btoRepo.saveProject();
+        return true;
     }
 
     public boolean deleteProj(int btoProjId) {

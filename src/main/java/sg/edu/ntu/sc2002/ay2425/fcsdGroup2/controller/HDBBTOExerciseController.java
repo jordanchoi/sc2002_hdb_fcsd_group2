@@ -20,14 +20,17 @@ public class HDBBTOExerciseController {
         return newExercise;
     }
 
-    // Edit exercise by ID
-    public BTOExercise editExercise(String exerciseId) {
+    public boolean editExercise(int id, String newName, int newApplicants, ProjStatus newStatus) {
         for (BTOExercise ex : exercises) {
-            if (String.valueOf(ex.getExerciseId()).equals(exerciseId)) {
-                return ex;
+            if (ex.getExerciseId() == id) {
+                ex.setExerciseName(newName);
+                ex.setTotalApplicants(newApplicants);
+                ex.setProjStatus(newStatus);
+                btoRepo.saveExercise(); // persist update
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     // Delete exercise by ID

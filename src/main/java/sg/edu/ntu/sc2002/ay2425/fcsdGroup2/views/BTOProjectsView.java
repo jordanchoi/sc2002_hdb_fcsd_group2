@@ -72,6 +72,7 @@ public class BTOProjectsView implements UserView {
             }
             case 3 -> {
                 System.out.println("Editing BTO Project...\n");
+                editBTOProject();
             }
             case 4 -> {
                 System.out.println("Deleting BTO Project\n");
@@ -351,7 +352,7 @@ public class BTOProjectsView implements UserView {
         }
     }
 
-    public void manageBTOProject(){
+    public void manageBTOProject() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose projects to view...\n");
         System.out.println("1. View All Projects");
@@ -369,7 +370,7 @@ public class BTOProjectsView implements UserView {
         }
     }
 
-    public void manageSelectedProject(BTOProj selected){
+    public void manageSelectedProject(BTOProj selected) {
         System.out.println("\nWhat would you like to do next?");
         System.out.println("1. Toggle Project Visibility");
         System.out.println("2. Manage HDB Officer ");
@@ -404,5 +405,117 @@ public class BTOProjectsView implements UserView {
             }
         }
 
+    }
+
+    private void editBTOProject() {
+        Scanner scanner = new Scanner(System.in);
+        projsController.insertProjectsFromRepo();
+        List<BTOProj> allProjects = projsController.viewAllProjs();
+
+        if (allProjects.isEmpty()) {
+            System.out.println("No projects available.");
+            return;
+        }
+
+        BTOProj selected = selectProjectFromTable(allProjects, exerciseController.viewAllExercises());
+        if (selected == null) return;
+
+        String name = selected.getProjName();
+        Neighbourhoods nbh = selected.getProjNbh();
+        LocalDateTime open = selected.getAppOpenDate();
+        LocalDateTime close = selected.getAppCloseDate();
+        int slots = selected.getOfficerSlots();
+        Map<String, FlatType> updatedFlatTypes = new HashMap<>();
+
+        boolean done = false;
+        while (!done) {
+            System.out.println("\nEditing Project: " + name);
+            System.out.println("1. Name (current: " + name + ")");
+            System.out.println("2. Neighbourhood (current: " + nbh + ")");
+            System.out.println("3. Open Date (current: " + open.toLocalDate() + ")");
+            System.out.println("4. Close Date (current: " + close.toLocalDate() + ")");
+            System.out.println("5. Officer Slots (current: " + slots + ")");
+            System.out.println("6. Edit Flat Types");
+            System.out.println("7. Save and Exit");
+            System.out.print("Your choice: ");
+            String input = scanner.nextLine().trim();
+
+            switch (input) {
+                case "1" -> {
+                    System.out.print("Enter new name: ");
+                    String inputName = scanner.nextLine().trim();
+                    if (!inputName.isEmpty()) name = inputName;
+                }
+                case "2" -> {
+                    Neighbourhoods[] all = Neighbourhoods.values();
+                    for (int i = 0; i < all.length; i++) {
+                        System.out.printf("%d. %s\n", i + 1, all[i]);
+                    }
+                    System.out.print("Choose new neighbourhood: ");
+                    try {
+                        int choice = Integer.parseInt(scanner.nextLine().trim());
+                        if (choice >= 1 && choice <= all.length) nbh = all[choice - 1];
+                    } catch (Exception e) {
+                        System.out.println("Invalid input.");
+                    }
+                }
+                case "3" -> {
+                    System.out.print("Enter new open date (YYYY-MM-DD): ");
+                    try {
+                        open = LocalDateTime.parse(scanner.nextLine().trim() + "T00:00:00");
+                    } catch (Exception e) {
+                        System.out.println("Invalid date.");
+                    }
+                }
+                case "4" -> {
+                    System.out.print("Enter new close date (YYYY-MM-DD): ");
+                    try {
+                        close = LocalDateTime.parse(scanner.nextLine().trim() + "T00:00:00");
+                    } catch (Exception e) {
+                        System.out.println("Invalid date.");
+                    }
+                }
+                case "5" -> {
+                    System.out.print("Enter officer slots (0–10): ");
+                    try {
+                        int newSlots = Integer.parseInt(scanner.nextLine().trim());
+                        if (newSlots >= 0 && newSlots <= 10) slots = newSlots;
+                        else System.out.println("Out of range.");
+                    } catch (Exception e) {
+                        System.out.println("Invalid number.");
+                    }
+                }
+                case "6" -> {
+                    List<FlatType> flatTypes = selected.getAvailableFlatTypes();
+                    Set<String> seen = new HashSet<>();
+                    List<FlatType> uniqueFlatTypes = new ArrayList<>();
+
+                    for (FlatType ft : flatTypes) {
+                        String key = ft.getTypeName() + ":" + ft.getTotalUnits() + ":" + ft.getSellingPrice();
+                        if (!seen.contains(key)) {
+                            seen.add(key);
+                            uniqueFlatTypes.add(ft);
+                        }
+                    }
+
+                    if (uniqueFlatTypes.isEmpty()) {
+                        System.out.println("No flat types available.");
+                        break;
+                    }
+
+                    System.out.println("\nAvailable Flat Types:");
+                    for (int i = 0; i < uniqueFlatTypes.size(); i++) {
+                        FlatType ft = uniqueFlatTypes.get(i);
+                        System.out.printf("%d. %s - %d units @ $%.2f\n", i + 1, ft.getTypeName(), ft.getTotalUnits(), ft.getSellingPrice());
+                    }
+                }
+                case "7" -> {
+                    boolean updated = projsController.editProj(selected, name, nbh, open, close, slots, updatedFlatTypes);
+                    System.out.println(updated ? "Project updated and saved." : "Update failed.");
+                    done = true;
+                }
+                default -> System.out.println("Invalid choice.");
+            }
+        }
     }
 }
