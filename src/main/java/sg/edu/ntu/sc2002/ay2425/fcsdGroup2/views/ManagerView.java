@@ -24,7 +24,7 @@ public class ManagerView implements UserView {
         do {
             displayMenu();
             choice = handleUserInput();
-        } while (choice != 10);
+        } while (choice != 10 || choice != 6);
     }
 
     @Override
