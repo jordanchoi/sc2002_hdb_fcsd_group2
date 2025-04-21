@@ -47,7 +47,9 @@ public class BTOProj {
                 '}';
     }
 
-    public BTOProj(int id, String name, Neighbourhoods nbh, List<FlatType> flatTypesAvail, LocalDateTime open, LocalDateTime close, HDBManager manager, int officerSlots, List<HDBOfficer> officerList) {
+    public BTOProj(int id, String name, Neighbourhoods nbh, List<FlatType> flatTypesAvail,
+                   LocalDateTime open, LocalDateTime close, HDBManager manager,
+                   int officerSlots, List<HDBOfficer> officerList, Boolean overrideVisibility) {
         this.btoProjId = id;
         this.projectName = name;
         this.neighbourhood = nbh;
@@ -57,8 +59,11 @@ public class BTOProj {
         this.managerIC = manager;
         this.officerSlots = officerSlots;
         this.officersList = officerList.toArray(new HDBOfficer[0]);
-
-        this.isVisible = open.isBefore(LocalDateTime.now()) && close.isAfter(LocalDateTime.now());
+        if (overrideVisibility == null) {
+            this.isVisible = open.isBefore(LocalDateTime.now()) && close.isAfter(LocalDateTime.now());
+        } else {
+            this.isVisible = overrideVisibility;
+        }
         this.status = this.isVisible ? ProjStatus.OPEN : ProjStatus.CLOSED;
 
         applications = new ArrayList<>();
@@ -81,6 +86,7 @@ public class BTOProj {
         this.appOpenDate = open;
         this.appCloseDate = close;
         this.isVisible = visible;
+        this.status = visible ? ProjStatus.OPEN : ProjStatus.CLOSED;
     }
 
     public int getProjId() { return btoProjId; }
@@ -92,7 +98,10 @@ public class BTOProj {
     public LocalDateTime getAppCloseDate() { return appCloseDate; }
     public void setAppCloseDate(LocalDateTime datetime) { this.appCloseDate = datetime; }
     public boolean getVisibility() { return isVisible; }
-    public void setVisibility(boolean visible) { this.isVisible = visible; }
+    public void setVisibility(boolean visible) {
+        this.isVisible = visible;
+        this.status = visible ? ProjStatus.OPEN : ProjStatus.CLOSED;
+    }
     public void toggleVisibility() { this.isVisible = !this.isVisible; }
     public ProjStatus getProjStatus() { return status; }
     public void setProjStatus(ProjStatus status) { this.status = status; }

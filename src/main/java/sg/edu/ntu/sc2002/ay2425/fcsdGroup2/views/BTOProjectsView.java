@@ -54,7 +54,7 @@ public class BTOProjectsView implements UserView {
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
 
-                if (choice >= 1 && choice <= 5) break; // ✅ Valid range
+                if (choice >= 1 && choice <= 5) break; //
                 else System.out.println("Invalid option. Please enter a number between 1 and 5.");
             } else {
                 System.out.println("Invalid input. Please enter a number.");
@@ -231,6 +231,7 @@ public class BTOProjectsView implements UserView {
     // then displays its full details and opens the management menu.
     public void viewAllProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         projsController.insertProjectsFromRepo();
+        exerciseController.insertExercisesFromRepo();
         List<BTOProj> allProjects = projsController.viewAllProjs();
         List<BTOExercise> exercises = exerciseController.viewAllExercises();
 
@@ -251,6 +252,7 @@ public class BTOProjectsView implements UserView {
     // If any are found, displays a table and allows selection for details and management.
     public void viewMyProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         projsController.insertProjectsFromRepo();
+        exerciseController.insertExercisesFromRepo();
         List<BTOProj> myProjects = projsController.viewOwnProjs();
         List<BTOExercise> exercises = exerciseController.viewAllExercises();
 
@@ -302,7 +304,7 @@ public class BTOProjectsView implements UserView {
 
         System.out.print("\nEnter Project ID to view more details and manage (or -1 to return): ");
         int id = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
 
         if (id == -1) return null;
 
@@ -394,7 +396,7 @@ public class BTOProjectsView implements UserView {
         switch (choice) {
             case 1 -> {
                 projsController.toggleProjVisibility(selected);
-                System.out.println("Visibility updated: " + (selected.getVisibility() ? "ON" : "OFF"));
+                System.out.println("\nVisibility updated: " + (selected.getVisibility() ? "ON" : "OFF"));
             }
             case 2 -> {
                 System.out.println("Managing HDB Officer...");

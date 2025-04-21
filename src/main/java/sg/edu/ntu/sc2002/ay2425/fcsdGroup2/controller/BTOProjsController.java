@@ -122,6 +122,7 @@ public class BTOProjsController {
 
     public void toggleProjVisibility(BTOProj proj) {
         proj.setVisibility(!proj.getVisibility());
+        btoRepo.saveProject(); // make sure this updates the file
     }
 
     public List<BTOProj> viewAllProjs() {
