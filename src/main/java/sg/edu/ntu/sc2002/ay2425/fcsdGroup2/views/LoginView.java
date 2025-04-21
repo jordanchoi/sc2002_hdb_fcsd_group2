@@ -10,8 +10,8 @@ import java.util.Scanner;
 public class LoginView {
     private String nric;
     private String password;
-    UserAuthController controller = UserAuthController.getInstance();
-    SessionStateManager session = SessionStateManager.getInstance();
+    private UserAuthController controller = UserAuthController.getInstance();
+    private SessionStateManager session = SessionStateManager.getInstance();
 
     public LoginView() {
         this.nric = "";
@@ -39,7 +39,7 @@ public class LoginView {
                     // Redirect to BTO Officer View
                     System.out.println("Redirecting to Manager View..\n");
                     ManagerView managerView = new ManagerView();
-                    managerView.run();
+                    managerView.start();
                 }
             } else {
                 System.out.println("Invalid NRIC or password.\n");

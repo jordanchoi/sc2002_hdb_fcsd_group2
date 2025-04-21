@@ -6,23 +6,30 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.FlatTypeFilter;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.MaritalStatusFilter;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.ProjNameFilter;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.ReportFilter;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
 
 public class HDBManagerController {
     private List<OfficerProjectApplication> applications;
+    private List<Application> allApplications;
 
-     public HDBManagerController(List<OfficerProjectApplication> a) {
+    public HDBManagerController(List<OfficerProjectApplication> a) {
         this.applications = a;
-     }
+    }
 
     public boolean approveOfficerRegistration(HDBOfficer officer, BTOProj project){
         // This method approves an officer's application for a specific project
         // by setting their application status to Assign.
         for (OfficerProjectApplication app : applications) {
             if (app.getProj().equals(project) && app.getOfficer().equals(officer)) {
-                app.setAssignmentStatus(AssignStatus.Assigned);
+                app.setAssignmentStatus(AssignStatus.ASSIGNED);
                 return true;
             }  
         }
@@ -34,7 +41,7 @@ public class HDBManagerController {
         // by setting their application status to Rejected.
         for (OfficerProjectApplication app : applications) {
             if (app.getProj().equals(project) && app.getOfficer().equals(officer)) {
-                app.setAssignmentStatus(AssignStatus.Rejected);
+                app.setAssignmentStatus(AssignStatus.REJECTED);
                 return true;
             }
         }
@@ -51,7 +58,7 @@ public class HDBManagerController {
         return false;
     }
 
-    public boolean rejctApplication(Application app){
+    public boolean rejectApplication(Application app){
         // This method rejects an application by setting its status to 'Unsuccessful'.
         // Returns true if the application is valid; false otherwise.
         if (app != null) {
@@ -60,4 +67,14 @@ public class HDBManagerController {
         }
         return false;
     }
+
+    public List<Application> generateReport(List<Application> applications, ReportFilter filter) {
+        List<Application> result = new ArrayList<>();
+        for (Application app : applications) {
+            if (filter.matches(app)) {
+                result.add(app);
+            }
+        }
+        return result;
+    }  
 }

@@ -100,11 +100,11 @@ public class UserAuthController {
             if (user.getPwd().equals(oldPassword)) {
                 user.setPwd(newPassword);
                 userRepository.updateUserPassword(user);
-                System.out.println("Password changed successfullyTry.");
+               // System.out.println("Password changed successfullyTry.");
                 // Need to call to update the data file.
                 return true;
             } else {
-                System.out.println("Old password is incorrect.  again.");
+                // System.out.println("Old password is incorrect. Try again.");
                 return false;
             }
         } else {
@@ -112,5 +112,17 @@ public class UserAuthController {
             System.out.println("User is not logged in. Please log in first.");
             return false;
         }
+
+
+    }
+
+    public boolean validatePassword(String password) {
+        // This method validates the provided password against the stored password for the given NRIC.
+        // It returns true if the password is valid, false otherwise.
+        // This method is used to manage user authentication and login functionality.
+        // It is used to manage user authentication and login functionality.
+
+        User user = SessionStateManager.getInstance().getLoggedInUser();
+        return user.getPwd().equals(password);
     }
 }

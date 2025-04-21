@@ -1,20 +1,26 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplication;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 public class BTOProjsController {
-    private List<BTOProj> projects;
+    private List<BTOProj> projects = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
+    private BTORepository btoRepo = new BTORepository();
+
+    public BTOProjsController() {
+        this.managers = new ArrayList<>();
+    }
 
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;
@@ -22,66 +28,107 @@ public class BTOProjsController {
         this.enquiries = e;
     }
 
-    public BTOProj CreateProj(int id, String name, LocalDateTime appOpenDate, LocalDateTime appCloseDate, boolean isVisible) {
-        // This method handles full creation of a BTO project.
-        // It initializes core project details and sets up empty lists for related entities.
+    public BTOProj CreateProj(
+            int id,
+            String name,
+            Neighbourhoods nbh,
+            Map<FlatTypes, FlatType> flatUnits,
+            LocalDateTime appOpenDate,
+            LocalDateTime appCloseDate,
+            boolean isVisible,
+            HDBManager manager,
+            int officerSlots,
+            HDBOfficer[] officers) {
+
         BTOProj proj = new BTOProj(id, name, appOpenDate, appCloseDate, isVisible);
-        projects.add(proj);
+
+        proj.setProjNbh(nbh);
+        proj.setManagerIC(manager);
+        proj.setOfficerSlots(officerSlots);
+        proj.setOfficersList(officers);
+
+        for (Map.Entry<FlatTypes, FlatType> entry : flatUnits.entrySet()) {
+            FlatTypes type = entry.getKey();
+            FlatType ft = entry.getValue();
+            proj.addFlatTypeWithPrice(type, ft.getTotalUnits(), ft.getSellingPrice());
+        }
+
+        if (!managers.contains(manager)) {
+            managers.add(manager);
+        }
+        manager.getCurrentProj().add(proj);
+        btoRepo.addProject(proj);
         return proj;
     }
 
-    public BTOProj editProj(int btoProjId) {
-        // This method handles editing of an existing BTO project by its ID.
-        // It locates the project and updates its visibility status as an example.
-        // This supports managing project visibility in the BTO system.
-        for (BTOProj proj : projects) {
-            if (proj.getProjId() == btoProjId) {
-                proj.setVisibility(!proj.getVisibility());
-                return proj;
+    public boolean editProj(BTOProj proj,
+                                 String newName,
+                                 Neighbourhoods newNbh,
+                                 LocalDateTime newOpen,
+                                 LocalDateTime newClose,
+                                 int newSlots,
+                                 Map<String, FlatType> updatedFlatTypes) {
+        if (proj == null) return false;
+
+        proj.setProjName(newName);
+        proj.setProjNbh(newNbh);
+        proj.setApplicationOpenDate(newOpen);
+        proj.setAppCloseDate(newClose);
+        proj.setOfficerSlots(newSlots);
+
+        // Apply flat type edits
+        if (updatedFlatTypes != null) {
+            List<FlatType> flatList = proj.getAvailableFlatTypes();
+            for (FlatType ft : flatList) {
+                FlatType updated = updatedFlatTypes.get(ft.getTypeName());
+                if (updated != null) {
+                    ft.setTotalUnits(updated.getTotalUnits());
+                    ft.setSellingPrice(updated.getSellingPrice());
+                }
             }
         }
-        return null; 
+        btoRepo.saveProject();
+        return true;
     }
 
-    public boolean deleteProj(int btoProjId) {
-        // This method handles deletion of a BTO project by its ID.
-        // It searches the project list and removes the matching project directly.
-        // This supports project removal from the system for cleanup or archiving.
-        for (int i = 0; i < projects.size(); i++) {
-            if (projects.get(i).getProjId() == btoProjId) {
-                projects.remove(i);
-                return true;
-            }
-        }
-        return false; // Project not found
-    }
+    public boolean deleteProjId(int id) {
+        List<BTOProj> repoProj = btoRepo.getAllProjects();
+        Iterator<BTOProj> iterator = repoProj.iterator();
+        boolean found = false;
 
-    public void toggleProjVisibility(int btoProjId, boolean visible) {
-        // This method updates the visibility status of a BTO project based on its ID.
-        // It searches the list and sets the visibility if the project is found.
-        for (BTOProj proj : projects) {
-            if (proj.getProjId() == btoProjId) {
-                proj.setVisibility(visible);
+        while (iterator.hasNext()) {
+            BTOProj proj = iterator.next();
+            if (proj.getProjId() == id) {
+                iterator.remove();
+                found = true;
                 break;
             }
         }
+        if (found) {
+            btoRepo.saveProject();
+        }
+        return found;
+    }
+
+    public boolean toggleVisibilityById(int id) {
+        for (BTOProj proj : viewAllProjs()) {
+            if (proj.getProjId() == id) {
+                proj.setVisibility(!proj.getVisibility());
+                return true;
+            }
+        }
+        return false;
     }
 
     public void toggleProjVisibility(BTOProj proj) {
-        // This method toggles the visibility of a BTO project object.
-        // It inverts the current visibility status of the given project.
         proj.setVisibility(!proj.getVisibility());
     }
 
     public List<BTOProj> viewAllProjs() {
-        // This method returns all BTO projects stored in the controller.
-        // It provides access to the full list of project records.
-        return new ArrayList<>(projects); // Return a copy to avoid direct modification
+         return new ArrayList<>(projects); // Return a copy to avoid direct modification
     }
 
     public List<BTOProj> viewProjsByAllManagers() {
-        // This method returns a list of all BTO projects managed by every manager in the system.
-        // It loops through each manager and each of their managed projects, adding them one by one.
         List<BTOProj> result = new ArrayList<>();
         for (HDBManager manager : managers) {
             for (BTOProj proj : manager.getCurrentProj()) {
@@ -93,41 +140,42 @@ public class BTOProjsController {
 
     public List<BTOProj> viewOwnProjs() {
         SessionStateManager session = SessionStateManager.getInstance();
-        if (session.getLoggedInUserType() == UserRoles.MANAGER) {
-            HDBManager manager = (HDBManager) session.getLoggedInUser();
-            int managerId = manager.getManagerId();
-            for (HDBManager m : managers) {
-                if (m.getManagerId() == managerId){
-                    return m.getCurrentProj();
-                }
+
+        if (session.getLoggedInUserType() != UserRoles.MANAGER) {
+            return Collections.emptyList();
+        }
+
+        HDBManager currentManager = (HDBManager) session.getLoggedInUser();
+        String loggedManagerName = currentManager.getFirstName();
+
+        List<BTOProj> myProjects = new ArrayList<>();
+        for (BTOProj project : projects) {
+            if (project.getManagerIC() != null &&
+                    project.getManagerIC().getFirstName().equalsIgnoreCase(loggedManagerName)) {
+                myProjects.add(project);
             }
         }
-        return null;
+
+        return myProjects;
     }
 
-    // Officer - Not completed
-    public List<OfficerProjectApplication> getApplicationsFromProjs(){
-        return null;
+    public void approveOfficerApplication(OfficerProjectApplication app, BTOProj proj) {
+
     }
 
-    // Officer - Not completed
-    public boolean addOfficersToProj() {
-        return true;
+    public void rejectOfficerApplication(OfficerProjectApplication app) {
+
     }
 
-    // Officer - Not completed
-    public boolean updateBTOApplicationStatus(boolean outcome, BTOProj proj) {
-        return true;
+    public void processApplicantDecision(Application app, BTOProj proj, boolean approve) {
+
     }
 
     public List<Enquiry> getAllEnq() {
-        // This method returns the full list of all enquiries.
-        // It allows external access to all recorded enquiry objects.
         return enquiries;
     }
 
     public void replyEnq(int enquiryId, String string){
-        // This method replies to an enquiry based on an input string format.
         for(Enquiry enquiry : enquiries){
             if(enquiry.getEnquiryId() == enquiryId){
                 enquiry.setReply(string);
@@ -138,6 +186,41 @@ public class BTOProjsController {
     // Not completed
     public void generateReport() {
 
+    }
+
+    public boolean isManagerAvailable(HDBManager manager, LocalDateTime newOpen, LocalDateTime newClose, List<BTOExercise> allExercises) {
+        for (BTOExercise ex : allExercises) {
+            for (BTOProj proj : ex.getExerciseProjs()) {
+                if (proj.getManagerIC() == manager) {
+                    LocalDateTime existingOpen = proj.getAppOpenDate();
+                    LocalDateTime existingClose = proj.getAppCloseDate();
+                    boolean overlaps = !newClose.isBefore(existingOpen) && !newOpen.isAfter(existingClose);
+                    if (overlaps) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean isProjectIdUnique(int id) {
+        for (BTOProj proj : viewAllProjs()) {
+            if (proj.getProjId() == id) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void insertProjectsFromRepo() {
+        projects.clear();
+        List<BTOProj> repoProjects = btoRepo.getAllProjects();
+        for (BTOProj proj : repoProjects) {
+            addProject(proj);
+        }
+    }
+
+    public void addProject(BTOProj project) {
+        projects.add(project);
     }
 }
 

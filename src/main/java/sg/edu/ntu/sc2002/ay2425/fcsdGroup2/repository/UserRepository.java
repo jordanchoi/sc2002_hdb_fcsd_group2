@@ -1,14 +1,13 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.FileIO;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -197,6 +196,30 @@ public class UserRepository {
                 return Optional.of(applicant);
             }
         }
+        return Optional.empty();
+    }
+
+    public Optional<User> getUserByName(String name, UserRoles role) {
+        if (role == UserRoles.APPLICANT) {
+            for (HDBApplicant applicant : applicants) {
+                if (applicant.getFirstName().equals(name)) {
+                    return Optional.of(applicant);
+                }
+            }
+        } else if (role == UserRoles.OFFICER) {
+            for (HDBOfficer officer : officers) {
+                if (officer.getFirstName().equals(name)) {
+                    return Optional.of(officer);
+                }
+            }
+        } else if (role == UserRoles.MANAGER) {
+            for (HDBManager manager : managers) {
+                if (manager.getFirstName().equals(name)) {
+                    return Optional.of(manager);
+                }
+            }
+        }
+        // nothing found
         return Optional.empty();
     }
 

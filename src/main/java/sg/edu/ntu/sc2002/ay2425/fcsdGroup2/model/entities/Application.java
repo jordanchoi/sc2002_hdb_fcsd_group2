@@ -1,7 +1,7 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
-
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 
 public class Application {
     private static int idCounter = 1;
@@ -9,10 +9,10 @@ public class Application {
     private final HDBApplicant applicant;
     private final BTOProj project;
     private ApplicationStatus status;
-    private final FlatType flatType;
+    private final FlatTypes flatType;
 
     // Constructor
-    public Application(HDBApplicant applicant, BTOProj project, ApplicationStatus status, FlatType flatType) {
+    public Application(HDBApplicant applicant, BTOProj project, ApplicationStatus status, FlatTypes flatType) {
         this.applicationId = idCounter++;
         this.applicant = applicant;
         this.project = project;
@@ -33,7 +33,7 @@ public class Application {
         return project;
     }
 
-    public FlatType getFlatType() {
+    public FlatTypes getFlatType() {
         return flatType;
     }
 
@@ -43,23 +43,23 @@ public class Application {
 
     // Methods
     public void approve() {
-        this.status = ApplicationStatus.Successful;
+        this.status = ApplicationStatus.SUCCESSFUL;
     }
     
     public void reject() {
-        this.status = ApplicationStatus.Unsuccessful;
+        this.status = ApplicationStatus.UNSUCCESSFUL;
     }
     
     public void booked() {
-        this.status = ApplicationStatus.Booked;
+        this.status = ApplicationStatus.BOOKED;
     }
 
     public void approveWithdrawal() {
-        this.status = ApplicationStatus.Withdrawn;
+        this.status = ApplicationStatus.WITHDRAWN;
     }
 
     public void requestWithdrawal() {
-        this.status = ApplicationStatus.withdrawRequested;
+        this.status = ApplicationStatus.WITHDRAW_REQUESTED;
     }
 
     public String getStatus() {
