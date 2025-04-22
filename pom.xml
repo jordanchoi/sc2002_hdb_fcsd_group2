@@ -26,6 +26,11 @@
               <id>apache-snapshots</id>
               <url>https://repository.apache.org/snapshots</url>
           </repository>
+          <repository>
+              <id>itext</id>
+              <name>iText Repository</name>
+              <url>https://repo.itextsupport.com/releases</url>
+          </repository>
       </repositories>
 
     <!-- For Read IO Dependencies -->
@@ -60,6 +65,12 @@
             <artifactId>commons-io</artifactId>
             <version>2.19.0</version>
         </dependency>
-    </dependencies>
 
+    <!-- PDF generation and Graph -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.30</version>
+        </dependency>
+    </dependencies>
 </project>

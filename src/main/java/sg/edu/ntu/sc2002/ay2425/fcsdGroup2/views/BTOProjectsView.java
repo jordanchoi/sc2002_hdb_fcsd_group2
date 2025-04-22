@@ -5,10 +5,12 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
-
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.ReportView;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
 import java.util.*;
 import java.time.LocalDateTime;
 
@@ -19,15 +21,14 @@ public class BTOProjectsView implements UserView {
     private SessionStateManager session = SessionStateManager.getInstance();
 
     public BTOProjectsView(BTOProjsController projsController, HDBBTOExerciseController exerciseController, ApplicationController applicationController) {
-        this.applicationController = applicationController;
         this.projsController = projsController;
         this.exerciseController = exerciseController;
+        this.applicationController = new ApplicationController();
     }
 
     public void start() {
         System.out.println("You are in the BTO Project Management Console.\nHere, you can manage BTO projects, including creating of BTO Project or get statistics for a particular Project.\n");
         System.out.println("What would you like to do?\n");
-        printAllApplications();
         int choice = 0;
         do {
             displayMenu();
@@ -35,28 +36,8 @@ public class BTOProjectsView implements UserView {
         } while (choice != 5); // Assuming 10 is the exit option
     }
 
-    public void printAllApplications() {
-        applicationController.insertApplicationsFromRepo();
-        List<Application> applications = applicationController.viewAllApplications();
 
-        if (applications.isEmpty()) {
-            System.out.println("No applications available.");
-            return;
-        }
 
-        System.out.println("=== All BTO Applications ===");
-        System.out.printf("%-5s %-12s %-25s %-10s %-12s %-15s\n",
-                "ID", "NRIC", "Project Name", "Flat", "Status", "Booked Flat");
-
-        for (Application app : applications) {
-            System.out.printf("%-5d %-12s %-25s %-10s %-12s\n",
-                    app.getAppId(),
-                    app.getApplicant().getNric(),
-                    app.getProject().getProjName(),
-                    app.getFlatType().getTypeName(),
-                    app.getStatus());
-        }
-    }
 
     @Override
     public void displayMenu() {
@@ -428,7 +409,7 @@ public class BTOProjectsView implements UserView {
             case 3 -> {
                 // CONTINUE HERE
                 System.out.println("Managing Applications...");
-                manageApplication(selected.getProjId());
+                manageApplicationsByProjectId(applicationController, selected.getProjId());
             }
             case 4 -> {
                 System.out.println("Returning to project list...");
@@ -436,84 +417,90 @@ public class BTOProjectsView implements UserView {
         }
     }
 
-    private void manageApplication(int projectId) {
-        Scanner scanner = new Scanner(System.in);
+    public void manageApplicationsByProjectId(ApplicationController applicationController, int projectId) {
+        // Load from repository
+        BTORepository btoRepo = new BTORepository();
+        UserRepository userRepo = new UserRepository();
+        ApplicationRepository appRepo = new ApplicationRepository(btoRepo, userRepo);
+        List<Application> apps = appRepo.getApplicationsByProjectId(projectId);
 
-        applicationController.insertApplicationsFromRepo();
-        List<Application> allApplications = applicationController.viewAllApplications();
-
-        // Filter applications that belong to the selected project
-        List<Application> projectApplications = new ArrayList<>();
-        for (Application app : allApplications) {
-            if (app.getProject().getProjId() == projectId) {
-                projectApplications.add(app);
-            }
-        }
-
-        if (projectApplications.isEmpty()) {
-            System.out.println("No applications found for project ID: " + projectId);
+        // Project details
+        System.out.println("=== Project: (ID: "+projectId+") ===");
+        if (apps.isEmpty()) {
+            System.out.println("No applications available.");
             return;
         }
 
-        // Display applications for selected project
-        System.out.println("=== Applications for Project ID " + projectId + " ===");
-        for (Application app : projectApplications) {
-            System.out.printf("ID: %d | NRIC: %s | Flat: %s | Status: %s\n",
+        System.out.println("=== List of All Applications ===");
+        System.out.printf("%-5s %-12s %-20s %-12s %-12s %-15s\n",
+                "ID", "NRIC", "Project Name", "Status", "Flat Type", "Booked Flat");
+
+        for (Application app : apps) {
+            Flat flat = app.getFlat();
+            String bookedFlat = (flat != null)
+                    ? "Blk " + flat.getBlock().getBlkNo() + " #" + flat.getFloorNo() + "-" + flat.getUnitNo()
+                    : "-";
+
+            System.out.printf("%-5d %-12s %-20s %-12s %-12s %-15s\n",
                     app.getAppId(),
                     app.getApplicant().getNric(),
+                    app.getProject().getProjName(),
+                    app.getStatus(),
                     app.getFlatType().getTypeName(),
-                    app.getStatus());
+                    bookedFlat);
         }
 
-        System.out.print("Enter Application ID to process: ");
-        int selectedAppId = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        Scanner scanner = new Scanner(System.in);
+        int appId;
 
-        // Find the selected application
-        Application selectedApp = null;
-        for (Application app : projectApplications) {
-            if (app.getAppId() == selectedAppId) {
-                selectedApp = app;
+        while (true) {
+            System.out.print("\nEnter Application ID to process (or -1 to cancel): ");
+            String input = scanner.nextLine().trim();
+
+            try {
+                appId = Integer.parseInt(input);
+                if (appId == -1) return;
                 break;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
             }
         }
+
+        final int selectedAppId = appId;
+        Application selectedApp = apps.stream()
+                .filter(a -> a.getAppId() == selectedAppId)
+                .findFirst()
+                .orElse(null);
 
         if (selectedApp == null) {
-            System.out.println("Invalid Application ID.");
+            System.out.println("Application ID not found in this project.");
             return;
         }
-
-        // Print and process application
-        System.out.println("\n--- Application Details ---");
-        System.out.println("Application ID : " + selectedApp.getAppId());
-        System.out.println("Applicant NRIC : " + selectedApp.getApplicant().getNric());
-        System.out.println("Flat Type      : " + selectedApp.getFlatType().getTypeName());
-        System.out.println("Status         : " + selectedApp.getStatus());
 
         if (!selectedApp.getStatusEnum().equals(ApplicationStatus.PENDING)) {
-            System.out.println("Application already processed.");
+            System.out.println("This application has already been processed.");
             return;
         }
 
-        System.out.print("Approve this application? (yes/no): ");
-        String input = scanner.nextLine().trim().toLowerCase();
+        String decision;
+        while (true) {
+            System.out.print("Approve this application? (yes/no): ");
+            decision = scanner.nextLine().trim().toLowerCase();
 
-        FlatType flatType = selectedApp.getFlatType();
-
-        if (input.equals("yes")) {
-            if (flatType.getUnitsAvail() > 0) {
-                flatType.setUnitsBooked(flatType.getUnitsBooked() + 1);
-                selectedApp.approve();
-                System.out.println("Application approved. Units remaining: " + flatType.getUnitsAvail());
+            if (decision.equals("yes") || decision.equals("no")) {
+                break;
             } else {
-                selectedApp.reject();
-                System.out.println("No units available. Application rejected automatically.");
+                System.out.println("Invalid input. Please enter 'yes' or 'no'.");
             }
-        } else if (input.equals("no")) {
-            selectedApp.reject();
-            System.out.println("Application rejected.");
+        }
+
+        boolean approved = decision.equals("yes");
+        boolean result = applicationController.processApplicationDecision(selectedApp, approved);
+
+        if (result) {
+            System.out.println(approved ? "\nApplication approved.\n" : "\nApplication rejected.\n");
         } else {
-            System.out.println("Invalid input. Skipping application.");
+            System.out.println("Action failed. Possibly due to unavailable flats.");
         }
     }
 
@@ -659,5 +646,4 @@ public class BTOProjectsView implements UserView {
         boolean success = projsController.deleteProjId(selected.getProjId());
         System.out.println(success ? "Project deleted successfully." : "Project not found.");
     }
-
 }

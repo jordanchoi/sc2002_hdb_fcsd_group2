@@ -76,4 +76,8 @@ public class Application {
     public BTOProj getProject() {
         return project;
     }
+
+    public ApplicationStatus getPreviousStatus() {
+        return previousStatus;
+    }
 }
