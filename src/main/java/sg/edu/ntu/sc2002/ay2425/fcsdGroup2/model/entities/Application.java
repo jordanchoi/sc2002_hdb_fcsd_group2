@@ -5,64 +5,75 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 
 public class Application {
     private static int idCounter = 1;
-    private final int applicationId;
-    private final HDBApplicant applicant;
-    private final BTOProj project;
+    private int applicationID;
+    private HDBApplicant applicant;
+    private BTOProj project;
     private ApplicationStatus status;
-    private final FlatTypes flatType;
+    private FlatType flatType;
+    private Flat flatBooked;
+    private ApplicationStatus previousStatus;
 
-    // Constructor
-    public Application(HDBApplicant applicant, BTOProj project, ApplicationStatus status, FlatTypes flatType) {
-        this.applicationId = idCounter++;
+    public Application(int id, HDBApplicant applicant, BTOProj project){
+        this.applicationID = id;
         this.applicant = applicant;
         this.project = project;
-        this.status = status;
-        this.flatType = flatType;
+        this.status = ApplicationStatus.PENDING;
+        this.flatType = null;
     }
 
-    // Getters
+
+    public void approve(){
+        this.status = ApplicationStatus.SUCCESSFUL;
+    }
+    public void reject(){
+        this.status = ApplicationStatus.UNSUCCESSFUL;
+    }
+    public void booked(){
+        this.status = ApplicationStatus.BOOKED;
+    }
+
     public int getAppId() {
-        return applicationId;
+        return applicationID;
     }
 
     public HDBApplicant getApplicant() {
         return applicant;
     }
 
-    public BTOProj getProject() {
-        return project;
-    }
-
-    public FlatTypes getFlatType() {
-        return flatType;
-    }
-
     public ApplicationStatus getStatusEnum() {
-        return status;
+        return this.status;
     }
 
-    // Methods
-    public void approve() {
-        this.status = ApplicationStatus.SUCCESSFUL;
+    public BTOProj getAppliedProj(){
+        return this.project;
     }
-    
-    public void reject() {
-        this.status = ApplicationStatus.UNSUCCESSFUL;
+
+    public FlatType getFlatType() {
+        return this.flatType;
     }
-    
-    public void booked() {
-        this.status = ApplicationStatus.BOOKED;
+
+    public Flat getFlat() {
+        return this.flatBooked;
+    }
+
+    public void requestWithdrawal() {
+        this.previousStatus = this.status;
+        this.status = ApplicationStatus.WITHDRAW_REQUESTED;
     }
 
     public void approveWithdrawal() {
         this.status = ApplicationStatus.WITHDRAWN;
     }
 
-    public void requestWithdrawal() {
-        this.status = ApplicationStatus.WITHDRAW_REQUESTED;
+    public void rejectWithdrawal() {
+        this.status = this.previousStatus;
     }
 
     public String getStatus() {
         return status.name();
+    }
+
+    public BTOProj getProject() {
+        return project;
     }
 }

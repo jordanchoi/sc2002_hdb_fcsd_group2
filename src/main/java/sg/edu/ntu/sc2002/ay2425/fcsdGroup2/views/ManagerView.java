@@ -1,5 +1,6 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
@@ -13,6 +14,7 @@ public class ManagerView implements UserView {
 
     private final BTOProjsController projsController = new BTOProjsController();
     private final HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
+    private final ApplicationController applicationController = new ApplicationController();
 
     public ManagerView() {
         // Constructor logic if needed
@@ -27,6 +29,7 @@ public class ManagerView implements UserView {
         } while (choice != 10 || choice != 6);
     }
 
+
     @Override
     public void displayMenu() {
         System.out.println("What would you like to do?\n");
@@ -34,46 +37,73 @@ public class ManagerView implements UserView {
         System.out.println("2. Manage BTO Projects");
         System.out.println("3. Manage BTO Applications");
         System.out.println("4. Manage All Enquiries");
-        System.out.println("5. Change Password");
-        System.out.println("6. Logout");
+        System.out.println("5. Generate Report");
+        System.out.println("6. Change Password");
+        System.out.println("7. Logout");
         System.out.println("10. Exit");
     }
 
     @Override
     public int handleUserInput() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("\nPlease select an option: ");
-        int choice = scanner.nextInt();
+        int choice = -1;
 
         BTOExercisesView exercisesView = new BTOExercisesView(exerciseController);
-        BTOProjectsView projectsView = new BTOProjectsView(projsController, exerciseController);
+        BTOProjectsView projectsView = new BTOProjectsView(projsController, exerciseController, applicationController);
 
-        switch (choice) {
-            case 1 -> {
-                System.out.println("Managing BTO Exercises...");
-                exercisesView.start();
+        while (true) {
+            System.out.print("\nPlease select an option: ");
+
+            // Validate that input is an integer
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // consume invalid input
+                continue;
             }
-            case 2 -> {
-                System.out.println("Managing BTO Projects...");
-                projectsView.start();
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            // Validate range of choices
+            if (choice < 1 || (choice > 6 && choice != 10)) {
+                System.out.println("Invalid choice. Please enter a valid option (1–6 or 10).");
+                continue;
             }
-            case 3 -> System.out.println("Managing BTO Applications...");
-            case 4 -> System.out.println("Managing All Enquiries...");
-            case 5 -> {
-                System.out.println("Changing password...");
-                changePassword();
+
+            // Valid choice, handle it
+            switch (choice) {
+                case 1 -> {
+                    System.out.println("Managing BTO Exercises...");
+                    exercisesView.start();
+                }
+                case 2 -> {
+                    System.out.println("Managing BTO Projects...");
+                    projectsView.start();
+                }
+                case 3 -> System.out.println("Managing BTO Applications...");
+                case 4 -> System.out.println("Managing All Enquiries...");
+                case 5 -> {
+                    System.out.println("Generating Report...");
+
+                }
+                case 6 -> {
+                    System.out.println("Changing password...");
+                    changePassword();
+                }
+                case 7 -> {
+                    System.out.println("Logging out...");
+                    session.logout();
+                }
+                case 10 -> {
+                    System.out.println("Exiting...");
+                    session.logout();
+                }
             }
-            case 6 -> {
-                System.out.println("Logging out...");
-                session.logout();
-            }
-            case 10 -> {
-                System.out.println("Exiting...");
-                session.logout();
-            }
+
+            return choice;
         }
-        return choice;
     }
+
 
     public void changePassword() {
         Scanner scanner = new Scanner(System.in);
