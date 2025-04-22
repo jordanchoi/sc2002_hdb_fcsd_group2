@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class BTORepository implements BTOStorageProvider {
-    private static final UserRepository userRepo = new UserRepository();
+    private static UserRepository userRepo = UserRepository.getInstance();
+    private static BTORepository instance;
 
     // Excel file path
     private static final String PROJECTS_FILE_PATH = "data/ProjectList.xlsx";
@@ -25,7 +26,7 @@ public class BTORepository implements BTOStorageProvider {
     private List<BTOExercise> exercises;
     private List<Application> applications;
 
-    public BTORepository() {
+    private BTORepository() {
         // Initialize new arraylists for projects and exercises
         projects = new ArrayList<>();
         exercises = new ArrayList<>();
@@ -35,6 +36,13 @@ public class BTORepository implements BTOStorageProvider {
         loadProjectsFromFile(PROJECTS_FILE_PATH);
         loadExercisesFromFile(EXERCISES_FILE_PATH);
         loadApplicationsFromFile(APPLICATIONS_FILE_PATH);
+    }
+
+    public static BTORepository getInstance() {
+        if (instance == null) {
+            instance = new BTORepository();
+        }
+        return instance;
     }
 
     private void loadProjectsFromFile(String filePath) {

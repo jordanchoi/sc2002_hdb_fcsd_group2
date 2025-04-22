@@ -10,7 +10,7 @@ import java.util.List;
 
 public class HDBBTOExerciseController {
     private List<BTOExercise> exercises = new ArrayList<>();
-    private BTORepository btoRepo = new BTORepository();
+    private BTORepository btoRepo = BTORepository.getInstance();
 
     public HDBBTOExerciseController() {}
 

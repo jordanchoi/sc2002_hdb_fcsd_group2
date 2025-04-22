@@ -8,8 +8,8 @@ import java.util.List;
 public class TestEnquiryRepository {
     public static void main(String[] args) {
         // Set up dependencies
-        UserRepository userRepo = new UserRepository();       // make sure this loads test data
-        BTORepository btoRepo = new BTORepository();           // make sure this loads test projects
+        UserRepository userRepo = UserRepository.getInstance();       // make sure this loads test data
+        BTORepository btoRepo = BTORepository.getInstance();         // make sure this loads test projects
         EnquiryRepository enquiryRepo = new EnquiryRepository(userRepo, btoRepo);
 
         userRepo.getAllUsers().forEach(u -> System.out.println(u.getNric() + " - " + u.getFirstName()));

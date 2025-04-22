@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ApplicationController {
     private final List<Application> applications = new ArrayList<>();
-    private BTORepository btoRepo = new BTORepository();
+    private BTORepository btoRepo = BTORepository.getInstance();
 
     public ApplicationController() {}
 
