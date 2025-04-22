@@ -1,5 +1,6 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
@@ -13,6 +14,7 @@ public class ManagerView implements UserView {
 
     private final BTOProjsController projsController = new BTOProjsController();
     private final HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
+    private final ApplicationController applicationController = new ApplicationController();
 
     public ManagerView() {
         // Constructor logic if needed
@@ -26,6 +28,7 @@ public class ManagerView implements UserView {
             choice = handleUserInput();
         } while (choice != 10 || choice != 6);
     }
+
 
     @Override
     public void displayMenu() {
@@ -46,7 +49,7 @@ public class ManagerView implements UserView {
         int choice = -1;
 
         BTOExercisesView exercisesView = new BTOExercisesView(exerciseController);
-        BTOProjectsView projectsView = new BTOProjectsView(projsController, exerciseController);
+        BTOProjectsView projectsView = new BTOProjectsView(projsController, exerciseController, applicationController);
 
         while (true) {
             System.out.print("\nPlease select an option: ");

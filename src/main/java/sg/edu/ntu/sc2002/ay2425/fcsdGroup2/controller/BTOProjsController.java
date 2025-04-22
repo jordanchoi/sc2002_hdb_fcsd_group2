@@ -14,6 +14,7 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 public class BTOProjsController {
     private List<BTOProj> projects = new ArrayList<>();
+    private List<Application> applications = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
     private BTORepository btoRepo = new BTORepository();

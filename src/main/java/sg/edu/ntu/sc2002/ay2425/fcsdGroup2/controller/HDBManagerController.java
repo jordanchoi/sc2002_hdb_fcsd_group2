@@ -3,17 +3,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplication;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.FlatTypeFilter;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.MaritalStatusFilter;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.ProjNameFilter;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.ReportFilter;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
 
 public class HDBManagerController {
@@ -67,14 +60,4 @@ public class HDBManagerController {
         }
         return false;
     }
-
-    public List<Application> generateReport(List<Application> applications, ReportFilter filter) {
-        List<Application> result = new ArrayList<>();
-        for (Application app : applications) {
-            if (filter.matches(app)) {
-                result.add(app);
-            }
-        }
-        return result;
-    }  
 }
