@@ -4,16 +4,23 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.EnquiryRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class EnquiryController {
     private static EnquiryController instance;
-    private final List<Enquiry> enquiries;
+    private final UserRepository userRepo = new UserRepository();
+    private final BTORepository btoRepo = new BTORepository();
+    private final EnquiryRepository enquiryRepository = new EnquiryRepository(userRepo, btoRepo);
+    //private final List<Enquiry> enquiries;
 
     public EnquiryController() {
-        this.enquiries = new ArrayList<>();
+        //this.enquiries = enquiryRepository.getAllEnquiries();
     }
 
     public static EnquiryController getInstance() {
@@ -24,13 +31,14 @@ public class EnquiryController {
     }
 
     public void createEnquiry(String msg, HDBApplicant applicant, BTOProj project) {
-        Enquiry newEnquiry = new Enquiry(msg, applicant, project);
-        enquiries.add(newEnquiry);
+        Enquiry enquiry = enquiryRepository.add(msg, applicant, project);
+        //enquiries.add(enquiry);
     }
 
     public Enquiry getEnquiryById(int id) {
-        for (Enquiry e : enquiries) {
-            if (e.getEnquiryId() == id) return e;
+        Optional<Enquiry> e = enquiryRepository.getById(id);
+        if (e.isPresent()) {
+            return e.get();
         }
         return null;
     }
@@ -55,25 +63,18 @@ public class EnquiryController {
 
 
     public boolean deleteEnquiry(int id) {
-        Enquiry e = getEnquiryById(id);
-        if (e != null) {
-            enquiries.remove(e);
+        if (enquiryRepository.getById(id).isPresent()) {
+            enquiryRepository.delete(id);
             return true;
         }
         return false;
     }
 
     public List<Enquiry> listEnquiries() {
-        return new ArrayList<>(enquiries);
+        return enquiryRepository.getAll();
     }
 
     public List<Enquiry> getEnquiriesByApplicant(HDBApplicant applicant) {
-        List<Enquiry> applicantEnquiries = new ArrayList<>();
-        for (Enquiry e : enquiries) {
-            if (e.getMadeBy().equals(applicant)) {
-                applicantEnquiries.add(e);
-            }
-        }
-        return applicantEnquiries;
+        return enquiryRepository.getByApplicant(applicant);
     }
 }
