@@ -21,12 +21,23 @@ public class EnquiryRepository {
     private final UserRepository userRepo;
     private final BTORepository btoRepo;
 
+    // Singleton
+    private static EnquiryRepository instance;
+
     // Constructor
-    public EnquiryRepository(UserRepository userRepo, BTORepository btoRepo) {
-        this.userRepo = userRepo;
-        this.btoRepo = btoRepo;
+    private EnquiryRepository() {
+        this.userRepo = UserRepository.getInstance();
+        this.btoRepo = BTORepository.getInstance();
         // Load existing enquiries from file or database
         loadFromFile();
+    }
+
+    // Singleton instance
+    public static EnquiryRepository getInstance() {
+        if (instance == null) {
+            instance = new EnquiryRepository();
+        }
+        return instance;
     }
 
     // Example method to get all enquiries

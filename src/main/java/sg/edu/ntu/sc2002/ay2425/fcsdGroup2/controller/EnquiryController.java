@@ -16,7 +16,7 @@ public class EnquiryController {
     private static EnquiryController instance;
     private final UserRepository userRepo = UserRepository.getInstance();
     private final BTORepository btoRepo = BTORepository.getInstance();
-    private final EnquiryRepository enquiryRepository = new EnquiryRepository(userRepo, btoRepo);
+    private final EnquiryRepository enquiryRepository = EnquiryRepository.getInstance();
     //private final List<Enquiry> enquiries;
 
     public EnquiryController() {

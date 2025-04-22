@@ -10,7 +10,7 @@ public class TestEnquiryRepository {
         // Set up dependencies
         UserRepository userRepo = UserRepository.getInstance();       // make sure this loads test data
         BTORepository btoRepo = BTORepository.getInstance();         // make sure this loads test projects
-        EnquiryRepository enquiryRepo = new EnquiryRepository(userRepo, btoRepo);
+        EnquiryRepository enquiryRepo = EnquiryRepository.getInstance();
 
         userRepo.getAllUsers().forEach(u -> System.out.println(u.getNric() + " - " + u.getFirstName()));
         btoRepo.getAllProjects().forEach(p -> System.out.println(p.getProjName()));
@@ -37,7 +37,7 @@ public class TestEnquiryRepository {
 */
 
         // Reload repository and list all enquiries
-        enquiryRepo = new EnquiryRepository(userRepo, btoRepo);
+        enquiryRepo = EnquiryRepository.getInstance();
         List<Enquiry> all = enquiryRepo.getAll();
 
         System.out.println("Loaded Enquiries:");
