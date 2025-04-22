@@ -8,7 +8,7 @@ public interface canApplyFlat {
      *
      * @return true if the user can apply for a flat, false otherwise.
      */
-    public boolean checkEligibility();
-    public boolean submitApplication();
-    public Application applyFlat();
+    boolean checkEligibility();
+    boolean submitApplication();
+    Application applyFlat();
 }

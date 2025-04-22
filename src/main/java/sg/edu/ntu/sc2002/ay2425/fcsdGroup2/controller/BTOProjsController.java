@@ -14,9 +14,9 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 public class BTOProjsController {
     private List<BTOProj> projects = new ArrayList<>();
-    private List<HDBManager> managers;
+    private final List<HDBManager> managers;
     private List<Enquiry> enquiries;
-    private BTORepository btoRepo = new BTORepository();
+    private final BTORepository btoRepo = new BTORepository();
 
     public BTOProjsController() {
         this.managers = new ArrayList<>();
@@ -175,6 +175,7 @@ public class BTOProjsController {
         return enquiries;
     }
 
+    /* Commented out by Jordan because this is not implemented yet
     public void replyEnq(int enquiryId, String string){
         for(Enquiry enquiry : enquiries){
             if(enquiry.getEnquiryId() == enquiryId){
@@ -182,6 +183,7 @@ public class BTOProjsController {
             }
         }
     }
+     */
 
     // Not completed
     public void generateReport() {
