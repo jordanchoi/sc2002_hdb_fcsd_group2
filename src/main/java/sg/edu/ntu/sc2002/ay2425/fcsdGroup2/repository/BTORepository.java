@@ -490,4 +490,26 @@ public class BTORepository implements BTOStorageProvider {
     private double convertLocalDateToExcelDate(LocalDate date) {
         return (double) date.toEpochDay() - LocalDate.of(1899, 12, 30).toEpochDay();
     }
+
+    public BTOProj getProjById(int projId) {
+        for (BTOProj proj : projects) {
+            if (proj.getProjId() == projId) {
+                return proj;
+            }
+        }
+
+        // return null if not found - handle with care.
+        return null;
+    }
+
+    public BTOProj getProjByName(String name) {
+        for (BTOProj proj : projects) {
+            if (proj.getProjName().equalsIgnoreCase(name)) {
+                return proj;
+            }
+        }
+
+        // return null if not found - handle with care.
+        return null;
+    }
 }

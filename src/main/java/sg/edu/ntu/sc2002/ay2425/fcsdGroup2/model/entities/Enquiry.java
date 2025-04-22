@@ -1,43 +1,50 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Enquiry {
-    private String enquiry;
-    private int enquiryId;
-    private String reply;
-    private HDBApplicant madeBy;
-    private BTOProj forProj;
+    private static int idCounter = 1;
+    private final int enquiryID;
+    private final List<ProjectMessage> thread;
+    private final HDBApplicant madeBy;
+    private final BTOProj forProj;
 
-    public Enquiry(int id, String enquiry) {
-        this.enquiryId = id;
-        this.enquiry = enquiry;
+    public Enquiry(String enquiry, HDBApplicant madeBy, BTOProj forProj) {
+        this.enquiryID = idCounter++;
+        this.thread = new ArrayList<>();
+        this.madeBy = madeBy;
+        this.forProj = forProj;
+
+        this.thread.add(new ProjectMessage(enquiry, madeBy));
     }
 
-    public void delete() {
-        this.enquiry = null;
-        this.reply = null;
+    public int getEnquiryId() { return enquiryID; }
+    public List<ProjectMessage> getEnquiries() { return thread; }
+    public HDBApplicant getMadeBy() { return madeBy; }
+    public BTOProj getForProj() { return forProj; }
+
+    public void addMessage(String enquiry, User sender) {
+        thread.add(new ProjectMessage(enquiry, sender));
     }
 
-    public void setEnquiry(String enquiry) {
-        this.enquiry = enquiry;
+    public ProjectMessage getMessageById(int messageId) {
+        for (ProjectMessage message : thread) {
+            if (message.getMessageId() == messageId) {
+                return message;
+            }
+        }
+        return null;
     }
 
-    public String getEnquiry() {
-        return enquiry;
-    }
 
-    public void setReply(String reply) {
-        this.reply = reply;
-    }
-
-    public String getReply() {
-        return reply;
-    }
-
-    public void setEnquiryId(int enquiryId) {
-        this.enquiryId = enquiryId;
-    }
-
-    public int getEnquiryId() {
-        return enquiryId;
+    public boolean editMessageById(int messageId, User currentUser, String newContent) {
+        for (ProjectMessage m : thread) {
+            if (m.getMessageId() == messageId && m.getSender().equals(currentUser)) {
+                m.setContent(newContent);
+                return true;
+            }
+        }
+        return false;
     }
 }

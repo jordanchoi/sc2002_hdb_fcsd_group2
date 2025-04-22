@@ -10,7 +10,7 @@ import java.util.List;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
 
 public class HDBManagerController {
-    private List<OfficerProjectApplication> applications;
+    private final List<OfficerProjectApplication> applications;
     private List<Application> allApplications;
 
     public HDBManagerController(List<OfficerProjectApplication> a) {

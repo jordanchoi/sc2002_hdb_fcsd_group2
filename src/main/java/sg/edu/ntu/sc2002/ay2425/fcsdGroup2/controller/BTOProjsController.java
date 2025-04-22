@@ -17,7 +17,7 @@ public class BTOProjsController {
     private List<Application> applications = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
-    private BTORepository btoRepo = new BTORepository();
+    private final BTORepository btoRepo = new BTORepository();
 
     public BTOProjsController() {
         this.managers = new ArrayList<>();
@@ -177,6 +177,7 @@ public class BTOProjsController {
         return enquiries;
     }
 
+    /* Commented out by Jordan because this is not implemented yet
     public void replyEnq(int enquiryId, String string){
         for(Enquiry enquiry : enquiries){
             if(enquiry.getEnquiryId() == enquiryId){
@@ -184,6 +185,7 @@ public class BTOProjsController {
             }
         }
     }
+     */
 
     // Not completed
     public void generateReport() {
