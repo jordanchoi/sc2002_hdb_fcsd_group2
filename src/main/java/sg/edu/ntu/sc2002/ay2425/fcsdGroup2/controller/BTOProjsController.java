@@ -14,7 +14,8 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
 public class BTOProjsController {
     private List<BTOProj> projects = new ArrayList<>();
-    private final List<HDBManager> managers;
+    private List<Application> applications = new ArrayList<>();
+    private List<HDBManager> managers;
     private List<Enquiry> enquiries;
     private final BTORepository btoRepo = new BTORepository();
 
@@ -122,6 +123,7 @@ public class BTOProjsController {
 
     public void toggleProjVisibility(BTOProj proj) {
         proj.setVisibility(!proj.getVisibility());
+        btoRepo.saveProject(); // make sure this updates the file
     }
 
     public List<BTOProj> viewAllProjs() {
