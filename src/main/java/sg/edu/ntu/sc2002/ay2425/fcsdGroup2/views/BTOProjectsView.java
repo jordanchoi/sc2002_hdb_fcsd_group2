@@ -461,7 +461,6 @@ public class BTOProjectsView implements UserView {
             }
         }
 
-        // No need for final variable: use appId directly in lambda
         int finalAppId = appId;
         OfficerProjectApplication selectedApp = applications.stream()
                 .filter(a -> a.getOfficerAppId() == finalAppId)
@@ -491,12 +490,32 @@ public class BTOProjectsView implements UserView {
         }
 
         boolean approved = decision.equals("yes");
-        boolean result = controller.processOfficerDecision(selectedApp, approved);
 
+        BTOProj project = btoRepo.getProjById(projectId);
+        if (project == null) {
+            System.out.println("\nProject not found.");
+            return;
+        }
+
+        if (approved) {
+            if (project.getOfficersList().length >= project.getOfficerSlots()) {
+                System.out.println("\nCannot approve: Officer slots are already filled.");
+                return;
+            } else {
+                boolean added = project.assignOfficer(selectedApp.getOfficer());
+                if (!added) {
+                    System.out.println("\nThis officer is already assigned to the project.");
+                    return;
+                }
+                btoRepo.saveProject();  // Save changes to Excel
+            }
+        }
+
+        boolean result = controller.processOfficerDecision(selectedApp, approved);
         if (result) {
             System.out.println(approved ? "\nOfficer application approved.\n" : "\nOfficer application rejected.\n");
         } else {
-            System.out.println("Action failed. Please check application status or data consistency.");
+            System.out.println("\nAction failed. Please check application status or data consistency.");
         }
     }
 
