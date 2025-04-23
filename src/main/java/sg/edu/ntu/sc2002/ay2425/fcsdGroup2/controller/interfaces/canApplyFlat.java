@@ -6,6 +6,6 @@ public interface canApplyFlat {
      *
      * @return true if the user can apply for a flat, false otherwise.
      */
-    public boolean checkEligibility(String projName);
-    public boolean submitApplication(String projName);
+    public boolean checkEligibility(BTOProj project);
+    public boolean submitApplication(BTOProj project);
 }
