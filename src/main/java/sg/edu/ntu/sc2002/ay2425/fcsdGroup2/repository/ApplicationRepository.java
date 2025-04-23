@@ -23,7 +23,6 @@ public class ApplicationRepository {
         loadApplicationsFromFile(APPLICATION_FILE_PATH, userRepo, btoRepo);
     }
 
-
     public List<Application> getApplications() {
         return applications;
     }

@@ -33,6 +33,4 @@ public class ApplicationController {
         applicationRepo.update(app);
         return true;
     }
-
-
 }

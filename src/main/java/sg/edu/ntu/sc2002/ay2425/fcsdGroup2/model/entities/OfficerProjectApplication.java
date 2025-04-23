@@ -19,18 +19,28 @@ public class OfficerProjectApplication {
     + setAssignmentStatus(status : AssignStatus) : void
     + getAssignmentStatus() : AssignStatus
      */
-
+    private static int idCounter = 1;
     private int officerAppId;
     private HDBOfficer officer;
     private BTOProj proj;
     private AssignStatus assignmentStatus;
 
     // Constructor - Default
-    public OfficerProjectApplication() {}
+    public OfficerProjectApplication() {
+        this.officerAppId = idCounter++;
+    }
 
     // Constructor - With parameters
     public OfficerProjectApplication(int officerAppId, HDBOfficer officer, BTOProj proj, AssignStatus assignmentStatus) {
         this.officerAppId = officerAppId;
+        this.officer = officer;
+        this.proj = proj;
+        this.assignmentStatus = assignmentStatus;
+    }
+
+    // ✅ Constructor for auto-generating ID
+    public OfficerProjectApplication(HDBOfficer officer, BTOProj proj, AssignStatus assignmentStatus) {
+        this.officerAppId = idCounter++; // Auto-increment
         this.officer = officer;
         this.proj = proj;
         this.assignmentStatus = assignmentStatus;
