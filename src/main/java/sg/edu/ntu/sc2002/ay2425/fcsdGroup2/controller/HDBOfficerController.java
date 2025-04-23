@@ -4,22 +4,22 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class HDBOfficerController implements canApplyFlat {
     private HDBOfficer officer;
     private BTORepository btoRepository;
+
+    BTOProj selectedProject = null;
 
     public HDBOfficerController (HDBOfficer officer, BTORepository btoRepository) {
         this.officer = officer;
         this.btoRepository = btoRepository;
     }
     
-    @Override
-    public boolean checkEligibility(String projName) {
-        BTOProj proj = null;
-        for (BTOProj p : btoRepository.getAllProjects()) {
-            if (p.getProjName() == projName)  {proj = p;}
-        }
+    public boolean checkEligibility(BTOProj proj) {
         //questionable need to wait for Applicant to know the different applications applied before
         //boolean appliedAsApplicant = proj.getAllApp().stream().anyMatch(app -> app.getApplicant().getUserId() == this.getUserId());
         Application currentApp = officer.getCurrentApplication();
@@ -39,26 +39,24 @@ public class HDBOfficerController implements canApplyFlat {
         // passed both checks!
         return true;
     }
-    
-    @Override
-    public boolean submitApplication(String projName) {
+
+    public boolean submitApplication(BTOProj projName) {
         if (!checkEligibility(projName)) return false;
-        
-        BTOProj newproj = null;
-        BTORepository repo = new BTORepository();
-        for (BTOProj project : repo.getAllProjects()) {
-            if (project.getProjName().equalsIgnoreCase(projName)) {
-                newproj = project;
-            }
-        }
 
         for (OfficerProjectApplication a : officer.getRegisteredApps()) {
-            if (projName == a.getProj().getProjName()) {return false;}
+            if (projName.getProjName() == a.getProj().getProjName()) {return false;}
         }
        
-        OfficerProjectApplication app = new OfficerProjectApplication(officer, newproj, AssignStatus.PENDING);
+        OfficerProjectApplication app = new OfficerProjectApplication(officer, projName, AssignStatus.PENDING);
         officer.addApps(app);
+
+        OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
+        
+        // Use the addOfficerProjectApplication function to add it to the list and save it to Excel
+        appController.addOfficerProjectApplication(app);  // Adds the application to ProjectApplicationList.xlsx
+
         return true;
+
     }
 
     public String projRegStatus(String projectName) {
@@ -82,4 +80,110 @@ public class HDBOfficerController implements canApplyFlat {
         // Additional details can be appended as required.
         return details;
     }
+
+    public void viewEnquiries() {
+        Scanner scanner = new Scanner(System.in);
+        
+        // Get all the projects handled by the officer
+        List<BTOProj> allProjects = officer.getAllProj();
+        
+        // Display all projects and ask the officer to choose one
+        System.out.println("Enter the index of the project you want to view enquiries for: ");
+        for (int i = 0; i < allProjects.size(); i++) {
+            BTOProj project = allProjects.get(i);
+            System.out.println("Index: " + i + ", Project: " + project.getProjName());
+        }
+    
+        int choice = scanner.nextInt();  // Get the officer's choice of project
+        BTOProj selectedProject = allProjects.get(choice);  // Get the selected project
+    
+        // Use EnquiryController to get the list of all enquiries
+        EnquiryController enquiryController = EnquiryController.getInstance();
+        List<Enquiry> allEnquiries = enquiryController.listEnquiries();  // Get all enquiries
+
+        // Filter the enquiries by the selected project
+        List<Enquiry> enquiries = new ArrayList<>();
+        for (Enquiry enquiry : allEnquiries) {
+            if (enquiry.getForProj().equals(selectedProject)) {
+                enquiries.add(enquiry);  // Add the enquiry to the list if it matches the project
+            }
+        }
+    
+        // Display the enquiries for the selected project
+        System.out.println("Enquiries for project: " + selectedProject.getProjName());
+        for (Enquiry enquiry : enquiries) {
+            System.out.println("Enquiry ID: " + enquiry.getEnquiryId());
+            System.out.println("Made by: " + enquiry.getMadeBy().getFirstName());  // Display the applicant's name who made the enquiry
+            System.out.println("Enquiry Messages:");
+    
+            // Iterate through the messages in the enquiry thread and print them
+            for (ProjectMessage message : enquiry.getEnquiries()) {
+                System.out.println("[" + message.getMessageId() + "] " + message.getSenderRole() + ": " 
+                        + message.getSender().getFirstName() + " - " + message.getContent());
+            }
+    
+            System.out.println("-------------------------");  // Separate each enquiry for readability
+        }
+    }
+    
+    public void replyEnquiries() {
+        Scanner scanner = new Scanner(System.in);
+        
+        // Ask the officer to select an enquiry to reply to
+        System.out.print("Enter the enquiry ID to reply to: ");
+        int enquiryId = scanner.nextInt(); // Officer selects which enquiry to reply to
+        
+        // Get the selected enquiry from EnquiryController
+        EnquiryController enquiryController = EnquiryController.getInstance();
+        Enquiry selectedEnquiry = enquiryController.getEnquiryById(enquiryId);  // Retrieve enquiry by ID
+        
+        if (selectedEnquiry == null) {
+            System.out.println("Enquiry not found.");
+            return;  // Exit if enquiry not found
+        }
+    
+        // Check that the officer is assigned to the project the enquiry is related to
+        BTOProj project = selectedEnquiry.getForProj();
+        boolean officerAssigned = false;
+    
+        // Iterate over the officersList (which is an array) to check if the officer is handling this project
+        for (HDBOfficer officerInList : project.getOfficersList()) {
+            if (officerInList.equals(officer)) {
+                officerAssigned = true;
+                break;
+            }
+        }
+    
+        if (!officerAssigned) {
+            System.out.println("You are not assigned to this project, cannot reply.");
+            return;  // Exit if the officer is not handling the project
+        }
+    
+        // Ask the officer to enter the message ID they want to reply to
+        System.out.print("Enter the message ID to reply to: ");
+        int messageId = scanner.nextInt();
+        
+        // Get the message from the enquiry by messageId
+        ProjectMessage selectedMessage = selectedEnquiry.getMessageById(messageId);
+        
+        if (selectedMessage == null) {
+            System.out.println("Message not found.");
+            return;  // Exit if message with that ID is not found
+        }
+    
+        // Ask for the reply message content
+        System.out.print("Enter your reply message: ");
+        scanner.nextLine(); // Consume the leftover newline character
+        String replyContent = scanner.nextLine();
+        
+        // Use EnquiryController to add the reply message to the selected enquiry
+        boolean success = enquiryController.addMessage(enquiryId, replyContent, officer);  // Add reply to the message thread
+        
+        if (success) {
+            System.out.println("Your reply has been added to the enquiry thread.");
+        } else {
+            System.out.println("Failed to add your reply.");
+        }
+    }
+    
 }
