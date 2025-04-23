@@ -1,9 +1,7 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplication;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 import java.util.Scanner;
@@ -15,6 +13,8 @@ public class ManagerView implements UserView {
     private final BTOProjsController projsController = new BTOProjsController();
     private final HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
     private final ApplicationController applicationController = new ApplicationController();
+    private final OfficerProjectApplicationController officerProjectApplicationController = new OfficerProjectApplicationController();
+
     public ManagerView() {
         // Constructor logic if needed
     }
@@ -48,7 +48,7 @@ public class ManagerView implements UserView {
         int choice = -1;
 
         BTOExercisesView exercisesView = new BTOExercisesView(exerciseController);
-        BTOProjectsView projectsView = new BTOProjectsView(projsController, exerciseController, applicationController);
+        BTOProjectsView projectsView = new BTOProjectsView(projsController, exerciseController, applicationController, officerProjectApplicationController);
 
         while (true) {
             System.out.print("\nPlease select an option: ");

@@ -3,6 +3,7 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.OfficerProjectApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
@@ -18,12 +19,14 @@ public class BTOProjectsView implements UserView {
     private final BTOProjsController projsController;
     private final HDBBTOExerciseController exerciseController;
     private final ApplicationController applicationController;
+    private final OfficerProjectApplicationController officerProjectApplicationController;
     private SessionStateManager session = SessionStateManager.getInstance();
 
-    public BTOProjectsView(BTOProjsController projsController, HDBBTOExerciseController exerciseController, ApplicationController applicationController) {
+    public BTOProjectsView(BTOProjsController projsController, HDBBTOExerciseController exerciseController, ApplicationController applicationController, OfficerProjectApplicationController officerProjectApplication) {
         this.projsController = projsController;
         this.exerciseController = exerciseController;
         this.applicationController = new ApplicationController();
+        this.officerProjectApplicationController = officerProjectApplication;
     }
 
     public void start() {
@@ -405,6 +408,7 @@ public class BTOProjectsView implements UserView {
             }
             case 2 -> {
                 System.out.println("Managing HDB Officer...");
+                manageOfficerByProjectId(selected.getProjId());
             }
             case 3 -> {
                 // CONTINUE HERE
@@ -414,6 +418,85 @@ public class BTOProjectsView implements UserView {
             case 4 -> {
                 System.out.println("Returning to project list...");
             }
+        }
+    }
+
+    public void manageOfficerByProjectId(int projectId) {
+        BTORepository btoRepo = new BTORepository();
+        UserRepository userRepo = new UserRepository();
+        ProjectApplicationRepository projAppRepo = new ProjectApplicationRepository(userRepo, btoRepo);
+        OfficerProjectApplicationController controller = new OfficerProjectApplicationController();
+        List<OfficerProjectApplication> applications = projAppRepo.getByProjectId(projectId);
+
+        System.out.println("=== Officer Assignments for Project ID: " + projectId + " ===");
+
+        if (applications.isEmpty()) {
+            System.out.println("No officer applications found for this project.");
+            return;
+        }
+
+        System.out.printf("%-5s %-12s %-25s %-20s\n", "ID", "NRIC", "Officer Name", "Status");
+
+        for (OfficerProjectApplication app : applications) {
+            System.out.printf("%-5d %-12s %-25s %-20s\n",
+                    app.getOfficerAppId(),
+                    app.getOfficer().getNric(),
+                    app.getOfficer().getFirstName(),
+                    app.getAssignmentStatus());
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        int appId;
+
+        while (true) {
+            System.out.print("\nEnter Officer Application ID to process (or -1 to cancel): ");
+            String input = scanner.nextLine().trim();
+
+            try {
+                appId = Integer.parseInt(input);
+                if (appId == -1) return;
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        }
+
+        // No need for final variable: use appId directly in lambda
+        int finalAppId = appId;
+        OfficerProjectApplication selectedApp = applications.stream()
+                .filter(a -> a.getOfficerAppId() == finalAppId)
+                .findFirst()
+                .orElse(null);
+
+        if (selectedApp == null) {
+            System.out.println("\nApplication ID not found in this project.");
+            return;
+        }
+
+        if (!selectedApp.getAssignmentStatus().equals(AssignStatus.PENDING)) {
+            System.out.println("\nThis application has already been processed.");
+            return;
+        }
+
+        String decision;
+        while (true) {
+            System.out.print("Approve this officer application? (yes/no): ");
+            decision = scanner.nextLine().trim().toLowerCase();
+
+            if (decision.equals("yes") || decision.equals("no")) {
+                break;
+            } else {
+                System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+            }
+        }
+
+        boolean approved = decision.equals("yes");
+        boolean result = controller.processOfficerDecision(selectedApp, approved);
+
+        if (result) {
+            System.out.println(approved ? "\nOfficer application approved.\n" : "\nOfficer application rejected.\n");
+        } else {
+            System.out.println("Action failed. Please check application status or data consistency.");
         }
     }
 

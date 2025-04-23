@@ -22,7 +22,6 @@ public class Application {
         this.flatType = null;
     }
 
-
     public void approve(){
         this.status = ApplicationStatus.SUCCESSFUL;
     }
