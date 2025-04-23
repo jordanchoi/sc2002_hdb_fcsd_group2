@@ -1,0 +1,31 @@
+package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums;
+public enum Neighbourhoods {
+    ANG_MO_KIO,
+    BEDOK,
+    BISHAN,
+    BUKIT_BATOK,
+    BUKIT_MERAH,
+    BUKIT_PANJANG,
+    BUKIT_TIMAH,
+    CENTRAL_AREA,
+    CHOA_CHU_KANG,
+    CLEMENTI,
+    GEYLANG,
+    HOUGANG,
+    JURONG_EAST,
+    JURONG_WEST,
+    KALLANG_WHAMPOA,
+    MARINE_PARADE,
+    PASIR_RIS,
+    PUNGGOL,
+    QUEENSTOWN,
+    SENGKANG,
+    SEMBAWANG,
+    SERANGOON,
+    TAMPINES,
+    TENGAH,
+    TOA_PAYOH,
+    WOODLANDS,
+    YISHUN
+
+}
