@@ -23,7 +23,14 @@ public class BookingController {
     }
 
     public boolean updateFlatAvail(Application app) {
-        FlatType flatToUpdate = app.getFlatType();
+        //FlatType flatToUpdate = app.getFlatTypeObj();
+        List<FlatType> project = app.getAppliedProj().getAvailableFlatTypes();
+        FlatType flatToUpdate = null;
+        for (FlatType f : project) {
+            if (f.getTypeName().equalsIgnoreCase(app.getFlatType().name())) {
+                flatToUpdate = f;
+            }
+        }
         int oldUnitsAvail = flatToUpdate.getUnitsAvail();
         if (oldUnitsAvail == 0) {
             return false;
@@ -42,7 +49,7 @@ public class BookingController {
     public boolean updateAppProfile(Application app, String newtype, BTORepository repo) {
         BTOProj proj = null;
         for (BTOProj p : repo.getAllProjects()) {
-            if (p.getProjName().equalsIgnoreCase(app.getBTOProj())) {
+            if (p.getProjName().equalsIgnoreCase(app.getAppliedProj().getProjName())) {
                 proj = p;
             }
         }
