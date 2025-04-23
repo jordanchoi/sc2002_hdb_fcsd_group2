@@ -21,8 +21,8 @@ public class ReportView {
     }
 
     public void generateReport() {
-        BTORepository btoRepo = new BTORepository();
-        UserRepository userRepo = new UserRepository();
+        BTORepository btoRepo = BTORepository.getInstance();
+        UserRepository userRepo = UserRepository.getInstance();
         ApplicationRepository appRepo = new ApplicationRepository(btoRepo, userRepo);
         List<Application> apps = appRepo.getApplications();
         List<HDBApplicant> applicants = userRepo.getApplicants();

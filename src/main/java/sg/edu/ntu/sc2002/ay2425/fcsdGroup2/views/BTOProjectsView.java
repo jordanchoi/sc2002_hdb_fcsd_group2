@@ -418,8 +418,8 @@ public class BTOProjectsView implements UserView {
     }
 
     public void manageApplicationsByProjectId(ApplicationController applicationController, int projectId) {
-        BTORepository btoRepo = new BTORepository();
-        UserRepository userRepo = new UserRepository();
+        BTORepository btoRepo = BTORepository.getInstance();
+        UserRepository userRepo = UserRepository.getInstance();
         ApplicationRepository appRepo = new ApplicationRepository(btoRepo, userRepo);
         List<Application> apps = appRepo.getApplicationsByProjectId(projectId);
 
