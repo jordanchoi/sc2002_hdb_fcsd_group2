@@ -94,6 +94,7 @@ public class EnquiryRepository {
                 e.printStackTrace();
             }
         }
+        enquiries.clear();
         enquiries.addAll(enquiryMap.values());
         int maxId = enquiryMap.keySet().stream().max(Integer::compareTo).orElse(0);
     }
@@ -141,6 +142,12 @@ public class EnquiryRepository {
         enquiries.add(enquiry);
         saveToFile();
         return enquiry;
+    }
+
+    public Enquiry add(Enquiry enq) {
+        enquiries.add(enq);
+        saveToFile();
+        return enq;
     }
 
 /*

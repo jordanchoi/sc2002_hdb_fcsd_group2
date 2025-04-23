@@ -101,6 +101,15 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
     @Override
     public boolean replyEnquiry(int enquiryId, String reply, HDBManager manager) {
         Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
+
+        // Testing
+        if (opt.isEmpty()) {
+            System.out.println("Enquiry not found");
+            return false;
+        }
+        // Testing
+        System.out.println(opt.get().toString());
+
         if (opt.isEmpty()) {return false;}
 
         Enquiry enq = opt.get();
@@ -108,8 +117,9 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         // Check if the manager is assigned to the project
         if (enq.getForProj().getManagerIC().equals(manager)) {
             enq.addMessage(reply, manager);
-            enquiryRepo.delete(enquiryId);
-            enquiryRepo.add(enq.getEnquiryId(), "", enq.getMadeBy(), enq.getForProj());
+            enquiryRepo.add(enq);
+            //enquiryRepo.delete(enquiryId);
+            //enquiryRepo.add(enq.getEnquiryId(), reply, enq.getMadeBy(), enq.getForProj());
             return true;
         }
 

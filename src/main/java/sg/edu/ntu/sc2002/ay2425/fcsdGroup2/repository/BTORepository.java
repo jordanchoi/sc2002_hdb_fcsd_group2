@@ -36,6 +36,11 @@ public class BTORepository implements BTOStorageProvider {
         loadProjectsFromFile(PROJECTS_FILE_PATH);
         loadExercisesFromFile(EXERCISES_FILE_PATH);
         loadApplicationsFromFile(APPLICATIONS_FILE_PATH);
+
+        for (BTOProj proj : projects) {
+            HDBManager manager = proj.getManagerIC(); // assuming this returns the assigned manager
+
+        }
     }
 
     public static BTORepository getInstance() {
@@ -174,6 +179,12 @@ public class BTORepository implements BTOStorageProvider {
                     visibilityOverride
             );
 
+            try {
+                assignedManager.assignProj(project);
+            } catch (NullPointerException e) {
+                System.out.println("Manager not found for project: " + projectName + ": " + e.getMessage());
+            }
+
             for (FlatType ft : new ArrayList<>(flatTypes)) {
                 try {
                     FlatTypes type = FlatTypes.fromDisplayName(ft.getTypeName());
@@ -184,6 +195,7 @@ public class BTORepository implements BTOStorageProvider {
             }
             projects.add(project);
         }
+
     }
 
 

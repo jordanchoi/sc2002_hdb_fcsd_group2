@@ -67,8 +67,8 @@ public class ManagerView implements UserView {
             scanner.nextLine();
 
             // Validate range of choices
-            if (choice < 1 || (choice > 6 && choice != 10)) {
-                System.out.println("Invalid choice. Please enter a valid option (1–6 or 10).");
+            if (choice < 1 || (choice > 7 && choice != 10)) {
+                System.out.println("Invalid choice. Please enter a valid option (1–7 or 10).");
                 continue;
             }
 
@@ -98,13 +98,14 @@ public class ManagerView implements UserView {
                 case 7 -> {
                     System.out.println("Logging out...");
                     session.logout();
+                    System.exit(1);
                 }
                 case 10 -> {
                     System.out.println("Exiting...");
                     session.logout();
+                    System.exit(1);
                 }
             }
-
             return choice;
         }
     }
