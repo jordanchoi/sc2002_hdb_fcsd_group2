@@ -150,15 +150,18 @@ public class EnquiryRepository {
         return enq;
     }
 
-/*
     public void update(Enquiry updated) {
-        int id = updated.getEnquiryId();
+        delete(updated.getEnquiryId());   // remove old copy
+        enquiries.add(updated);           // add updated copy
+        saveToFile();                     // persist
+    /*
+     int id = updated.getEnquiryId();
         delete(updated.getEnquiryId());
         add(id, updated.get, updated.getMadeBy(), updated.getForProj());
         saveToFile();
-    }
+     */
 
- */
+    }
 
     public boolean delete(int id) {
         if (getById(id).isPresent()) {

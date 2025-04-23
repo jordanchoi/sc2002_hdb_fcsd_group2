@@ -44,7 +44,13 @@ public class Enquiry {
     public BTOProj getForProj() { return forProj; }
 
     public void addMessage(String enquiry, User sender) {
-        thread.add(new ProjectMessage(enquiry, sender));
+        boolean alreadyExists = thread.stream().anyMatch(
+                m -> m.getContent().equals(enquiry) && m.getSender().equals(sender)
+        );
+        if (!alreadyExists) {
+            thread.add(new ProjectMessage(enquiry, sender));
+        }
+        //thread.add(new ProjectMessage(enquiry, sender));
     }
 
     public ProjectMessage getMessageById(int messageId) {

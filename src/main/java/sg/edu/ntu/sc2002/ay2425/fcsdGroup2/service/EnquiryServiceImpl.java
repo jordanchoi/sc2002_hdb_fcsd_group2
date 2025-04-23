@@ -38,7 +38,7 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         enquiry.addMessage(msg, sender);
         //?
         enquiryRepo.delete(enquiryId);
-        enquiryRepo.add(enquiry.getEnquiryId(), "", enquiry.getMadeBy(), enquiry.getForProj());
+        //enquiryRepo.add(enquiry.getEnquiryId(), "", enquiry.getMadeBy(), enquiry.getForProj());
         return true;
     }
 
@@ -117,7 +117,7 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         // Check if the manager is assigned to the project
         if (enq.getForProj().getManagerIC().equals(manager)) {
             enq.addMessage(reply, manager);
-            enquiryRepo.add(enq);
+            enquiryRepo.update(enq);
             //enquiryRepo.delete(enquiryId);
             //enquiryRepo.add(enq.getEnquiryId(), reply, enq.getMadeBy(), enq.getForProj());
             return true;
