@@ -13,9 +13,9 @@ public class HDBOfficer extends HDBApplicant{
     private List<OfficerProjectApplication> registrationApps;
 
 
-    public HDBOfficer(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
-        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
-        this.officerId = userId;
+    public HDBOfficer(int officerID, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
+        super(officerID, nric, password, firstName, lastName, middleName, age, maritalStatus);
+        this.officerId = officerID;
         this.projectsHandled = new ArrayList<>();
         this.registrationApps = new ArrayList<>();
     }

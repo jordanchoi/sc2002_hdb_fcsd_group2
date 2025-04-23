@@ -100,7 +100,7 @@ public class UserRepository {
                 HDBManager manager = new HDBManager(managerId + 1, name, nric, age, maritalStatus, password);
                 managers.add(manager);
             } else if (role.equals("Officer")) {
-                HDBOfficer officer = new HDBOfficer(officerId + 1, name, nric, age, maritalStatus, password);
+                HDBOfficer officer = new HDBOfficer(officerId + 1, nric, name,password, null, null, age, maritalStatus);
                 officers.add(officer);
             } else if (role.equals("Applicant")) {
                 // we will identify applicant by their NRIC so no need for id.

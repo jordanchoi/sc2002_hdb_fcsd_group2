@@ -34,7 +34,8 @@ public class LoginView {
                 } else if (session.getLoggedInUserType() == UserRoles.OFFICER) {
                     // Redirect to Officer View
                     System.out.println("Redirecting to Officer View..\n");
-                    // OfficerView officerView = new OfficerView();
+                    OfficerView officerView = new OfficerView();
+                    officerView.start();
                 } else if (session.getLoggedInUserType() == UserRoles.MANAGER) {
                     // Redirect to BTO Officer View
                     System.out.println("Redirecting to Manager View..\n");
