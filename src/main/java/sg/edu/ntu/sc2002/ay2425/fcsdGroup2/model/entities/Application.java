@@ -13,6 +13,7 @@ public class Application {
     private Flat flatBooked;
     private ApplicationStatus previousStatus;
 
+
     public Application(int id, HDBApplicant applicant, BTOProj project){
         this.applicationID = id;
         this.applicant = applicant;
@@ -58,7 +59,7 @@ public class Application {
 
     public void requestWithdrawal() {
         this.previousStatus = this.status;
-        this.status = ApplicationStatus.WITHDRAW_REQUESTED;
+        this.status = ApplicationStatus.WITHDRAW_REQ;
     }
 
     public void approveWithdrawal() {
@@ -75,5 +76,9 @@ public class Application {
 
     public BTOProj getProject() {
         return project;
+    }
+
+    public ApplicationStatus getPreviousStatus() {
+        return previousStatus;
     }
 }

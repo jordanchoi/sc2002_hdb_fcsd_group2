@@ -15,7 +15,6 @@ public class ManagerView implements UserView {
     private final BTOProjsController projsController = new BTOProjsController();
     private final HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
     private final ApplicationController applicationController = new ApplicationController();
-
     public ManagerView() {
         // Constructor logic if needed
     }
@@ -84,7 +83,7 @@ public class ManagerView implements UserView {
                 case 4 -> System.out.println("Managing All Enquiries...");
                 case 5 -> {
                     System.out.println("Generating Report...");
-
+                    generateReport();
                 }
                 case 6 -> {
                     System.out.println("Changing password...");
@@ -130,5 +129,10 @@ public class ManagerView implements UserView {
                 break;
             }
         } while (attempts > 0);
+    }
+
+    public void generateReport() {
+        ReportView reportView = new ReportView();
+        reportView.generateReport();
     }
 }

@@ -18,23 +18,20 @@ public class BTORepository implements BTOStorageProvider {
     // Excel file path
     private static final String PROJECTS_FILE_PATH = "data/ProjectList.xlsx";
     private static final String EXERCISES_FILE_PATH = "data/ExerciseList.xlsx";
-    private static final String APPLICATIONS_FILE_PATH = "data/ApplicationLists.xlsx";
 
     // Container for the projects & exercises
     private List<BTOProj> projects;
     private List<BTOExercise> exercises;
-    private List<Application> applications;
+
 
     public BTORepository() {
         // Initialize new arraylists for projects and exercises
         projects = new ArrayList<>();
         exercises = new ArrayList<>();
-        applications = new ArrayList<>();
 
         // Load projects and exercises from the Excel files
         loadProjectsFromFile(PROJECTS_FILE_PATH);
         loadExercisesFromFile(EXERCISES_FILE_PATH);
-        loadApplicationsFromFile(APPLICATIONS_FILE_PATH);
     }
 
     private void loadProjectsFromFile(String filePath) {
@@ -235,123 +232,6 @@ public class BTORepository implements BTOStorageProvider {
         }
     }
 
-    private void loadApplicationsFromFile(String filePath) {
-        applications.clear();
-
-        List<List<String>> data;
-
-        File localFile = new File(filePath);
-        if (localFile.exists()) {
-            data = FileIO.readExcelFileLocal(filePath);
-        } else {
-            data = FileIO.readMergedExcelFile(filePath);
-        }
-
-        for (List<String> row : data) {
-            try {
-                // A - Applicant NRIC
-                String applicantNric = row.get(0).trim();
-                Optional<User> user = userRepo.getUserByName(applicantNric, UserRoles.APPLICANT);
-                if (user.isEmpty()) {
-                    System.out.println("Applicant not found: " + applicantNric);
-                    continue;
-                }
-                HDBApplicant applicant = (HDBApplicant) user.get();
-
-                // B - Application ID
-                int appId = (int) Double.parseDouble(row.get(1).trim());
-
-                // C - Project ID
-                int projId = (int) Double.parseDouble(row.get(2).trim());
-                Optional<BTOProj> matchedProject = projects.stream()
-                        .filter(p -> p.getProjId() == projId)
-                        .findFirst();
-                if (matchedProject.isEmpty()) {
-                    System.out.println("Project ID not found: " + projId);
-                    continue;
-                }
-                BTOProj project = matchedProject.get();
-
-                // D - Application Status
-                ApplicationStatus status = ApplicationStatus.valueOf(row.get(3).trim().toUpperCase());
-
-                // E - Flat Type
-                FlatTypes flatTypeEnum = FlatTypes.fromDisplayName(row.get(4).trim());
-                FlatType flatType = project.getFlatUnits().get(flatTypeEnum);
-
-                // F - Flat Booked (optional)
-                String flatStr = row.get(5).trim();
-                Flat bookedFlat = null;
-                if (!flatStr.isEmpty()) {
-                    bookedFlat = parseFlatFromString(flatStr, flatType, project);
-                }
-
-                // G - Previous Status (optional)
-                ApplicationStatus previousStatus = null;
-                if (row.size() > 6 && !row.get(6).trim().isEmpty()) {
-                    previousStatus = ApplicationStatus.valueOf(row.get(6).trim().toUpperCase());
-                }
-
-                // Create and populate the Application object
-                Application app = new Application(appId, applicant, project);
-
-                // Use reflection to patch internal fields
-                if (flatType != null) {
-                    java.lang.reflect.Field ftField = Application.class.getDeclaredField("flatType");
-                    ftField.setAccessible(true);
-                    ftField.set(app, flatType);
-                }
-
-                java.lang.reflect.Field statusField = Application.class.getDeclaredField("status");
-                statusField.setAccessible(true);
-                statusField.set(app, status);
-
-                if (bookedFlat != null) {
-                    java.lang.reflect.Field bookedField = Application.class.getDeclaredField("flatBooked");
-                    bookedField.setAccessible(true);
-                    bookedField.set(app, bookedFlat);
-                }
-
-                if (previousStatus != null) {
-                    java.lang.reflect.Field prevStatusField = Application.class.getDeclaredField("previousStatus");
-                    prevStatusField.setAccessible(true);
-                    prevStatusField.set(app, previousStatus);
-                }
-
-                applications.add(app);
-            } catch (Exception e) {
-                System.out.println("Error parsing application row: " + row);
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private Flat parseFlatFromString(String flatStr, FlatType type, BTOProj project) {
-        try {
-            String cleaned = flatStr.replace("Blk ", "").trim(); // "10 03-105"
-            String[] parts = cleaned.split(" ");
-            int blockNo = Integer.parseInt(parts[0]);
-            String[] floorUnit = parts[1].split("-");
-
-            int floor = Integer.parseInt(floorUnit[0]);
-            int unit = Integer.parseInt(floorUnit[1]);
-
-            for (Block block : project.getBlocks()) {
-                if (block.getBlkNo() == blockNo) {
-                    return new Flat(floor, unit, FlatBookingStatus.BOOKED, type, block);
-                }
-            }
-
-            System.out.println("Block not found for booked flat: " + flatStr);
-            return null;
-
-        } catch (Exception e) {
-            System.out.println("Invalid flat string: " + flatStr);
-            return null;
-        }
-    }
-
-
     @Override
     public List<BTOProj> getAllProjects() {
         return projects;
@@ -362,9 +242,6 @@ public class BTORepository implements BTOStorageProvider {
         return exercises;
     }
 
-    @Override
-    public List<Application> getAllApplications() { return applications;}
-
     public void addProject(BTOProj project) {
         projects.add(project);
         this.saveProject();
@@ -374,12 +251,6 @@ public class BTORepository implements BTOStorageProvider {
     public void addExercise(BTOExercise exercise) {
         exercises.add(exercise);
         this.saveExercise();
-    }
-
-    @Override
-    public void addApplication(Application application) {
-        applications.add(application);
-        this.saveApplication();
     }
 
     @Override
@@ -476,12 +347,6 @@ public class BTORepository implements BTOStorageProvider {
 
         FileIO.writeExcelFile(EXERCISES_FILE_PATH, rows);
     }
-
-    @Override
-    public void saveApplication() {
-
-    }
-
 
     private LocalDateTime convertExcelDateToLocalDateTime(double excelDate) {
         return LocalDate.of(1899, 12, 30).plusDays((long) excelDate).atStartOfDay();
