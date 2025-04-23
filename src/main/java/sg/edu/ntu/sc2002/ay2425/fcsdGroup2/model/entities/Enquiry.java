@@ -4,12 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Enquiry {
-    private static int idCounter = 1;
     private final int enquiryID;
     private final List<ProjectMessage> thread;
     private final HDBApplicant madeBy;
     private final BTOProj forProj;
 
+    public Enquiry(int enquiryID, String message, HDBApplicant madeBy, BTOProj forProj) {
+        this.enquiryID = enquiryID;
+        this.thread = new ArrayList<>();;
+        this.madeBy = madeBy;
+        this.forProj = forProj;
+
+        this.thread.add(new ProjectMessage(message, madeBy));
+    }
+
+    // For loading from file.
+    public Enquiry(int enquiryID, HDBApplicant madeBy, BTOProj forProj) {
+        this.enquiryID = enquiryID;
+        this.thread = new ArrayList<>();
+        this.madeBy = madeBy;
+        this.forProj = forProj;
+    }
+
+    /* Problematic constructor
     public Enquiry(String enquiry, HDBApplicant madeBy, BTOProj forProj) {
         this.enquiryID = idCounter++;
         this.thread = new ArrayList<>();
@@ -19,13 +36,21 @@ public class Enquiry {
         this.thread.add(new ProjectMessage(enquiry, madeBy));
     }
 
+     */
+
     public int getEnquiryId() { return enquiryID; }
     public List<ProjectMessage> getEnquiries() { return thread; }
     public HDBApplicant getMadeBy() { return madeBy; }
     public BTOProj getForProj() { return forProj; }
 
     public void addMessage(String enquiry, User sender) {
-        thread.add(new ProjectMessage(enquiry, sender));
+        boolean alreadyExists = thread.stream().anyMatch(
+                m -> m.getContent().equals(enquiry) && m.getSender().equals(sender)
+        );
+        if (!alreadyExists) {
+            thread.add(new ProjectMessage(enquiry, sender));
+        }
+        //thread.add(new ProjectMessage(enquiry, sender));
     }
 
     public ProjectMessage getMessageById(int messageId) {
@@ -36,7 +61,6 @@ public class Enquiry {
         }
         return null;
     }
-
 
     public boolean editMessageById(int messageId, User currentUser, String newContent) {
         for (ProjectMessage m : thread) {

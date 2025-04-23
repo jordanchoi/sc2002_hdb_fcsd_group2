@@ -9,9 +9,15 @@ public interface BTOStorageProvider {
     List<BTOProj> getAllProjects();
     List<BTOExercise> getAllExercises();
 
+    List<Application> getAllApplications();
+
     void addProject(BTOProj project);
     void addExercise(BTOExercise exercise);
 
+    void addApplication(Application application);
+
     void saveProject();
     void saveExercise();
+
+    void saveApplication();
 }

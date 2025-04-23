@@ -4,7 +4,9 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers.ManagerViewHandler;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 import java.util.Scanner;
 
@@ -64,8 +66,8 @@ public class ManagerView implements UserView {
             scanner.nextLine();
 
             // Validate range of choices
-            if (choice < 1 || (choice > 6 && choice != 10)) {
-                System.out.println("Invalid choice. Please enter a valid option (1–6 or 10).");
+            if (choice < 1 || (choice > 7 && choice != 10)) {
+                System.out.println("Invalid choice. Please enter a valid option (1–7 or 10).");
                 continue;
             }
 
@@ -80,7 +82,10 @@ public class ManagerView implements UserView {
                     projectsView.start();
                 }
                 case 3 -> System.out.println("Managing BTO Applications...");
-                case 4 -> System.out.println("Managing All Enquiries...");
+                case 4 ->  {
+                    System.out.println("Managing All Enquiries...");
+                    new EnquiryView(new ManagerViewHandler((HDBManager) session.getLoggedInUser())).display();
+                }
                 case 5 -> {
                     System.out.println("Generating Report...");
                     generateReport();
@@ -92,17 +97,17 @@ public class ManagerView implements UserView {
                 case 7 -> {
                     System.out.println("Logging out...");
                     session.logout();
+                    System.exit(1);
                 }
                 case 10 -> {
                     System.out.println("Exiting...");
                     session.logout();
+                    System.exit(1);
                 }
             }
-
             return choice;
         }
     }
-
 
     public void changePassword() {
         Scanner scanner = new Scanner(System.in);

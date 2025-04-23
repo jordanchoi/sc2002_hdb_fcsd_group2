@@ -26,7 +26,7 @@ public class UserAuthController {
     private static UserAuthController instance;
 
     // This is a static instance of the UserRepository class.
-    private final UserRepository userRepository = new UserRepository();
+    private final UserRepository userRepository = UserRepository.getInstance();
     private final SessionStateManager session = SessionStateManager.getInstance();
 
     // Private constructor to prevent instantiation

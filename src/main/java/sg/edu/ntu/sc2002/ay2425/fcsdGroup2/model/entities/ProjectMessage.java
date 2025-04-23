@@ -24,6 +24,8 @@ public class ProjectMessage {
         this.timestamp = timestamp;
     };
 
+
+
     public int getMessageId() { return messageId; }
     public String getContent() { return content; }
     public User getSender() { return sender; }
