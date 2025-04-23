@@ -16,7 +16,7 @@ public class BTOProjsController {
     private List<BTOProj> projects = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
-    private final BTORepository btoRepo = new BTORepository();
+    private final BTORepository btoRepo = BTORepository.getInstance();
 
     public BTOProjsController() {
         this.managers = new ArrayList<>();
