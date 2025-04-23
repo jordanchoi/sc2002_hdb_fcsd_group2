@@ -29,32 +29,45 @@ public class ReportView {
 
         // Input: Marital Status Filter
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Select Marital Status to filter (or 0 to skip):");
-        System.out.println("0. Skip");
+        System.out.println("Select Marital Status to filter (press Enter to skip):");
         MaritalStatus[] statuses = MaritalStatus.values();
         for (int i = 0; i < statuses.length; i++) {
             System.out.println((i + 1) + ". " + statuses[i].name());
         }
         System.out.print("Choice: ");
-        int maritalChoice = Integer.parseInt(scanner.nextLine().trim());
+        String maritalInput = scanner.nextLine().trim();
         String maritalFilter = "";
-        if (maritalChoice > 0 && maritalChoice <= statuses.length) {
-            maritalFilter = statuses[maritalChoice - 1].name();
+        if (!maritalInput.isEmpty()) {
+            try {
+                int maritalChoice = Integer.parseInt(maritalInput);
+                if (maritalChoice > 0 && maritalChoice <= statuses.length) {
+                    maritalFilter = statuses[maritalChoice - 1].name();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Skipping marital status filter.");
+            }
         }
 
         // Input: Flat Type Filter
-        System.out.println("\nSelect Flat Type to filter (or 0 to skip):");
-        System.out.println("0. Skip");
+        System.out.println("\nSelect Flat Type to filter (press Enter to skip):");
         FlatTypes[] types = FlatTypes.values();
         for (int i = 0; i < types.length; i++) {
             System.out.println((i + 1) + ". " + types[i].getDisplayName());
         }
         System.out.print("Choice: ");
-        int flatChoice = Integer.parseInt(scanner.nextLine().trim());
+        String flatInput = scanner.nextLine().trim();
         String flatTypeFilter = "";
-        if (flatChoice > 0 && flatChoice <= types.length) {
-            flatTypeFilter = types[flatChoice - 1].getDisplayName();
+        if (!flatInput.isEmpty()) {
+            try {
+                int flatChoice = Integer.parseInt(flatInput);
+                if (flatChoice > 0 && flatChoice <= types.length) {
+                    flatTypeFilter = types[flatChoice - 1].getDisplayName();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Skipping flat type filter.");
+            }
         }
+
 
         // Input: Age Group
         System.out.print("\nFilter by Age Group (e.g., 20-30) or press Enter to skip: ");
@@ -118,8 +131,8 @@ public class ReportView {
             y -= rowHeight * 2;
 
             // Table Headers
-            float[] colX = {50, 120, 200, 250, 320, 420, 520};
-            String[] headers = {"NRIC", "Name", "Age", "Marital", "Flat Type", "Project", "Flat Booked"};
+            float[] colX = {50, 120, 200, 250, 320, 420, 520, 620};
+            String[] headers = {"NRIC", "Name", "Age", "Marital", "Flat Type", "Project", "Flat Booked", "Status"};
             content.setFont(PDType1Font.HELVETICA_BOLD, 12);
             for (int i = 0; i < headers.length; i++) {
                 content.beginText();
@@ -158,7 +171,8 @@ public class ReportView {
                         matchedApplicant.getMaritalStatus().name(),
                         app.getFlatType().getTypeName(),
                         app.getProject().getProjName(),
-                        flatStr
+                        flatStr,
+                        app.getStatus()
                 };
 
                 for (int i = 0; i < values.length; i++) {
@@ -182,8 +196,6 @@ public class ReportView {
             e.printStackTrace();
         }
     }
-
-
 }
 
 

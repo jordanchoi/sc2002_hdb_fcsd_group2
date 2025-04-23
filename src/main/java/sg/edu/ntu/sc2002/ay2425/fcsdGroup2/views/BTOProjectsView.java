@@ -418,14 +418,12 @@ public class BTOProjectsView implements UserView {
     }
 
     public void manageApplicationsByProjectId(ApplicationController applicationController, int projectId) {
-        // Load from repository
         BTORepository btoRepo = new BTORepository();
         UserRepository userRepo = new UserRepository();
         ApplicationRepository appRepo = new ApplicationRepository(btoRepo, userRepo);
         List<Application> apps = appRepo.getApplicationsByProjectId(projectId);
 
-        // Project details
-        System.out.println("=== Project: (ID: "+projectId+") ===");
+        System.out.println("=== Project: (ID: " + projectId + ") ===");
         if (apps.isEmpty()) {
             System.out.println("No applications available.");
             return;
@@ -477,6 +475,25 @@ public class BTOProjectsView implements UserView {
             return;
         }
 
+        // Handle withdrawal requests
+        if (selectedApp.getStatusEnum() == ApplicationStatus.WITHDRAW_REQ) {
+            System.out.print("Approve withdrawal request? (yes/no): ");
+            String decision = scanner.nextLine().trim().toLowerCase();
+
+            if (decision.equals("yes")) {
+                selectedApp.approveWithdrawal();
+                appRepo.update(selectedApp); // Save to Excel
+                System.out.println("Withdrawal approved.");
+            } else if (decision.equals("no")) {
+                selectedApp.rejectWithdrawal();
+                appRepo.update(selectedApp); // Save to Excel
+                System.out.println("Withdrawal rejected.");
+            } else {
+                System.out.println("Invalid input. No changes made.");
+            }
+            return;
+        }
+
         if (!selectedApp.getStatusEnum().equals(ApplicationStatus.PENDING)) {
             System.out.println("This application has already been processed.");
             return;
@@ -503,6 +520,7 @@ public class BTOProjectsView implements UserView {
             System.out.println("Action failed. Possibly due to unavailable flats.");
         }
     }
+
 
 
     // Allows the user to edit a selected BTO project.
