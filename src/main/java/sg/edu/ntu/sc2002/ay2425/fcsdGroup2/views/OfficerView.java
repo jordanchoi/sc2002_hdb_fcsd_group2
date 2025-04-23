@@ -13,6 +13,7 @@ public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
     UserAuthController controller = UserAuthController.getInstance();
     UserRepository user = new UserRepository();
+    BTORepository repo = new BTORepository();
     BookingController bookingController = new BookingController();
     List<HDBOfficer> officerList = user.getOfficers();
     HDBOfficer currentOfficer = null;
@@ -25,7 +26,7 @@ public class OfficerView implements UserView {
         System.out.println("You are logged in as an officer.");
         System.out.println("Welcome! Officer " + session.getLoggedInUser().getFirstName());
         int choice = 0;
-        while (choice != 10) {
+        while (choice != 12) {
             displayMenu();
             choice = handleUserInput();
         }
@@ -36,8 +37,6 @@ public class OfficerView implements UserView {
             }
         }
     }
-        
-    BTORepository repo = new BTORepository();
     HDBOfficerController currentController = new HDBOfficerController(currentOfficer,repo);
 
     @Override
@@ -49,10 +48,12 @@ public class OfficerView implements UserView {
         System.out.println("4. View Project Details");
         System.out.println("5. Update Flat Availablility");
         System.out.println("6. Retrieve Applicant Application using NRIC");
-        System.out.println("7. Update Applicant Application Status ");
+        System.out.println("7. Update Applicant Application Status");
         System.out.println("8. Update Applicant Application Profile");
         System.out.println("9. Generate Receipt");
-        System.out.println("10. Exit");
+        System.out.println("10. View Enquiry");
+        System.out.println("11. Reply Enquiry");
+        System.out.println("12. Exit");
     }
 
     @Override
@@ -71,7 +72,15 @@ public class OfficerView implements UserView {
                     System.out.print("Enter the project name to apply for as officer: ");
                     scanner = new Scanner(System.in);
                     String projName = scanner.nextLine();
-                    currentController.submitApplication(projName);
+                    BTOProj proj = null;
+                    for (BTOProj p : repo.getAllProjects()) {
+                        if (p.getProjName() == projName)  {proj = p;}
+                    }
+                    if (currentController.submitApplication(proj)) {
+                        System.out.println("Succesfully applied as officer for " + projName);
+                    }else {
+                        System.out.println("Not allowed to apply for " + projName + "as officer.");
+                    }
                     break;
 
                 case 3:
@@ -85,9 +94,9 @@ public class OfficerView implements UserView {
                     System.out.print("Enter the project name to view details: ");
                     String detailProjName = scanner.nextLine();
                     BTOProj foundProj = null;
-                    for (BTOProj proj : repo.getAllProjects()) {
-                        if (proj.getProjName().equalsIgnoreCase(detailProjName)) {
-                            foundProj = proj;
+                    for (BTOProj project : repo.getAllProjects()) {
+                        if (project.getProjName().equalsIgnoreCase(detailProjName)) {
+                            foundProj = project;
                             System.out.println(foundProj.toString());
                         }
                     }
@@ -134,8 +143,15 @@ public class OfficerView implements UserView {
                     Application receipt = findApplication();
                     bookingController.generateReceipt(receipt);
                     break;
-
+                
                 case 10:
+                    currentController.viewEnquiries();
+                    break;
+
+                case 11:
+                    currentController.replyEnquiries();
+                    break;
+                case 12:
                     break;
             }
         return choice;
