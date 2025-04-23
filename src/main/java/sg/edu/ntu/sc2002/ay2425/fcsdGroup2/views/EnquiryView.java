@@ -5,11 +5,21 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.EnquiryController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.RoleHandler;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class EnquiryView {
+    private final RoleHandler roleHandler;
+
+    public EnquiryView(RoleHandler roleHandler) {
+        this.roleHandler = roleHandler;
+    }
+
+    public void display() {
+        roleHandler.displayEnquiryOptions();
+    }
 
     /* Commented out by Jordan because it is very problematic
     private final EnquiryController controller;

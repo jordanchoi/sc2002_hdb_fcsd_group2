@@ -4,7 +4,9 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers.ManagerViewHandler;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 import java.util.Scanner;
 
@@ -81,7 +83,10 @@ public class ManagerView implements UserView {
                     projectsView.start();
                 }
                 case 3 -> System.out.println("Managing BTO Applications...");
-                case 4 -> System.out.println("Managing All Enquiries...");
+                case 4 ->  {
+                    System.out.println("Managing All Enquiries...");
+                    new EnquiryView(new ManagerViewHandler((HDBManager) session.getLoggedInUser())).display();
+                }
                 case 5 -> {
                     System.out.println("Generating Report...");
 
@@ -103,7 +108,6 @@ public class ManagerView implements UserView {
             return choice;
         }
     }
-
 
     public void changePassword() {
         Scanner scanner = new Scanner(System.in);

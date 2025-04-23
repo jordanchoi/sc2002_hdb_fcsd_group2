@@ -98,6 +98,24 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         return enquiryRepo.getAll();
     }
 
+    @Override
+    public boolean replyEnquiry(int enquiryId, String reply, HDBManager manager) {
+        Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
+        if (opt.isEmpty()) {return false;}
+
+        Enquiry enq = opt.get();
+
+        // Check if the manager is assigned to the project
+        if (enq.getForProj().getManagerIC().equals(manager)) {
+            enq.addMessage(reply, manager);
+            enquiryRepo.delete(enquiryId);
+            enquiryRepo.add(enq.getEnquiryId(), "", enq.getMadeBy(), enq.getForProj());
+            return true;
+        }
+
+        return false;
+    }
+
     // Officer Enquiry Service Methods
     @Override
     public List<Enquiry> getEnquiryForAssignedProj(BTOProj proj) {
