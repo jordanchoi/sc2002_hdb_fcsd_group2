@@ -1,76 +1,160 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.*;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
     UserAuthController controller = UserAuthController.getInstance();
+    UserRepository user = new UserRepository();
+    BookingController bookingController = new BookingController();
+    List<HDBOfficer> officerList = user.getOfficers();
+    HDBOfficer currentOfficer = null;
+    List<HDBApplicant> applicantList = user.getApplicants();
+
     public OfficerView() {}
 
-    public void main() {
+    @Override
+    public void start() {
         System.out.println("You are logged in as an officer.");
         System.out.println("Welcome! Officer " + session.getLoggedInUser().getFirstName());
-        int choice == 0;
-        while (choice != 9) {
+        int choice = 0;
+        while (choice != 10) {
             displayMenu();
             choice = handleUserInput();
         }
-    }
 
-    public int displayMenu() {
+        for (HDBOfficer o : officerList) {
+            if (o.getOfficerId() == session.getLoggedInUser().getUserId()) {
+                currentOfficer = o;
+            }
+        }
+    }
+        
+    BTORepository repo = new BTORepository();
+    HDBOfficerController currentController = new HDBOfficerController(currentOfficer,repo);
+
+    @Override
+    public void displayMenu() {
         System.out.println("Officer Menu:");
         System.out.println("1. Open Applicant Menu");
         System.out.println("2. Apply Project as Officer");
         System.out.println("3. Check Project Registration Status");
         System.out.println("4. View Project Details");
-        System.out.println("5. Open Enquiry/Booking Menu");
-        System.out.println("9. Exit");
+        System.out.println("5. Update Flat Availablility");
+        System.out.println("6. Retrieve Applicant Application using NRIC");
+        System.out.println("7. Update Applicant Application Status ");
+        System.out.println("8. Update Applicant Application Profile");
+        System.out.println("9. Generate Receipt");
+        System.out.println("10. Exit");
     }
 
+    @Override
     public int handleUserInput() {
         System.out.print("Enter your choice: ");
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
+        scanner.nextLine();
 
         switch (choice) {
                 case 1:
                     ApplicantView applicantView = new ApplicantView();
                     break;
+
                 case 2:
                     System.out.print("Enter the project name to apply for as officer: ");
-                    Scanner scanner = new Scanner(System.in);
+                    scanner = new Scanner(System.in);
                     String projName = scanner.nextLine();
-                    HDBOfficerController.applyProjOfficer(projName);
+                    currentController.submitApplication(projName);
                     break;
+
                 case 3:
                     System.out.print("Enter the project name to check registration status: ");
                     String regProjName = scanner.nextLine();
-                    String status = HDBofficerController.projRegStatus(regProjName);
+                    String status = currentController.projRegStatus(regProjName);
                     System.out.println("Registration status for project \"" + regProjName + "\": " + status);
                     break;
+
                 case 4:
                     System.out.print("Enter the project name to view details: ");
                     String detailProjName = scanner.nextLine();
                     BTOProj foundProj = null;
-                    for (BTOProj proj : btoRepository.getAllProjs()) {
+                    for (BTOProj proj : repo.getAllProjects()) {
                         if (proj.getProjName().equalsIgnoreCase(detailProjName)) {
                             foundProj = proj;
-                            break;
+                            System.out.println(foundProj.toString());
                         }
                     }
-                    if (bookProj == null) {
-                        System.out.println("Project not found.");
-                    }
                     break;
+
                 case 5:
-                    BookingView bookingView = new BookingView();
+                    Application flatUpdate = findApplication();
+
+                    if (bookingController.updateFlatAvail(flatUpdate)) 
+                        {System.out.println("Flat updated successfully.");}
+                    else 
+                        {System.out.println("Unsuccessful attempt.");}
+                    break; 
+
+                case 6:
+                    System.out.print("Enter the flat to update (based on NRIC): ");
+                    String appID = scanner.nextLine();
+                    HDBApplicant result = bookingController.retrieveApp(appID);
+                    System.out.println(result);
+                    //result.viewApplicationDetails(); 
                     break;
+
+                case 7:
+                    Application statusUpdate = findApplication();
+
+                    if (bookingController.updateAppStatus(statusUpdate)) 
+                        {System.out.println("Status updated successfully.");}
+                    else 
+                        {System.out.println("Unsuccessful attempt.");}
+                    break;
+
+                case 8:
+                    Application profileUpdate = findApplication();
+                    System.out.print("Enter the new type of flat (2-Room or 3-Room): ");
+                    String newProfile = scanner.nextLine();
+
+                    if (bookingController.updateAppProfile(profileUpdate, newProfile,repo)) 
+                        {System.out.println("Status updated successfully.");}
+                    else 
+                        {System.out.println("Unsuccessful attempt.");}
+                    break;
+
                 case 9:
+                    Application receipt = findApplication();
+                    bookingController.generateReceipt(receipt);
+                    break;
+
+                case 10:
                     break;
             }
+        return choice;
         }
+
+    public Application findApplication() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter NRIC: ");
+        String nric = scanner.nextLine();
+
+        Application appToUpdate = null;
+
+        HDBApplicant app = null;
+        for (HDBApplicant a : applicantList) {
+            if (a.getNric().equalsIgnoreCase(nric)) {
+                app = a;
+            }
+        }
+        appToUpdate = app.getCurrentApplication();
+        return appToUpdate;
     }
 }

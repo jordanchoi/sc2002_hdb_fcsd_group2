@@ -1,78 +1,71 @@
-package controller;
-
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.entities.HDBApplicant;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.entities.BTOProj;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.entities.HDBOfficer;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.*;
 import java.time.LocalDateTime;
 
-public class OfficerController {
-    private Officer officer;
+public class HDBOfficerController implements canApplyFlat {
+    private HDBOfficer officer;
     private BTORepository btoRepository;
 
-    public OfficerController (Officer officer, BTORepository btoRepository) {
+    public HDBOfficerController (HDBOfficer officer, BTORepository btoRepository) {
         this.officer = officer;
         this.btoRepository = btoRepository;
     }
-
-    public boolean projEligibility(BTOProj project, HDBApplicant appliedProj) {
-        if (project.btoProjId == appliedProj.btoProjId) {
-            return false;
+    
+    @Override
+    public boolean checkEligibility(String projName) {
+        BTOProj proj = null;
+        for (BTOProj p : btoRepository.getAllProjects()) {
+            if (p.getProjName() == projName)  {proj = p;}
         }
+        //questionable need to wait for Applicant to know the different applications applied before
+        //boolean appliedAsApplicant = proj.getAllApp().stream().anyMatch(app -> app.getApplicant().getUserId() == this.getUserId());
+        Application currentApp = officer.getCurrentApplication();
+        if (currentApp != null && proj == currentApp.getAppliedProj()) {return false;}
 
-        LocalDateTime newOpen = project.getAppOpenDate();
-        LocalDateTime newClose = project.getAppCloseDate();
+        LocalDateTime startNew = proj.getAppOpenDate();
+        LocalDateTime endNew   = proj.getAppCloseDate();
+        for (BTOProj handled : officer.getAllProj()) {
+            LocalDateTime startOld = handled.getAppOpenDate();
+            LocalDateTime endOld   = handled.getAppCloseDate();
 
-        if (newOpen == null || newClose == null) {
-            // If dates are not set properly, avoid applying.
-            return false;
+            // overlap iff NOT (new ends before old starts OR new starts after old ends)
+            boolean overlap = !( endNew.isBefore(startOld) || startNew.isAfter(endOld) );
+
+            if (overlap) {return false;}
         }
-
-        for (BTOProj handledProj : officer.getProjectsHandled()) {
-            LocalDateTime handledOpen = handledProj.getAppOpenDate();
-            LocalDateTime handledClose = handledProj.getAppCloseDate();
-            if (handledOpen == null || handledClose == null) {
-                continue;
+        // passed both checks!
+        return true;
+    }
+    
+    @Override
+    public boolean submitApplication(String projName) {
+        if (!checkEligibility(projName)) return false;
+        
+        BTOProj newproj = null;
+        BTORepository repo = new BTORepository();
+        for (BTOProj project : repo.getAllProjects()) {
+            if (project.getProjName().equalsIgnoreCase(projName)) {
+                newproj = project;
             }
-            if (newOpen.isBefore(handledClose) || newClose.isAfter(handledOpen)) {
-                return false;
-            }
         }
+
+        for (OfficerProjectApplication a : officer.getRegisteredApps()) {
+            if (projName == a.getProj().getProjName()) {return false;}
+        }
+       
+        OfficerProjectApplication app = new OfficerProjectApplication(officer, newproj, AssignStatus.PENDING);
+        officer.addApps(app);
         return true;
     }
 
-    public boolean applyProjOfficer(String projectName) {
-        BTOProj newProject = null;
-
-        // Search for the project by name.
-        for (BTOProj proj : btoRepository.getAllProjs()) {
-            if (proj.getProjName().equalsIgnoreCase(projectName)) {
-                newProject = proj;
-                break;
-            }
-        }
-        if (newProject == null) {
-            System.out.println("Project not found.");
-            return false;
-        }
-        if (projEligibility(officer.projectsHandled[0],newProject)) {
-            newProject.assignOfficer(officer);
-            officer.addProject(newProject);
-            System.out.println("Successfully applied to be the officer for project: " + newProject.getProjName());
-            return true;
-        }else{
-            System.out.println("You are already handling a project in the same time frame.");
-            return false;
-        }
-    }
-
     public String projRegStatus(String projectName) {
-        for (BTOProj proj : btoRepository.getAllProjs()) {
+        for (BTOProj proj : btoRepository.getAllProjects()) {
             if (proj.getProjName().equalsIgnoreCase(projectName)) {
-                if (proj.getOfficersList().contains(officer)) {
-                    return "Registered";
-                } else {
-                    return "Not Registered";
+                for (HDBOfficer o : proj.getOfficersList()) {
+                    if (o.equals(officer)) {return "Registered";} else {return "Not Registered";}
                 }
             }
         }
