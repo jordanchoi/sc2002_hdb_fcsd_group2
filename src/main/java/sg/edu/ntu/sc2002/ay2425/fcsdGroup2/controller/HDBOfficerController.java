@@ -40,14 +40,14 @@ public class HDBOfficerController implements canApplyFlat {
         return true;
     }
 
-    public boolean submitApplication(BTOProj projName) {
-        if (!checkEligibility(projName)) return false;
-
+    public boolean submitApplication(String projName) {
+        BTOProj proj = findProject(projName, btoRepository);
+        if (!checkEligibility(proj)) return false;
         for (OfficerProjectApplication a : officer.getRegisteredApps()) {
-            if (projName.getProjName() == a.getProj().getProjName()) {return false;}
+            if (proj.getProjName().equalsIgnoreCase(a.getProj().getProjName())) {return false;}
         }
        
-        OfficerProjectApplication app = new OfficerProjectApplication(officer, projName, AssignStatus.PENDING);
+        OfficerProjectApplication app = new OfficerProjectApplication(officer, proj, AssignStatus.PENDING);
         officer.addApps(app);
 
         OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
@@ -126,6 +126,14 @@ public class HDBOfficerController implements canApplyFlat {
         }
     }
     
+    public BTOProj findProject(String projName, BTORepository repo) {
+        BTOProj proj = null;
+        for (BTOProj p : repo.getAllProjects()) {
+            if (projName.equalsIgnoreCase(p.getProjName()))  {proj = p;}
+        }
+        return proj;
+    }
+
     public void replyEnquiries() {
         Scanner scanner = new Scanner(System.in);
         
