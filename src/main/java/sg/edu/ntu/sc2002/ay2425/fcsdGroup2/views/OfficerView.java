@@ -42,12 +42,8 @@ public class OfficerView implements UserView {
         while (choice != 12) {
             displayMenu();
             choice = handleUserInput();
-        }
-
-        
+        }   
     }
-
-
     @Override
     public void displayMenu() {
         System.out.println("Officer Menu:");
