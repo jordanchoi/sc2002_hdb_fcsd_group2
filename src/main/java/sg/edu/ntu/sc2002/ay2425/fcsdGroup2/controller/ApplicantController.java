@@ -1,29 +1,24 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.canApplyFlat;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.ProjectMessage;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.ApplicationService;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.EnquiryServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class ApplicantController implements canApplyFlat {
     private final HDBApplicant model;
     private final ApplicationService appService = new ApplicationService();
     private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
-    private final BTORepository projRepo = BTORepository.getInstance();
-
+    private final BTORepository projRepo = BTORepository.getInstance();  // ✅ Correct Singleton Usage
 
     public ApplicantController(HDBApplicant model) {
         this.model = model;
@@ -137,120 +132,118 @@ public class ApplicantController implements canApplyFlat {
         System.out.println(applicationDetails);
     }
 
-//    public void showAllEnquiries(){
-//        List<Enquiry>applicantEnquiry = enquiryService.getEnquiriesByApplicant(model);
-//        if (applicantEnquiry.isEmpty()) {
-//            System.out.println("No enquiries found.");
-//        }
-//        for (Enquiry e : applicantEnquiry) {
-//            System.out.println("--------------------------------------------------");
-//            System.out.println("Enquiry ID: " + e.getEnquiryId() +
-//                    " | Applicant: " + e.getMadeBy().getFirstName() +
-//                    " | Project: " + e.getForProj().getProjName());
-//
-//            for (int i = 0; i < e.getEnquiries().size(); i++) {
-//                System.out.println("[" + i + "] " + e.getEnquiries().get(i).toString());
-//            }
-//            System.out.println("--------------------------------------------------");
-//        }
-//    }
-//
-//    public void submitEnquiry() {
-//        Scanner scanner = new Scanner(System.in);
-//
-//        System.out.println("Enter the message for your enquiry: ");
-//        String message = scanner.nextLine();
-//
-//        List<BTOProj> eligibleProjects = getEligibleProjs();
-//        BTOProj selectedProject = selectProject(eligibleProjects);
-//
-//        if (selectedProject != null) {
-//            enquiryService.submitEnquiry(message, model, selectedProject);
-//            System.out.println("Enquiry submitted successfully!");
-//        } else {
-//            System.out.println("Enquiry submission cancelled.");
-//        }
-//    }
-////
-//    public void submitExisting() {
-//        Scanner scanner = new Scanner(System.in);
-//
-//        System.out.println("Enter the Enquiry ID to add a message to: ");
-//        int enquiryId = scanner.nextInt();
-//        scanner.nextLine();
-//
-//        System.out.println("Enter your message: ");
-//        String message = scanner.nextLine();
-//
-//        enquiryService.addMessage(enquiryId,message,model.getNric());
-//    }
-//
-//    public void editEnquiryMessage() {
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Enter Enquiry ID to edit message:");
-//        int enquiryId = scanner.nextInt();
-//        scanner.nextLine(); // consume leftover newline
-//
-//        Enquiry enquiry = enquiryService.getEnquiryById(enquiryId);
-//
-//        if (enquiry == null) {
-//            System.out.println("Enquiry not found.");
-//            return;
-//        }
-//
-//        // Display all messages
-//        System.out.println("Messages in this Enquiry:");
-//        for (ProjectMessage message : enquiry.getEnquiries()) {
-//            System.out.println("Message ID: " + message.getMessageId());
-//            System.out.println("Sender: " + message.getSender().getFirstName());
-//            System.out.println("Content: " + message.getContent());
-//            System.out.println("---------------------------");
-//        }
-//
-//        System.out.println("Enter Message ID you want to edit:");
-//        int messageId = scanner.nextInt();
-//        scanner.nextLine(); // consume leftover newline
-//
-//        System.out.println("Enter new message content:");
-//        String newMessage = scanner.nextLine();
-//
-//        boolean success = enquiryService.editOwnMessage(enquiryId, messageId, model, newMessage);
-//
-//        if (success) {
-//            System.out.println("Message updated successfully.");
-//        } else {
-//            System.out.println("Failed to update message. Maybe you're not the sender?");
-//        }
-//    }
-//
-//    public void deleteEnquiry() {
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Enter Enquiry ID to delete:");
-//        int enquiryId = scanner.nextInt();
-//        scanner.nextLine(); // consume newline
-//
-//        boolean success = enquiryService.deleteEnquiry(enquiryId, model);
-//
-//        if (success) {
-//            System.out.println("Enquiry deleted successfully.");
-//        } else {
-//            System.out.println("Failed to delete enquiry.");
-//        }
-//    }
-//
+    public void showAllEnquiries(){
+        List<Enquiry> applicantEnquiry = enquiryService.getEnquiriesByApplicant(model);
+        if (applicantEnquiry.isEmpty()) {
+            System.out.println("No enquiries found.");
+        }
+        for (Enquiry e : applicantEnquiry) {
+            System.out.println("--------------------------------------------------");
+            System.out.println("Enquiry ID: " + e.getEnquiryId() +
+                    " | Applicant: " + e.getMadeBy().getFirstName() +
+                    " | Project: " + e.getForProj().getProjName());
+
+            for (int i = 0; i < e.getEnquiries().size(); i++) {
+                System.out.println("[" + i + "] " + e.getEnquiries().get(i).toString());
+            }
+            System.out.println("--------------------------------------------------");
+        }
+    }
+
+    public void submitEnquiry() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the message for your enquiry: ");
+        String message = scanner.nextLine();
+
+        List<BTOProj> eligibleProjects = getEligibleProjs();
+        BTOProj selectedProject = selectProject(eligibleProjects);
+
+        if (selectedProject != null) {
+            enquiryService.submitEnquiry(message, model, selectedProject);
+            System.out.println("Enquiry submitted successfully!");
+        } else {
+            System.out.println("Enquiry submission cancelled.");
+        }
+    }
+
+    public void submitExisting() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the Enquiry ID to add a message to: ");
+        int enquiryId = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter your message: ");
+        String message = scanner.nextLine();
+
+        enquiryService.addMessage(enquiryId, message, model.getNric());
+    }
+
+    public void editEnquiryMessage() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter Enquiry ID to edit message:");
+        int enquiryId = scanner.nextInt();
+        scanner.nextLine(); // consume leftover newline
+
+        Optional<Enquiry> enquiry = enquiryService.getEnquiryById(enquiryId);
+
+        if (enquiry.isEmpty()) {
+            System.out.println("Enquiry not found.");
+            return;
+        }
+
+        System.out.println("Messages in this Enquiry:");
+        for (ProjectMessage message : enquiry.get().getEnquiries()) {
+            System.out.println("Message ID: " + message.getMessageId());
+            System.out.println("Sender: " + message.getSender().getFirstName());
+            System.out.println("Content: " + message.getContent());
+            System.out.println("---------------------------");
+        }
+
+        System.out.println("Enter Message ID you want to edit:");
+        String messageId = scanner.nextLine();
+
+        System.out.println("Enter new message content:");
+        String newMessage = scanner.nextLine();
+
+        boolean success = enquiryService.editOwnMessage(enquiryId, messageId, model, newMessage);
+
+        if (success) {
+            System.out.println("Message updated successfully.");
+        } else {
+            System.out.println("Failed to update message. Maybe you're not the sender?");
+        }
+    }
+
+    public void deleteEnquiry() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter Enquiry ID to delete:");
+        int enquiryId = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        boolean success = enquiryService.deleteEnquiry(enquiryId, model);
+
+        if (success) {
+            System.out.println("Enquiry deleted successfully.");
+        } else {
+            System.out.println("Failed to delete enquiry.");
+        }
+    }
+
 //    public void deleteMessageInEnquiry() {
 //        Scanner scanner = new Scanner(System.in);
 //        System.out.println("Enter Enquiry ID:");
 //        int enquiryId = scanner.nextInt();
 //        scanner.nextLine();
 //
-//        Enquiry enquiry = enquiryService.getEnquiryById(enquiryId);
-//
-//        if (enquiry == null) {
+//        Optional<Enquiry> enquiryOpt = enquiryService.getEnquiryById(enquiryId);
+//        if (enquiryOpt.isEmpty()) {
 //            System.out.println("Enquiry not found.");
 //            return;
 //        }
 //
+//        Enquiry enquiry = enquiryOpt.get();
 //
 //        System.out.println("Your messages in this enquiry:");
 //        for (ProjectMessage message : enquiry.getEnquiries()) {
@@ -273,5 +266,4 @@ public class ApplicantController implements canApplyFlat {
 //            System.out.println("Failed to delete message. You may not be the sender.");
 //        }
 //    }
-
 }

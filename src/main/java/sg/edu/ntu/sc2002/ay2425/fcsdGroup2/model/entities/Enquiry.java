@@ -65,10 +65,11 @@ public class Enquiry {
     public boolean editMessageById(int messageId, User currentUser, String newContent) {
         for (ProjectMessage m : thread) {
             if (m.getMessageId() == messageId && m.getSender().equals(currentUser)) {
-                m.setContent(newContent);
+                m.setContent(newContent);  // does not recreate message
                 return true;
             }
         }
         return false;
     }
+
 }

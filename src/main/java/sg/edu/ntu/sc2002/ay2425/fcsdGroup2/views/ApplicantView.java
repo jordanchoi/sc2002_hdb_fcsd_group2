@@ -58,11 +58,11 @@ public class ApplicantView implements UserView {
             case 2 -> controller.applyForProject();
             case 3 -> controller.showApplicantApplicationDetails();
             case 4 -> controller.withdrawApplication();
-//            case 5 -> controller.submitEnquiry();
-//            case 6 -> controller.submitExisting();
-//            case 7 -> controller.showAllEnquiries();
-//            case 8 -> controller.editEnquiryMessage();
-//            case 9 -> controller.deleteEnquiry();
+            case 5 -> controller.submitEnquiry();
+            case 6 -> controller.submitExisting();
+            case 7 -> controller.showAllEnquiries();
+            case 8 -> controller.editEnquiryMessage();
+            case 9 -> controller.deleteEnquiry();
 //            case 10 -> controller.deleteMessageInEnquiry();
             case 11 -> changePassword();
             case 12 -> System.out.println("Logging out...");
