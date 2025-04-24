@@ -1,15 +1,19 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.*;
-
 import java.util.List;
 import java.util.Scanner;
 
-import org.apache.logging.log4j.core.pattern.EqualsIgnoreCaseReplacementConverter;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BookingController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBOfficerController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 
 public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
@@ -74,7 +78,8 @@ public class OfficerView implements UserView {
                     System.out.print("Enter the project name to apply for as officer: ");
                     scanner = new Scanner(System.in);
                     String projName = scanner.nextLine();
-                    if (currentController.submitApplication(projName)) {
+                    BTOProj proj = currentController.findProject(projName, repo);
+                    if (currentController.submitApplication(proj)) {
                         System.out.println("Successfully applied as officer for " + projName);
                     }else {
                         System.out.println("Not allowed to apply for " + projName + "as officer.");

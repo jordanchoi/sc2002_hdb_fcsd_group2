@@ -1,12 +1,18 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.canApplyFlat;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplication;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.ProjectMessage;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 
 public class HDBOfficerController implements canApplyFlat {
     private HDBOfficer officer;
@@ -43,7 +49,6 @@ public class HDBOfficerController implements canApplyFlat {
     @Override
     public boolean submitApplication(BTOProj proj) {
         // Need to be implemented.
-        // BTOProj proj = findProject(projName, btoRepository);
         if (!checkEligibility(proj)) return false;
         for (OfficerProjectApplication a : officer.getRegisteredApps()) {
             if (proj.getProjName().equalsIgnoreCase(a.getProj().getProjName())) {return false;}
@@ -60,7 +65,7 @@ public class HDBOfficerController implements canApplyFlat {
         return true;
     }
 
-    public boolean submitApplication(String projName) {
+    /*public boolean submitApplication(String projName) {
         BTOProj proj = findProject(projName, btoRepository);
         if (!checkEligibility(proj)) return false;
         for (OfficerProjectApplication a : officer.getRegisteredApps()) {
@@ -77,7 +82,7 @@ public class HDBOfficerController implements canApplyFlat {
 
         return true;
 
-    }
+    }*/
 
     public String projRegStatus(String projectName) {
         for (BTOProj proj : btoRepository.getAllProjects()) {
