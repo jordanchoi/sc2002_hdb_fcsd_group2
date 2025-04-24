@@ -160,6 +160,33 @@ public class BTOProjsController {
         return myProjects;
     }
 
+    public List<BTOProj> viewOwnProjsOfficer() {
+        SessionStateManager session = SessionStateManager.getInstance();
+
+        // Ensure the logged-in user is an officer
+        if (session.getLoggedInUserType() != UserRoles.OFFICER) {
+            return Collections.emptyList();
+        }
+
+        HDBOfficer currentOfficer = (HDBOfficer) session.getLoggedInUser();
+        String officerNric = currentOfficer.getNric();
+
+        List<BTOProj> officerProjects = new ArrayList<>();
+        for (BTOProj project : projects) {
+            if (project.getOfficersList() != null) {
+                for (HDBOfficer officer : project.getOfficersList()) {
+                    if (officer.getNric().equalsIgnoreCase(officerNric)) {
+                        officerProjects.add(project);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return officerProjects;
+    }
+
+
     public void approveOfficerApplication(OfficerProjectApplication app, BTOProj proj) {
 
     }
