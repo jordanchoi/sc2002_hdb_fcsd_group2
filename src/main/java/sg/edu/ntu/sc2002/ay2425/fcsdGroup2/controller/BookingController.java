@@ -4,6 +4,13 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.*;
+import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class BookingController {
@@ -71,14 +78,130 @@ public class BookingController {
     }
 
     public void generateReceipt(Application app) {
-        HDBApplicant user = app.getApplicant();
+        String fileName = "output/Receipt_" + app.getApplicant().getNric() + ".pdf";
 
-        System.out.println("Applicant's Name: " + user.getFullName());
-        System.out.println("Applicant's NRIC: " + user.getNric());
-        System.out.println("Applicant's Age: " + user.getAge());
-        System.out.println("Applicant's Marital Status: " + user.getMaritalStatus());
-        System.out.println("Applicant's Flat Type: " + app.getFlat());
-        // System.out.println("Project Details: " + user.viewApplicationDetails());
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            doc.addPage(page);
+            PDPageContentStream content = new PDPageContentStream(doc, page);
+
+            float margin = 60;
+            float y = 780;
+            float spacing = 18;
+            float labelIndent = 20;
+            float labelWidth = 130;
+
+            // Title
+            content.setFont(PDType1Font.HELVETICA_BOLD, 18);
+            content.beginText();
+            content.newLineAtOffset(margin, y);
+            content.showText("HDB Flat Booking Confirmation Receipt");
+            content.endText();
+            y -= spacing;
+
+            // Timestamp
+            content.setFont(PDType1Font.HELVETICA_OBLIQUE, 10);
+            content.beginText();
+            content.newLineAtOffset(margin, y);
+            content.showText("Generated on: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")));
+            content.endText();
+            y -= spacing + 8;
+
+            // Line separator
+            content.moveTo(margin, y);
+            content.lineTo(page.getMediaBox().getWidth() - margin, y);
+            content.stroke();
+            y -= spacing;
+
+            float labelX = margin + 20;
+            float valueX = margin + 160; // fixed position for all values
+
+            // --- Applicant Details ---
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, y);
+            content.showText("Applicant Details");
+            content.endText();
+            y -= spacing;
+
+            content.setFont(PDType1Font.HELVETICA, 11);
+            String[][] applicantInfo = {
+                    {"Full Name", app.getApplicant().getFirstName()},
+                    {"NRIC", app.getApplicant().getNric()},
+                    {"Age", String.valueOf(app.getApplicant().getAge())},
+                    {"Marital Status", app.getApplicant().getMaritalStatus().name()}
+            };
+            for (String[] row : applicantInfo) {
+                content.beginText();
+                content.newLineAtOffset(labelX, y);
+                content.showText(row[0]);
+                content.endText();
+
+                content.beginText();
+                content.newLineAtOffset(valueX, y);
+                content.showText(": " + row[1]);
+                content.endText();
+
+                y -= spacing;
+            }
+
+            y -= 8;
+            content.moveTo(margin, y);
+            content.lineTo(page.getMediaBox().getWidth() - margin, y);
+            content.stroke();
+            y -= spacing;
+
+            // --- Booking Details ---
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, y);
+            content.showText("Booking Details");
+            content.endText();
+            y -= spacing;
+
+            content.setFont(PDType1Font.HELVETICA, 11);
+            String flatStr = app.getFlat() != null
+                    ? "Blk " + app.getFlat().getBlock().getBlkNo() + " #" + app.getFlat().getFloorNo() + "-" + app.getFlat().getUnitNo()
+                    : "NIL";
+            String[][] bookingInfo = {
+                    {"Flat Type", app.getFlatType().getTypeName()},
+                    {"Project", app.getProject().getProjName()},
+                    {"Application Status", app.getStatus()},
+                    {"Flat Booked", flatStr}
+            };
+            for (String[] row : bookingInfo) {
+                content.beginText();
+                content.newLineAtOffset(labelX, y);
+                content.showText(row[0]);
+                content.endText();
+
+                content.beginText();
+                content.newLineAtOffset(valueX, y);
+                content.showText(": " + row[1]);
+                content.endText();
+
+                y -= spacing;
+            }
+
+            // Footer
+            y -= spacing;
+            content.setFont(PDType1Font.HELVETICA_OBLIQUE, 10);
+            content.beginText();
+            content.newLineAtOffset(margin, y);
+            content.showText("This is a system-generated receipt. No signature is required.");
+            content.endText();
+
+            content.close();
+
+            File outputDir = new File("output");
+            if (!outputDir.exists()) outputDir.mkdir();
+            doc.save(fileName);
+            System.out.println("\nOfficial receipt saved to: " + fileName + "\n");
+        } catch (Exception e) {
+            System.out.println("\nError generating receipt: " + e.getMessage() + "\n");
+            e.printStackTrace();
+        }
     }
 
 }
+
