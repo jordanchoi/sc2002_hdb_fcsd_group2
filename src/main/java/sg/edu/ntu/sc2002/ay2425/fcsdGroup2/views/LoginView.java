@@ -31,6 +31,7 @@ public class LoginView {
                     System.out.println("Redirecting to Applicant View..\n");
                     // Redirect to ApplicantView
                     ApplicantView applicantView = new ApplicantView();
+                    applicantView.start();
                 } else if (session.getLoggedInUserType() == UserRoles.OFFICER) {
                     // Redirect to Officer View
                     System.out.println("Redirecting to Officer View..\n");
