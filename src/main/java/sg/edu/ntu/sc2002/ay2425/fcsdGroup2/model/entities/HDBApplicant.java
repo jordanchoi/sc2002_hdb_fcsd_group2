@@ -1,25 +1,33 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
+
+import java.util.List;
 
 public class HDBApplicant extends User {
     private Application currentApplication;
+    private final BTORepository btoRepo = new BTORepository();
+    private final UserRepository userRepo = new UserRepository();
+    private final ApplicationRepository applicationRepo = new ApplicationRepository(btoRepo, userRepo);
+
+    public HDBApplicant(String name, String nric, int age, MaritalStatus maritalStatus, String password) {
+        super(name, nric, age, maritalStatus, password);
+    }
 
     public Application getCurrentApplication() {
-        return currentApplication;
+        return applicationRepo.getApplicationByNric(this.nric);
     }
 
     public void setCurrentApplication(Application currentApplication) {
         this.currentApplication = currentApplication;
     }
 
-    public HDBApplicant(String name, String nric, int age, MaritalStatus maritalStatus, String password) {
-        super(name, nric, age, maritalStatus, password);
-        this.currentApplication = null;
-    }
 
     @Override
-    public void viewMenu(){
+    public void viewMenu() {
         System.out.println("\n=== Applicant Menu ===");
         System.out.println("1. View available BTO projects");
         System.out.println("2. Apply for a BTO project");
@@ -31,20 +39,17 @@ public class HDBApplicant extends User {
         System.out.println("8. Logout");
     }
 
-//    @Override
-//    public String toString() {
-//        return "HDBApplicant{" +
-//                "maritalStatus=" + maritalStatus +
-//                ", age=" + age +
-//                ", middleName='" + middleName + '\'' +
-//                ", lastName='" + lastName + '\'' +
-//                ", firstName='" + firstName + '\'' +
-//                ", password='" + password + '\'' +
-//                ", nric='" + nric + '\'' +
-//                ", userId=" + userId +
-//                ", enquiries=" + enquiries +
-//                ", applications=" + applications +
-//                ", appliedProject=" + appliedProject +
-//                '}';
-//    }
+    // Optional toString (commented out or edit for debugging)
+    /*
+    @Override
+    public String toString() {
+        return "HDBApplicant{" +
+                "currentApplication=" + currentApplication +
+                ", name='" + getName() + '\'' +
+                ", nric='" + getNric() + '\'' +
+                ", age=" + getAge() +
+                ", maritalStatus=" + getMaritalStatus() +
+                '}';
+    }
+    */
 }

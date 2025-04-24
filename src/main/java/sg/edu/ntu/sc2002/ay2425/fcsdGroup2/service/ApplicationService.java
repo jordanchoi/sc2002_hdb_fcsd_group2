@@ -10,6 +10,7 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class ApplicationService {
     private final BTORepository btoRepo = new BTORepository();
@@ -80,5 +81,4 @@ public class ApplicationService {
                 .max(Comparator.naturalOrder())
                 .orElse(0) + 1;
     }
-
 }
