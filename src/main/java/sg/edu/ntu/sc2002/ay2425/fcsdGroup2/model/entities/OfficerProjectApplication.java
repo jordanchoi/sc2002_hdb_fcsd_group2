@@ -38,7 +38,7 @@ public class OfficerProjectApplication {
         this.assignmentStatus = assignmentStatus;
     }
 
-    // ✅ Constructor for auto-generating ID
+    // Constructor for auto-generating ID
     public OfficerProjectApplication(HDBOfficer officer, BTOProj proj, AssignStatus assignmentStatus) {
         this.officerAppId = idCounter++; // Auto-increment
         this.officer = officer;
