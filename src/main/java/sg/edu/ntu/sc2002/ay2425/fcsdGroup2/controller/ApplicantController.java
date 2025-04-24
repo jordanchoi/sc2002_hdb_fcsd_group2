@@ -106,12 +106,7 @@ public class ApplicantController implements canApplyFlat {
             System.out.println("Returning to main menu.");
             return;
         }
-        boolean result = submitApplication(selectedProject);
-        if (result) {
-            System.out.println("Application submitted for project: " + selectedProject.getProjName());
-        } else {
-            System.out.println("Application canceled.");
-        }
+        submitApplication(selectedProject);
     }
 
     @Override

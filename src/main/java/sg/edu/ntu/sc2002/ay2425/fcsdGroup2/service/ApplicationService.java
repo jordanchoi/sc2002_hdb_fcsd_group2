@@ -10,7 +10,6 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class ApplicationService {
     private final BTORepository btoRepo = BTORepository.getInstance();
@@ -18,21 +17,33 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepo = new ApplicationRepository(btoRepo, userRepo);
 
     public void applyForProject(HDBApplicant applicant, BTOProj project) {
-        int newId = generateNextAppId();
-        if (applicant.getCurrentApplication() != null) {
-            ApplicationStatus status = applicant.getCurrentApplication().getStatusEnum();
+        Application currentApp = applicant.getCurrentApplication();
+
+        if (currentApp != null) {
+            ApplicationStatus status = currentApp.getStatusEnum();
+
+            // Only allow override if previous application is unsuccessful or withdrawn
             if (status == ApplicationStatus.UNSUCCESSFUL || status == ApplicationStatus.WITHDRAWN) {
-                applicant.setCurrentApplication(new Application(newId, applicant, project));
+                // Use same app ID to override
+                int existingId = currentApp.getAppId();
+                Application newApp = new Application(existingId, applicant, project);
+
+                applicant.setCurrentApplication(newApp);
+                applicationRepo.update(newApp);
+
                 System.out.println("Application submitted successfully for project: " + project.getProjName());
                 return;
             }
+
             System.out.println("You already have an ongoing application.");
             return;
         }
+
+        // New application
+        int newId = generateNextAppId();
         Application newApp = new Application(newId, applicant, project);
         applicant.setCurrentApplication(newApp);
         applicationRepo.add(newApp);
-        applicationRepo.update(newApp);
         System.out.println("Application submitted successfully for project: " + project.getProjName());
     }
 
@@ -49,13 +60,10 @@ public class ApplicationService {
             return;
         }
 
-        // Change status to WITHDRAW_REQ
         current.requestWithdrawal();
-        // Save the updated application to the file
         applicationRepo.update(current);
         System.out.println("Withdrawal request submitted.");
     }
-
 
     public String viewApplicationDetails(HDBApplicant applicant) {
         Application app = applicant.getCurrentApplication();
