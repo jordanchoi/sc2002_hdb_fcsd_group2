@@ -18,6 +18,7 @@ public class BookingController {
     public BookingController () {}
     UserRepository user = UserRepository.getInstance();
     List<HDBApplicant> applicantList = user.getApplicants();
+    BTORepository repo = BTORepository.getInstance();
 
     public HDBApplicant retrieveApp(String NRIC) {
         HDBApplicant app = null;
@@ -28,6 +29,59 @@ public class BookingController {
         }
         return app;
     }
+
+    public Application findApplication(String nric) {
+        /*Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the flat to update (based on NRIC): ");
+        String nric = scanner.nextLine();*/
+
+        ApplicationRepository appRepo = new ApplicationRepository(repo, user);
+        Application selectedApp = appRepo.getApplicationByNric(nric);
+        if (selectedApp == null) {
+            System.out.println("No application found for NRIC: " + nric);
+        }
+        return selectedApp;
+
+        /*BTORepository btoRepo = BTORepository.getInstance();
+        UserRepository userRepo = UserRepository.getInstance();
+        ApplicationRepository appRepo = new ApplicationRepository(btoRepo, userRepo);
+        List<Application> apps = appRepo.getApplications();
+
+        if (apps.isEmpty()) {
+            System.out.println("⚠ No applications found.");
+            return null;
+        }
+
+        System.out.println("\n=== List of Applicant Applications ===");
+        System.out.printf("%-20s %-15s %-25s %-10s %-15s%n",
+                "Applicant Name", "NRIC", "Project", "Flat", "Status");
+        System.out.println("---------------------------------------------------------------------------------------");
+
+        for (int i = 0; i < apps.size(); i++) {
+            Application app = apps.get(i);
+            String name = app.getApplicant().getFirstName();
+            String nric = app.getApplicant().getNric();
+            String projectName = app.getProject().getProjName();
+            String flatType = app.getFlatType() != null ? app.getFlatType().getTypeName() : "NIL";
+            String status = app.getStatus() != null ? app.getStatus() : "N/A";
+
+            System.out.printf("%-20s %-15s %-25s %-10s %-15s%n",
+                    name, nric, projectName, flatType, status);
+        }
+
+        System.out.println("---------------------------------------------------------------------------------------");
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter NRIC of the applicant to proceed: ");
+        String nricInput = scanner.nextLine().trim();
+
+        Application selectedApp = appRepo.getApplicationByNric(nricInput);
+        if (selectedApp == null) {
+            System.out.println("No application found for NRIC: " + nricInput);
+        }
+
+        return selectedApp;
+    */}
 
     public boolean updateFlatAvail(Application app) {
         //FlatType flatToUpdate = app.getFlatTypeObj();

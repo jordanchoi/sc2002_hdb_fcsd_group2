@@ -12,8 +12,6 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 
 public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
@@ -101,7 +99,9 @@ public class OfficerView implements UserView {
                 break;
 
             case 5:
-                Application flatUpdate = findApplication();
+                System.out.print("Enter the flat to update (based on Applicant NRIC): ");
+                String nric = scanner.nextLine();
+                Application flatUpdate = bookingController.findApplication(nric);
 
                 if (bookingController.updateFlatAvail(flatUpdate)) {
                     System.out.println("Flat updated successfully.");
@@ -111,15 +111,15 @@ public class OfficerView implements UserView {
                 break;
 
             case 6:
-                System.out.print("Enter the flat to update (based on NRIC): ");
-                String appID = scanner.nextLine();
-                HDBApplicant result = bookingController.retrieveApp(appID);
-                System.out.println(result);
-                //result.viewApplicationDetails();
+                System.out.print("Enter the flat to update (based on Applicant NRIC): ");
+                String nricForRetrieve = scanner.nextLine();
+                bookingController.retrieveApp(nricForRetrieve);
                 break;
 
             case 7:
-                Application statusUpdate = findApplication();
+                System.out.print("Enter the flat to update (based on Applicant NRIC): ");
+                String nricForStatus = scanner.nextLine();
+                Application statusUpdate = bookingController.findApplication(nricForStatus);
 
                 if (bookingController.updateAppStatus(statusUpdate)) {
                     System.out.println("Status updated successfully.");
@@ -129,7 +129,10 @@ public class OfficerView implements UserView {
                 break;
 
             case 8:
-                Application profileUpdate = findApplication();
+                System.out.print("Enter the flat to update (based on Applicant NRIC): ");
+                String nricForProfile = scanner.nextLine();
+                Application profileUpdate = bookingController.findApplication(nricForProfile);
+
                 System.out.print("Enter the new type of flat (2-Room or 3-Room): ");
                 String newProfile = scanner.nextLine();
 
@@ -141,10 +144,12 @@ public class OfficerView implements UserView {
                 break;
 
             case 9:
-                Application receipt = findApplication();
+                System.out.print("Enter the flat to update (based on NRIC): ");
+                String nricForReceipt = scanner.nextLine();
+                Application receipt = bookingController.findApplication(nricForReceipt);
                 bookingController.generateReceipt(receipt);
                 break;
-
+                
             case 10:
                 currentController.viewEnquiries();
                 break;
@@ -158,47 +163,6 @@ public class OfficerView implements UserView {
         return choice;
     }
 
-    public Application findApplication() {
-        BTORepository btoRepo = BTORepository.getInstance();
-        UserRepository userRepo = UserRepository.getInstance();
-        ApplicationRepository appRepo = new ApplicationRepository(btoRepo, userRepo);
-        List<Application> apps = appRepo.getApplications();
-
-        if (apps.isEmpty()) {
-            System.out.println("⚠ No applications found.");
-            return null;
-        }
-
-        System.out.println("\n=== List of Applicant Applications ===");
-        System.out.printf("%-20s %-15s %-25s %-10s %-15s%n",
-                "Applicant Name", "NRIC", "Project", "Flat", "Status");
-        System.out.println("---------------------------------------------------------------------------------------");
-
-        for (int i = 0; i < apps.size(); i++) {
-            Application app = apps.get(i);
-            String name = app.getApplicant().getFirstName();
-            String nric = app.getApplicant().getNric();
-            String projectName = app.getProject().getProjName();
-            String flatType = app.getFlatType() != null ? app.getFlatType().getTypeName() : "NIL";
-            String status = app.getStatus() != null ? app.getStatus() : "N/A";
-
-            System.out.printf("%-20s %-15s %-25s %-10s %-15s%n",
-                    name, nric, projectName, flatType, status);
-        }
-
-        System.out.println("---------------------------------------------------------------------------------------");
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter NRIC of the applicant to proceed: ");
-        String nricInput = scanner.nextLine().trim();
-
-        Application selectedApp = appRepo.getApplicationByNric(nricInput);
-        if (selectedApp == null) {
-            System.out.println("No application found for NRIC: " + nricInput);
-        }
-
-        return selectedApp;
-    }
 
     // Displays only BTO projects created by the currently logged-in HDB Manager.
     // Uses the SessionStateManager to identify the manager.
