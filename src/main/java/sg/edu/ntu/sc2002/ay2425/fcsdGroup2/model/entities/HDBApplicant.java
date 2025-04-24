@@ -5,26 +5,29 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
-import java.util.List;
-
 public class HDBApplicant extends User {
+
     private Application currentApplication;
-    private final BTORepository btoRepo = new BTORepository();
-    private final UserRepository userRepo = new UserRepository();
-    private final ApplicationRepository applicationRepo = new ApplicationRepository(btoRepo, userRepo);
+
+    // Lazy-loaded to avoid circular initialization errors
+    private BTORepository btoRepo;
+    private UserRepository userRepo;
+    private ApplicationRepository applicationRepo;
 
     public HDBApplicant(String name, String nric, int age, MaritalStatus maritalStatus, String password) {
         super(name, nric, age, maritalStatus, password);
     }
 
     public Application getCurrentApplication() {
+        if (btoRepo == null) btoRepo = BTORepository.getInstance();
+        if (userRepo == null) userRepo = UserRepository.getInstance();
+        if (applicationRepo == null) applicationRepo = new ApplicationRepository(btoRepo, userRepo);
         return applicationRepo.getApplicationByNric(this.nric);
     }
 
     public void setCurrentApplication(Application currentApplication) {
         this.currentApplication = currentApplication;
     }
-
 
     @Override
     public void viewMenu() {
@@ -38,18 +41,4 @@ public class HDBApplicant extends User {
         System.out.println("7. Change password");
         System.out.println("8. Logout");
     }
-
-    // Optional toString (commented out or edit for debugging)
-    /*
-    @Override
-    public String toString() {
-        return "HDBApplicant{" +
-                "currentApplication=" + currentApplication +
-                ", name='" + getName() + '\'' +
-                ", nric='" + getNric() + '\'' +
-                ", age=" + getAge() +
-                ", maritalStatus=" + getMaritalStatus() +
-                '}';
-    }
-    */
 }

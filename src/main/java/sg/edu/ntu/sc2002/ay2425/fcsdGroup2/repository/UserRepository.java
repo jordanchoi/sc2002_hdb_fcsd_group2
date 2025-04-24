@@ -20,6 +20,7 @@ import java.util.Optional;
  */
 
 public class UserRepository {
+    private static UserRepository instance;
 
     // Data Files Path
     private static final String MANAGER_FILE_PATH = "data/ManagerList.xlsx";
@@ -271,5 +272,12 @@ public class UserRepository {
         } else if (userToUpdate instanceof HDBApplicant) {
             saveUsersToFile(APPLICANT_FILE_PATH, null, null, applicants);
         }
+    }
+
+    public static UserRepository getInstance() {
+        if (instance == null) {
+            instance = new UserRepository();
+        }
+        return instance;
     }
 }

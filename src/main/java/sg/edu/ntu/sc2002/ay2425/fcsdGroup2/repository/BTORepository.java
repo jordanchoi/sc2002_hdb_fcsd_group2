@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class BTORepository implements BTOStorageProvider {
     private static final UserRepository userRepo = new UserRepository();
-
+    private static BTORepository instance;
     // Excel file path
     private static final String PROJECTS_FILE_PATH = "data/ProjectList.xlsx";
     private static final String EXERCISES_FILE_PATH = "data/ExerciseList.xlsx";
@@ -376,5 +376,12 @@ public class BTORepository implements BTOStorageProvider {
 
         // return null if not found - handle with care.
         return null;
+    }
+
+    public static BTORepository getInstance() {
+        if (instance == null) {
+            instance = new BTORepository();
+        }
+        return instance;
     }
 }
