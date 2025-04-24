@@ -5,10 +5,12 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
+import java.util.ArrayList;
+
 public class HDBApplicant extends User {
 
+    int applicantId;
     private Application currentApplication;
-
     // Lazy-loaded to avoid circular initialization errors
     private BTORepository btoRepo;
     private UserRepository userRepo;
@@ -17,6 +19,13 @@ public class HDBApplicant extends User {
     public HDBApplicant(String name, String nric, int age, MaritalStatus maritalStatus, String password) {
         super(name, nric, age, maritalStatus, password);
     }
+
+    // Constructor we will use for this project
+    public HDBApplicant(int applicantId, String name, String nric, int age, MaritalStatus maritalStatus, String password) {
+        super(name, nric, age, maritalStatus, password);
+        this.applicantId = 0;
+    }
+
 
     public Application getCurrentApplication() {
         if (btoRepo == null) btoRepo = BTORepository.getInstance();

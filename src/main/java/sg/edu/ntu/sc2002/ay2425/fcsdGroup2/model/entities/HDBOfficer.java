@@ -1,73 +1,133 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
+
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
+//import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces.canApplyFlat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-public class HDBOfficer extends User {
+public class HDBOfficer extends HDBApplicant {
     private int officerId;
     private List<BTOProj> projectsHandled;
     private List<OfficerProjectApplication> registrationApps;
 
 
-    // Constructor we will use in this project
+    public HDBOfficer(String firstName, String nric, int age, MaritalStatus maritalStatus, String password) {
+        super(firstName, nric, age, maritalStatus, password);
+        this.projectsHandled = new ArrayList<>();
+        this.registrationApps = new ArrayList<>();
+    }
+
+    // Constructor we will use for this project
     public HDBOfficer(int officerId, String name, String nric, int age, MaritalStatus maritalStatus, String password) {
         super(name, nric, age, maritalStatus, password);
-        this.officerId = officerId;
         this.projectsHandled = new ArrayList<>();
+        this.registrationApps = new ArrayList<>();
+        this.officerId = 0;
     }
 
-    // Constructor for HDBOfficer, closer to the real world
-    public HDBOfficer(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus) {
-        super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
-        this.projectsHandled = new ArrayList<>();
+    /*@Override
+    public boolean checkEligibility(String proj) {
+        boolean appliedAsApplicant = proj.getAllApps().stream().anyMatch(app -> app.getApplicant().getUserId() == this.getUserId());
+        if (appliedAsApplicant) {return false;}
+
+        LocalDateTime startNew = proj.getAppOpenDate();
+        LocalDateTime endNew   = proj.getAppCloseDate();
+        for (BTOProj handled : projectsHandled) {
+            LocalDateTime startOld = handled.getAppOpenDate();
+            LocalDateTime endOld   = handled.getAppCloseDate();
+
+            // overlap iff NOT (new ends before old starts OR new starts after old ends)
+            boolean overlap = !( endNew.isBefore(startOld) || startNew.isAfter(endOld) );
+
+            if (overlap) {return false;}
+        }
+        // passed both checks!
+        return true;
     }
 
-
-
-    /*
     @Override
-    public void viewProjects() {
-        if (assignedProject != null) {
-            System.out.println(name + " is managing BTO Project: " + assignedProject.getProjectName());
-        } else {
-            System.out.println(name + " is not assigned to any project.");
+    public boolean submitApplication(String projName) {
+        if (!checkEligibility(projName)) return false;
+
+        BTOProj newproj = null;
+        BTORepository repo = new BTORepository();
+        for (BTOProj project : repo.getAllProjects()) {
+            if (project.getProjName().equalsIgnoreCase(projName)) {
+                newproj = project;
+            }
+        }
+
+        for (OfficerProjectApplication a : registrationApps) {
+            if (projName == a.getProj().getProjName()) {return false;}
+        }
+       
+        OfficerProjectApplication app = new OfficerProjectApplication(this, proj, AssignStatus.Pending);
+        registrationApps.add(0, app);
+        return true;
+    }*/
+
+    public int getOfficerId() {
+        return officerId;
+    }
+
+    public void setOfficerId(int id) {
+        this.officerId = id;
+    }
+
+    public List<BTOProj> getAllProj() {
+        return projectsHandled;
+    }
+
+    public void setProj(List<BTOProj> projects) {
+        this.projectsHandled = projects;
+    }
+
+    public void addProj(BTOProj proj) {
+        this.projectsHandled.add(0,proj);
+    }
+
+    public void removeProj(int projId) {
+        boolean removed = projectsHandled.removeIf(p -> p.getProjId() == projId);
+        if (!removed) {
+        throw new NoSuchElementException("No project with ID " + projId);
         }
     }
-    */
-    @Override
-    public void viewMenu() {
-        System.out.println("\n=== HDB Officer Menu ===");
-        System.out.println("1. View available BTO projects");
-        System.out.println("2. Apply for a BTO project");
-        System.out.println("3. View applied project status");
-        System.out.println("4. Withdraw application");
-        System.out.println("5. Submit enquiry");
-        System.out.println("6. View/Edit/Delete enquiries");
-        System.out.println("7. Register as HDB Officer for a project");
-        System.out.println("8. View registration status for Officer role");
-        System.out.println("9. View details of assigned project");
-        System.out.println("10. View and respond to enquiries regarding assigned project");
-        System.out.println("11. Process flat bookings for successful applicants");
-        System.out.println("12. Generate receipt for flat bookings");
-        System.out.println("13. Change password");
-        System.out.println("14. Logout");
+
+    public BTOProj getProj(int projId) {
+        for (BTOProj p : projectsHandled) {
+            if (p.getProjId() == projId) {return p;}
+        }
+        throw new NoSuchElementException("No project with ID " + projId);
     }
 
-    @Override
-    public String toString() {
-        return "HDBOfficer{" +
-                "officerId=" + officerId +
-                ", projectsHandled=" + projectsHandled +
-                ", registrationApps=" + registrationApps +
-                ", userId=" + userId +
-                ", nric='" + nric + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", age=" + age +
-                ", maritalStatus=" + maritalStatus +
-                '}';
+    public List<OfficerProjectApplication> getRegisteredApps() {
+        return registrationApps;
+    }
+
+    public void setRegisteredApps(List<OfficerProjectApplication> apps) {
+        this.registrationApps = apps;
+    }
+
+    public void addApps(OfficerProjectApplication app) {
+        this.registrationApps.add(0,app);
+    }
+
+    public void removeApps(int appId) {
+        boolean removed = registrationApps.removeIf(a -> a.getOfficerAppId() == appId);
+        if (!removed) {
+            throw new NoSuchElementException("No application with ID " + appId);
+        }
+    }
+
+    public OfficerProjectApplication getApps(int appId) {
+        for (OfficerProjectApplication a : registrationApps) {
+            if (a.getOfficerAppId() == appId) {return a;}
+        }
+        throw new NoSuchElementException("No application with ID " + appId);
     }
 }
+
+
+
