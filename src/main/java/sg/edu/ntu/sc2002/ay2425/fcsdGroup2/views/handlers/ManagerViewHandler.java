@@ -21,7 +21,7 @@ public class ManagerViewHandler implements RoleHandler {
     @Override
     public void displayEnquiryOptions() {
         while (true) {
-            System.out.println("\n[Manager Enquiries]");
+            System.out.println("\n== Manager Enquiries ==");
             System.out.println("1. View All Enquiries");
             System.out.println("2. View My Project Enquiries");
             System.out.println("3. View Enquiry by ID");

@@ -55,9 +55,8 @@ public class OfficerView implements UserView {
         System.out.println("7. Update Applicant Application Status");
         System.out.println("8. Update Applicant Application Profile");
         System.out.println("9. Generate Receipt");
-        System.out.println("10. View Enquiry");
-        System.out.println("11. Reply Enquiry");
-        System.out.println("12. Exit");
+        System.out.println("10. Manage Enquiry");
+        System.out.println("11. Exit");
     }
 
     @Override
@@ -148,11 +147,7 @@ public class OfficerView implements UserView {
             case 10:
                 currentController.viewEnquiries();
                 break;
-
             case 11:
-                currentController.replyEnquiries();
-                break;
-            case 12:
                 break;
         }
         return choice;
@@ -165,7 +160,7 @@ public class OfficerView implements UserView {
         List<Application> apps = appRepo.getApplications();
 
         if (apps.isEmpty()) {
-            System.out.println("⚠ No applications found.");
+            System.out.println("No applications found.");
             return null;
         }
 

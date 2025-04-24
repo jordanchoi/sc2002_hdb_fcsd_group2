@@ -13,6 +13,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplicat
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.ProjectMessage;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.EnquiryView;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers.OfficerViewHandler;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.RoleHandler;
 
 public class HDBOfficerController implements canApplyFlat {
     private HDBOfficer officer;
@@ -108,50 +112,16 @@ public class HDBOfficerController implements canApplyFlat {
     }
 
     public void viewEnquiries() {
-        Scanner scanner = new Scanner(System.in);
-        
-        // Get all the projects handled by the officer
-        List<BTOProj> allProjects = officer.getAllProj();
-        
-        // Display all projects and ask the officer to choose one
-        System.out.println("Enter the index of the project you want to view enquiries for: ");
-        for (int i = 0; i < allProjects.size(); i++) {
-            BTOProj project = allProjects.get(i);
-            System.out.println("Index: " + i + ", Project: " + project.getProjName());
-        }
-    
-        int choice = scanner.nextInt();  // Get the officer's choice of project
-        BTOProj selectedProject = allProjects.get(choice);  // Get the selected project
-    
-        // Use EnquiryController to get the list of all enquiries
-        EnquiryController enquiryController = EnquiryController.getInstance();
-        List<Enquiry> allEnquiries = enquiryController.listEnquiries();  // Get all enquiries
+        SessionStateManager session = SessionStateManager.getInstance();
+        HDBOfficer officer = (HDBOfficer) session.getLoggedInUser();
 
-        // Filter the enquiries by the selected project
-        List<Enquiry> enquiries = new ArrayList<>();
-        for (Enquiry enquiry : allEnquiries) {
-            if (enquiry.getForProj().equals(selectedProject)) {
-                enquiries.add(enquiry);  // Add the enquiry to the list if it matches the project
-            }
-        }
-    
-        // Display the enquiries for the selected project
-        System.out.println("Enquiries for project: " + selectedProject.getProjName());
-        for (Enquiry enquiry : enquiries) {
-            System.out.println("Enquiry ID: " + enquiry.getEnquiryId());
-            System.out.println("Made by: " + enquiry.getMadeBy().getFirstName());  // Display the applicant's name who made the enquiry
-            System.out.println("Enquiry Messages:");
-    
-            // Iterate through the messages in the enquiry thread and print them
-            for (ProjectMessage message : enquiry.getEnquiries()) {
-                System.out.println("[" + message.getMessageId() + "] " + message.getSenderRole() + ": " 
-                        + message.getSender().getFirstName() + " - " + message.getContent());
-            }
-    
-            System.out.println("-------------------------");  // Separate each enquiry for readability
-        }
+        // Let the OfficerViewHandler handle project selection and enquiry actions
+        RoleHandler handler = new OfficerViewHandler(officer);
+        EnquiryView enquiryView = new EnquiryView(handler);
+        enquiryView.display();
     }
-    
+
+
     public BTOProj findProject(String projName, BTORepository repo) {
         BTOProj proj = null;
         for (BTOProj p : repo.getAllProjects()) {

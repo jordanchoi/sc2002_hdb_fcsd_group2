@@ -27,6 +27,7 @@ public class BTOProj {
     private HDBOfficer[] officersList;
     private int officerSlots;
     private Map<FlatTypes, FlatType> flatUnits = new HashMap<>();
+    private String rawOfficerNames;
 
     @Override
     public String toString() {
@@ -165,6 +166,9 @@ public class BTOProj {
         officersList = updated.toArray(new HDBOfficer[0]);
         return removed;
     }
+
+    public String getRawOfficerNames() { return rawOfficerNames; }
+    public void setRawOfficerNames(String raw) { this.rawOfficerNames = raw; }
 
     public int getOfficerSlots() { return officerSlots; }
     public void setOfficerSlots(int officerSlots) { this.officerSlots = officerSlots; }
