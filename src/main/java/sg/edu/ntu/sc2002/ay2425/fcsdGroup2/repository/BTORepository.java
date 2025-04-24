@@ -530,11 +530,4 @@ public class BTORepository implements BTOStorageProvider {
         // return null if not found - handle with care.
         return null;
     }
-
-    public static BTORepository getInstance() {
-        if (instance == null) {
-            instance = new BTORepository();
-        }
-        return instance;
-    }
 }

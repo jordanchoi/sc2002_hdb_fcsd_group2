@@ -8,7 +8,9 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.ProjectMessage;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.ApplicationService;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.EnquiryServiceImpl;
 
@@ -21,6 +23,13 @@ public class ApplicantController implements canApplyFlat {
     private final ApplicationService appService = new ApplicationService();
     private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
     private final BTORepository projRepo = new BTORepository();
+
+    BTORepository btoRepo = BTORepository.getInstance();
+    ApplicationRepository appRepo = new ApplicationRepository(btoRepo);
+    UserRepository userRepo = new UserRepository();
+
+    userRepo.injectApplications(appRepo);
+
 
     public ApplicantController(HDBApplicant model) {
         this.model = model;
