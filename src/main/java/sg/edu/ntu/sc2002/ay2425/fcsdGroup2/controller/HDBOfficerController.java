@@ -25,6 +25,7 @@ public class HDBOfficerController implements canApplyFlat {
         this.btoRepository = btoRepository;
     }
     
+    @Override
     public boolean checkEligibility(BTOProj proj) {
         //questionable need to wait for Applicant to know the different applications applied before
         //boolean appliedAsApplicant = proj.getAllApp().stream().anyMatch(app -> app.getApplicant().getUserId() == this.getUserId());

@@ -31,19 +31,18 @@ public class OfficerView implements UserView {
     public void start() {
         System.out.println("You are logged in as an officer.");
         System.out.println("Welcome! Officer " + session.getLoggedInUser().getFirstName());
+        for (HDBOfficer o : officerList) {
+            if (o.getNric().equalsIgnoreCase(session.getLoggedInUser().getNric())) {
+                currentOfficer = o;
+            }
+        }
         int choice = 0;
         while (choice != 12) {
             displayMenu();
             choice = handleUserInput();
         }
-
-        for (HDBOfficer o : officerList) {
-            if (o.getOfficerId() == session.getLoggedInUser().getUserId()) {
-                currentOfficer = o;
-            }
-        }
-    }
-    HDBOfficerController currentController = new HDBOfficerController(currentOfficer,repo);
+    }        
+    //HDBOfficerController currentController = new HDBOfficerController(currentOfficer,repo);
 
     @Override
     public void displayMenu() {
@@ -64,6 +63,7 @@ public class OfficerView implements UserView {
 
     @Override
     public int handleUserInput() {
+        HDBOfficerController currentController = new HDBOfficerController(currentOfficer,repo);
         System.out.print("Enter your choice: ");
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
