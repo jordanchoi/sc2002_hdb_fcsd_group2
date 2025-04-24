@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class ApplicationService {
-    private final BTORepository btoRepo = new BTORepository();
-    private final UserRepository userRepo = new UserRepository();
+    private final BTORepository btoRepo = BTORepository.getInstance();
+    private final UserRepository userRepo = UserRepository.getInstance();
     private final ApplicationRepository applicationRepo = new ApplicationRepository(btoRepo, userRepo);
 
     public void applyForProject(HDBApplicant applicant, BTOProj project) {
