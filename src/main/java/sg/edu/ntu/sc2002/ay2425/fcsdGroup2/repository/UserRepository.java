@@ -22,6 +22,9 @@ import java.util.Optional;
 public class UserRepository {
     private static UserRepository instance;
 
+    // Singleton
+    private static UserRepository instance;
+
     // Data Files Path
     private static final String MANAGER_FILE_PATH = "data/ManagerList.xlsx";
     private static final String OFFICER_FILE_PATH = "data/OfficerList.xlsx";
@@ -31,8 +34,16 @@ public class UserRepository {
     private List<HDBOfficer> officers;
     private List<HDBApplicant> applicants;
 
+    public static UserRepository getInstance() {
+        if (instance == null) {
+            instance = new UserRepository();
+        }
+        return instance;
+    }
+
+
     // Constructors
-    public UserRepository() {
+    private UserRepository() {
         this.managers = new ArrayList<>();
         this.officers = new ArrayList<>();
         this.applicants = new ArrayList<>();

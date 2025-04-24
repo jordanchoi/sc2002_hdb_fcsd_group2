@@ -11,8 +11,8 @@ import java.util.List;
 
 public class ApplicationController {
     private final List<Application> applications = new ArrayList<>();
-    private final BTORepository btoRepo = new BTORepository();
-    private final UserRepository userRepo = new UserRepository();
+    private BTORepository btoRepo = BTORepository.getInstance();
+    private final UserRepository userRepo = UserRepository.getInstance();
     private final ApplicationRepository applicationRepo = new ApplicationRepository(btoRepo, userRepo);
     public ApplicationController() {}
 

@@ -145,9 +145,6 @@ public class BTOProj {
     public void setOfficersList(HDBOfficer[] officersList) { this.officersList = officersList; }
 
     public boolean assignOfficer(HDBOfficer officer) {
-        for (HDBOfficer o : officersList) {
-            if (o.getUserId() == officer.getUserId()) return false;
-        }
         HDBOfficer[] updated = new HDBOfficer[officersList.length + 1];
         System.arraycopy(officersList, 0, updated, 0, officersList.length);
         updated[officersList.length] = officer;

@@ -9,8 +9,8 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import java.util.List;
 
 public class OfficerProjectApplicationController {
-    private final UserRepository userRepo = new UserRepository();
-    private final BTORepository btoRepo = new BTORepository();
+    private final UserRepository userRepo = UserRepository.getInstance();
+    private final BTORepository btoRepo = BTORepository.getInstance();
     private final ProjectApplicationRepository projAppRepo = new ProjectApplicationRepository(userRepo, btoRepo);
     public OfficerProjectApplicationController() {}
 

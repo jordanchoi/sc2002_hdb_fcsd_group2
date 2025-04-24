@@ -2,7 +2,13 @@ package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.OfficerProjectApplication;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicationController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers.ManagerViewHandler;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 import java.util.Scanner;
 
@@ -34,11 +40,10 @@ public class ManagerView implements UserView {
         System.out.println("What would you like to do?\n");
         System.out.println("1. Manage BTO Exercises");
         System.out.println("2. Manage BTO Projects");
-        System.out.println("3. Manage BTO Applications");
-        System.out.println("4. Manage All Enquiries");
-        System.out.println("5. Generate Report");
-        System.out.println("6. Change Password");
-        System.out.println("7. Logout");
+        System.out.println("3. Manage All Enquiries");
+        System.out.println("4. Generate Report");
+        System.out.println("5. Change Password");
+        System.out.println("6. Logout");
         System.out.println("10. Exit");
     }
 
@@ -65,7 +70,7 @@ public class ManagerView implements UserView {
 
             // Validate range of choices
             if (choice < 1 || (choice > 6 && choice != 10)) {
-                System.out.println("Invalid choice. Please enter a valid option (1–6 or 10).");
+                System.out.println("Invalid choice. Please enter a valid option (1–7 or 10).");
                 continue;
             }
 
@@ -79,30 +84,32 @@ public class ManagerView implements UserView {
                     System.out.println("Managing BTO Projects...");
                     projectsView.start();
                 }
-                case 3 -> System.out.println("Managing BTO Applications...");
-                case 4 -> System.out.println("Managing All Enquiries...");
-                case 5 -> {
+                case 3 ->  {
+                    System.out.println("Managing All Enquiries...");
+                    new EnquiryView(new ManagerViewHandler((HDBManager) session.getLoggedInUser())).display();
+                }
+                case 4 -> {
                     System.out.println("Generating Report...");
                     generateReport();
                 }
-                case 6 -> {
+                case 5 -> {
                     System.out.println("Changing password...");
                     changePassword();
                 }
-                case 7 -> {
+                case 6 -> {
                     System.out.println("Logging out...");
                     session.logout();
+                    System.exit(1);
                 }
                 case 10 -> {
                     System.out.println("Exiting...");
                     session.logout();
+                    System.exit(1);
                 }
             }
-
             return choice;
         }
     }
-
 
     public void changePassword() {
         Scanner scanner = new Scanner(System.in);

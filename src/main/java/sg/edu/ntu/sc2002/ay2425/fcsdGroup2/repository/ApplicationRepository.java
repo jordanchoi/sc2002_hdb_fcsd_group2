@@ -56,7 +56,6 @@ public class ApplicationRepository {
                 int projId = (int) Double.parseDouble(row.get(2).trim());
                 BTOProj project = btoRepo.getProjById(projId);
                 if (project == null) {
-                    System.out.println("Project ID not found: " + projId);
                     continue;
                 }
 
