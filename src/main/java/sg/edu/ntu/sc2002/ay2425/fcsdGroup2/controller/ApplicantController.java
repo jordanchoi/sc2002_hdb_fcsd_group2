@@ -18,7 +18,7 @@ public class ApplicantController implements canApplyFlat {
     private final HDBApplicant model;
     private final ApplicationService appService = new ApplicationService();
     private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
-    private final BTORepository projRepo = BTORepository.getInstance();  // ✅ Correct Singleton Usage
+    private final BTORepository projRepo = BTORepository.getInstance();
 
     public ApplicantController(HDBApplicant model) {
         this.model = model;
