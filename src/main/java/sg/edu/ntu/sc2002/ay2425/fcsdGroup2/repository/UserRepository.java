@@ -20,6 +20,7 @@ import java.util.Optional;
  */
 
 public class UserRepository {
+    private static UserRepository instance;
 
     // Singleton
     private static UserRepository instance;
@@ -282,5 +283,12 @@ public class UserRepository {
         } else if (userToUpdate instanceof HDBApplicant) {
             saveUsersToFile(APPLICANT_FILE_PATH, null, null, applicants);
         }
+    }
+
+    public static UserRepository getInstance() {
+        if (instance == null) {
+            instance = new UserRepository();
+        }
+        return instance;
     }
 }

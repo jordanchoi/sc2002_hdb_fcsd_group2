@@ -157,6 +157,7 @@ public class ApplicationRepository {
         return null;
     }
 
+
     public void saveToFile() {
         List<List<String>> data = new ArrayList<>();
         data.add(List.of("Applicant NRIC", "Application ID", "Project ID", "Status", "Flat Type", "Booked Flat", "Previous Status"));
@@ -169,13 +170,14 @@ public class ApplicationRepository {
             }
 
             String previousStatus = (app.getPreviousStatus() != null) ? app.getPreviousStatus().name() : "";
+            String flatTypeName = (app.getFlatType() != null) ? app.getFlatType().getTypeName() : "NIL";
 
             data.add(List.of(
                     app.getApplicant().getNric(),
                     String.valueOf(app.getAppId()),
                     String.valueOf(app.getProject().getProjId()),
                     app.getStatus(),
-                    app.getFlatType().getTypeName(),
+                    flatTypeName,
                     bookedFlat,
                     previousStatus
             ));
@@ -213,4 +215,15 @@ public class ApplicationRepository {
         }
         return result;
     }
+
+    public Application getApplicationByNric(String nric) {
+        for (Application app : applications) {
+            if (app.getApplicant().getNric().equalsIgnoreCase(nric)) {
+                return app;
+            }
+        }
+        return null;
+    }
+
+
 }
