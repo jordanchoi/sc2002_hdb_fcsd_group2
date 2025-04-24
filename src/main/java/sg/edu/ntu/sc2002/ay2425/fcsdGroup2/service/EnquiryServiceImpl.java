@@ -48,6 +48,7 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         if (opt.isEmpty()) return false;
 
         Enquiry enquiry = opt.get();
+
         int msgId;
         try {
             msgId = Integer.parseInt(msgIdStr);
@@ -58,12 +59,33 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         if (enquiry.getMadeBy().equals(applicant)) {
             boolean success = enquiry.editMessageById(msgId, applicant, newContent);
             if (success) {
-                enquiryRepo.update(enquiry); // Preserve message IDs
+                enquiryRepo.update(enquiry);
             }
             return success;
         }
         return false;
     }
+
+    @Override
+    public boolean deleteMessage(int enquiryId, int messageId, User sender) {
+        Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
+        if (opt.isEmpty()) return false;
+
+        Enquiry enquiry = opt.get();
+
+        boolean success = enquiry.deleteMessageById(messageId, sender);
+        if (success) {
+            if (enquiry.getEnquiries().isEmpty()) {
+                enquiryRepo.delete(enquiryId);
+            } else {
+                enquiryRepo.update(enquiry);
+            }
+        }
+        return success;
+    }
+
+
+
 
     @Override
     public boolean deleteEnquiry(int enquiryId, HDBApplicant applicant) {

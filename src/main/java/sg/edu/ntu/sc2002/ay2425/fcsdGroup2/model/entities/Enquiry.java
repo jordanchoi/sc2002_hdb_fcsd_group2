@@ -1,6 +1,7 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Enquiry {
@@ -72,4 +73,15 @@ public class Enquiry {
         return false;
     }
 
+    public boolean deleteMessageById(int messageId, User sender) {
+        Iterator<ProjectMessage> iterator = thread.iterator();
+        while (iterator.hasNext()) {
+            ProjectMessage message = iterator.next();
+            if (message.getMessageId() == messageId && message.getSender().equals(sender)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -15,68 +15,93 @@ public class ApplicantView implements UserView {
     private final UserAuthController authController = UserAuthController.getInstance();
 
     public ApplicantView() {
-        // Constructor logic if needed
         this.scanner = new Scanner(System.in);
     }
 
     @Override
     public void start() {
         System.out.println("Welcome! Applicant " + session.getLoggedInUser().getFirstName() + "!\nYou are in the Applicant Main Menu.\n");
-        int choice = 0;
+        int choice;
         do {
             displayMenu();
-            handleUserInput();
-        } while (choice != 12);
+            choice = handleUserInput();
+        } while (choice != 5);
     }
-
 
     @Override
     public void displayMenu() {
         System.out.println("\n=== Applicant Menu ===");
         System.out.println("1. View available BTO projects");
-        System.out.println("2. Apply for a BTO project");
-        System.out.println("3. View applied project status");
-        System.out.println("4. Withdraw application");
-        System.out.println("5. Submit enquiry");
-        System.out.println("6. Add message to existing enquiry");
-        System.out.println("7. View enquiries");
-        System.out.println("8. Edit enquiries");
-        System.out.println("9. Delete enquiry");
-        System.out.println("10. Delete enquiry in existing enquiry");
-        System.out.println("11. Change password");
-        System.out.println("12. Logout");
+        System.out.println("2. BTO Application Services");
+        System.out.println("3. Enquiry Services");
+        System.out.println("4. Change password");
+        System.out.println("5. Logout");
     }
 
     @Override
     public int handleUserInput() {
-        // placeholder return statement
-        int choice = 0;
-        System.out.print("Please select an option: ");
-        choice = scanner.nextInt();
+        int choice = getIntInput("Please select an option: ");
+
         switch (choice) {
             case 1 -> controller.viewEligibleProjects();
-            case 2 -> controller.applyForProject();
-            case 3 -> controller.showApplicantApplicationDetails();
-            case 4 -> controller.withdrawApplication();
-            case 5 -> controller.submitEnquiry();
-            case 6 -> controller.submitExisting();
-            case 7 -> controller.showAllEnquiries();
-            case 8 -> controller.editEnquiryMessage();
-            case 9 -> controller.deleteEnquiry();
-//            case 10 -> controller.deleteMessageInEnquiry();
-            case 11 -> changePassword();
-            case 12 -> System.out.println("Logging out...");
+            case 2 -> handleBTOApplicationMenu();
+            case 3 -> handleEnquiryMenu();
+            case 4 -> changePassword();
+            case 5 -> System.out.println("Logging out...");
             default -> System.out.println("Invalid choice. Please try again.");
         }
         return choice;
     }
 
+    private void handleBTOApplicationMenu() {
+        int choice;
+        do {
+            System.out.println("\n=== BTO Application Services ===");
+            System.out.println("1. Apply for a BTO project");
+            System.out.println("2. View applied project status");
+            System.out.println("3. Withdraw application");
+            System.out.println("4. Back to main menu");
 
+            choice = getIntInput("Please select a BTO application option: ");
+
+            switch (choice) {
+                case 1 -> controller.applyForProject();
+                case 2 -> controller.showApplicantApplicationDetails();
+                case 3 -> controller.withdrawApplication();
+                case 4 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid option. Please try again.");
+            }
+        } while (choice != 4);
+    }
+
+    public void handleEnquiryMenu() {
+        int choice;
+        do {
+            System.out.println("\n=== Enquiry Menu ===");
+            System.out.println("1. Submit new enquiry");
+            System.out.println("2. Add message to existing enquiry");
+            System.out.println("3. View enquiries");
+            System.out.println("4. Edit enquiry message");
+            System.out.println("5. Delete entire enquiry");
+            System.out.println("6. Delete message from an enquiry (coming soon)");
+            System.out.println("7. Back to main menu");
+
+            choice = getIntInput("Please select an enquiry option: ");
+
+            switch (choice) {
+                case 1 -> controller.submitEnquiry();
+                case 2 -> controller.submitExisting();
+                case 3 -> controller.showAllEnquiries();
+                case 4 -> controller.editEnquiryMessage();
+                case 5 -> controller.deleteEnquiry();
+                case 6 -> controller.deleteMessageInEnquiry();
+                case 7 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid option. Please try again.");
+            }
+        } while (choice != 7);
+    }
 
     public void changePassword() {
-        Scanner scanner = new Scanner(System.in);
-
-        // Change Password Attempt Count
         int attempts = 3;
 
         do {
@@ -100,4 +125,18 @@ public class ApplicantView implements UserView {
         } while (attempts > 0);
     }
 
+    private int getIntInput(String prompt) {
+        int input;
+        while (true) {
+            System.out.print(prompt);
+            if (scanner.hasNextInt()) {
+                input = scanner.nextInt();
+                scanner.nextLine();
+                return input;
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+        }
+    }
 }

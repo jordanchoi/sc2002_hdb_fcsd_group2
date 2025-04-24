@@ -9,16 +9,14 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.ApplicationService;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.EnquiryServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class ApplicantController implements canApplyFlat {
     private final HDBApplicant model;
     private final ApplicationService appService = new ApplicationService();
     private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
-    private final BTORepository projRepo = BTORepository.getInstance();  // ✅ Correct Singleton Usage
+    private final BTORepository projRepo = BTORepository.getInstance();
+    private final Scanner scanner = new Scanner(System.in);
 
     public ApplicantController(HDBApplicant model) {
         this.model = model;
@@ -41,7 +39,6 @@ public class ApplicantController implements canApplyFlat {
     }
 
     public BTOProj selectProject(List<BTOProj> availableProjects) {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("\n=== Available BTO Projects ===");
 
         if (availableProjects.isEmpty()) {
@@ -53,28 +50,24 @@ public class ApplicantController implements canApplyFlat {
             System.out.println(project.getProjId() + ". " + project.getProjName() + " (" + project.getProjNbh() + ")");
         }
 
-        System.out.println("\nEnter the Project ID of the project you want to apply for, or 0 to return to the main menu:");
+        while (true) {
+            System.out.println("\nEnter the Project ID of the project you want to apply for, or 0 to return:");
+            String input = scanner.nextLine();
 
-        int chosenProjId;
-        try {
-            chosenProjId = scanner.nextInt();
-        } catch (Exception e) {
-            System.out.println("Invalid input. Please enter a valid Project ID.");
-            return null;
-        }
+            try {
+                int chosenProjId = Integer.parseInt(input);
+                if (chosenProjId == 0) return null;
 
-        if (chosenProjId == 0) {
-            return null;
-        }
-
-        for (BTOProj project : availableProjects) {
-            if (project.getProjId() == chosenProjId) {
-                return project;
+                for (BTOProj project : availableProjects) {
+                    if (project.getProjId() == chosenProjId) {
+                        return project;
+                    }
+                }
+                System.out.println("Invalid Project ID. Please try again.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
             }
         }
-
-        System.out.println("Invalid Project ID. Please try again.");
-        return null;
     }
 
     public List<BTOProj> getEligibleProjs() {
@@ -109,11 +102,14 @@ public class ApplicantController implements canApplyFlat {
     public void applyForProject() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
         BTOProj selectedProject = selectProject(eligibleProjects);
-        boolean result = submitApplication(selectedProject);
-        if (result){
-            System.out.println("Application submitted for project: " + selectedProject.getProjName());
+        if (selectedProject == null) {
+            System.out.println("Returning to main menu.");
+            return;
         }
-        else {
+        boolean result = submitApplication(selectedProject);
+        if (result) {
+            System.out.println("Application submitted for project: " + selectedProject.getProjName());
+        } else {
             System.out.println("Application canceled.");
         }
     }
@@ -132,10 +128,11 @@ public class ApplicantController implements canApplyFlat {
         System.out.println(applicationDetails);
     }
 
-    public void showAllEnquiries(){
+    public void showAllEnquiries() {
         List<Enquiry> applicantEnquiry = enquiryService.getEnquiriesByApplicant(model);
         if (applicantEnquiry.isEmpty()) {
             System.out.println("No enquiries found.");
+            return;
         }
         for (Enquiry e : applicantEnquiry) {
             System.out.println("--------------------------------------------------");
@@ -151,10 +148,12 @@ public class ApplicantController implements canApplyFlat {
     }
 
     public void submitEnquiry() {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Enter the message for your enquiry: ");
+        System.out.println("Enter the message for your enquiry (or 0 to return): ");
         String message = scanner.nextLine();
+        if (message.equals("0")) {
+            System.out.println("Returning to main menu.");
+            return;
+        }
 
         List<BTOProj> eligibleProjects = getEligibleProjs();
         BTOProj selectedProject = selectProject(eligibleProjects);
@@ -168,26 +167,21 @@ public class ApplicantController implements canApplyFlat {
     }
 
     public void submitExisting() {
-        Scanner scanner = new Scanner(System.in);
+        Integer enquiryId = promptForInt("Enter the Enquiry ID to add a message to (0 to return): ");
+        if (enquiryId == null || enquiryId == 0) return;
 
-        System.out.println("Enter the Enquiry ID to add a message to: ");
-        int enquiryId = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.println("Enter your message: ");
+        System.out.println("Enter your message (or 0 to cancel): ");
         String message = scanner.nextLine();
+        if (message.equals("0")) return;
 
         enquiryService.addMessage(enquiryId, message, model.getNric());
     }
 
     public void editEnquiryMessage() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter Enquiry ID to edit message:");
-        int enquiryId = scanner.nextInt();
-        scanner.nextLine(); // consume leftover newline
+        Integer enquiryId = promptForInt("Enter Enquiry ID to edit message (0 to return):");
+        if (enquiryId == null || enquiryId == 0) return;
 
         Optional<Enquiry> enquiry = enquiryService.getEnquiryById(enquiryId);
-
         if (enquiry.isEmpty()) {
             System.out.println("Enquiry not found.");
             return;
@@ -201,69 +195,66 @@ public class ApplicantController implements canApplyFlat {
             System.out.println("---------------------------");
         }
 
-        System.out.println("Enter Message ID you want to edit:");
+        System.out.println("Enter Message ID you want to edit (or 0 to return):");
         String messageId = scanner.nextLine();
+        if (messageId.equals("0")) return;
 
-        System.out.println("Enter new message content:");
+        System.out.println("Enter new message content (or 0 to cancel):");
         String newMessage = scanner.nextLine();
+        if (newMessage.equals("0")) return;
 
         boolean success = enquiryService.editOwnMessage(enquiryId, messageId, model, newMessage);
 
-        if (success) {
-            System.out.println("Message updated successfully.");
-        } else {
-            System.out.println("Failed to update message. Maybe you're not the sender?");
-        }
+        System.out.println(success ? "Message updated successfully." : "Failed to update message. Maybe you're not the sender?");
     }
 
     public void deleteEnquiry() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter Enquiry ID to delete:");
-        int enquiryId = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        Integer enquiryId = promptForInt("Enter Enquiry ID to delete (0 to return):");
+        if (enquiryId == null || enquiryId == 0) return;
 
         boolean success = enquiryService.deleteEnquiry(enquiryId, model);
 
-        if (success) {
-            System.out.println("Enquiry deleted successfully.");
-        } else {
-            System.out.println("Failed to delete enquiry.");
-        }
+        System.out.println(success ? "Enquiry deleted successfully." : "Failed to delete enquiry.");
     }
 
-//    public void deleteMessageInEnquiry() {
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Enter Enquiry ID:");
-//        int enquiryId = scanner.nextInt();
-//        scanner.nextLine();
-//
-//        Optional<Enquiry> enquiryOpt = enquiryService.getEnquiryById(enquiryId);
-//        if (enquiryOpt.isEmpty()) {
-//            System.out.println("Enquiry not found.");
-//            return;
-//        }
-//
-//        Enquiry enquiry = enquiryOpt.get();
-//
-//        System.out.println("Your messages in this enquiry:");
-//        for (ProjectMessage message : enquiry.getEnquiries()) {
-//            if (message.getSender().equals(model)) {
-//                System.out.println("Message ID: " + message.getMessageId());
-//                System.out.println("Content: " + message.getContent());
-//                System.out.println("-----------------------");
-//            }
-//        }
-//
-//        System.out.println("Enter Message ID to delete:");
-//        int messageId = scanner.nextInt();
-//        scanner.nextLine();
-//
-//        boolean success = enquiryService.deleteMessageInEnquiry(enquiryId, messageId, model);
-//
-//        if (success) {
-//            System.out.println("Message deleted successfully.");
-//        } else {
-//            System.out.println("Failed to delete message. You may not be the sender.");
-//        }
-//    }
+    public void deleteMessageInEnquiry() {
+        Integer enquiryId = promptForInt("Enter Enquiry ID (0 to return):");
+        if (enquiryId == null || enquiryId == 0) return;
+
+        Optional<Enquiry> enquiryOpt = enquiryService.getEnquiryById(enquiryId);
+        if (enquiryOpt.isEmpty()) {
+            System.out.println("Enquiry not found.");
+            return;
+        }
+
+        Enquiry enquiry = enquiryOpt.get();
+
+        System.out.println("Your messages in this enquiry:");
+        for (ProjectMessage message : enquiry.getEnquiries()) {
+            if (message.getSender().equals(model)) {
+                System.out.println("Message ID: " + message.getMessageId());
+                System.out.println("Content: " + message.getContent());
+                System.out.println("-----------------------");
+            }
+        }
+
+        Integer messageId = promptForInt("Enter Message ID to delete (0 to return):");
+        if (messageId == null || messageId == 0) return;
+
+        boolean success = enquiryService.deleteMessage(enquiryId, messageId, model);
+
+        System.out.println(success ? "Message deleted successfully." : "Failed to delete message. You may not be the sender.");
+    }
+
+    private Integer promptForInt(String promptMessage) {
+        while (true) {
+            System.out.println(promptMessage);
+            String input = scanner.nextLine();
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
 }

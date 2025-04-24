@@ -19,10 +19,17 @@ public class HDBApplicant extends User {
     }
 
     public Application getCurrentApplication() {
+        if (currentApplication != null) return currentApplication;
+
+        // Lazy load repositories
         if (btoRepo == null) btoRepo = BTORepository.getInstance();
         if (userRepo == null) userRepo = UserRepository.getInstance();
         if (applicationRepo == null) applicationRepo = new ApplicationRepository(btoRepo, userRepo);
-        return applicationRepo.getApplicationByNric(this.nric);
+
+        // Attempt to fetch and cache the current application
+        currentApplication = applicationRepo.getApplicationByNric(this.nric);
+
+        return currentApplication;
     }
 
     public void setCurrentApplication(Application currentApplication) {

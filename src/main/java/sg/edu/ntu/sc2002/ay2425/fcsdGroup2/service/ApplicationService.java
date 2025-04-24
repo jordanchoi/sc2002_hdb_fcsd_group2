@@ -32,6 +32,7 @@ public class ApplicationService {
         Application newApp = new Application(newId, applicant, project);
         applicant.setCurrentApplication(newApp);
         applicationRepo.add(newApp);
+        applicationRepo.update(newApp);
         System.out.println("Application submitted successfully for project: " + project.getProjName());
     }
 
@@ -48,9 +49,13 @@ public class ApplicationService {
             return;
         }
 
+        // Change status to WITHDRAW_REQ
         current.requestWithdrawal();
+        // Save the updated application to the file
+        applicationRepo.update(current);
         System.out.println("Withdrawal request submitted.");
     }
+
 
     public String viewApplicationDetails(HDBApplicant applicant) {
         Application app = applicant.getCurrentApplication();
