@@ -50,7 +50,6 @@ public class ProjectApplicationRepository {
 
                 BTOProj project = btoRepo.getProjById(projId);
                 if (project == null) {
-                    System.out.println("Project ID not found: " + projId);
                     continue;
                 }
 

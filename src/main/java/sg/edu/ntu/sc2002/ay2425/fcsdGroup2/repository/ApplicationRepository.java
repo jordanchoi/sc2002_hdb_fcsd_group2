@@ -56,7 +56,6 @@ public class ApplicationRepository {
                 int projId = (int) Double.parseDouble(row.get(2).trim());
                 BTOProj project = btoRepo.getProjById(projId);
                 if (project == null) {
-                    System.out.println("Project ID not found: " + projId);
                     continue;
                 }
 
@@ -113,11 +112,20 @@ public class ApplicationRepository {
 
     private Flat parseFlatFromString(String flatStr, FlatType type, BTOProj project) {
         try {
+            // Skip if placeholder or invalid
+            if (flatStr == null || flatStr.trim().equals("-") || flatStr.trim().isEmpty()) {
+                return null;
+            }
+
             String cleaned = flatStr.replace("Blk ", "").trim(); // e.g. "10 03-105"
             String[] parts = cleaned.split(" ");
+            if (parts.length < 2) return null;
+
             int blockNo = Integer.parseInt(parts[0]);
 
             String[] floorUnit = parts[1].split("-");
+            if (floorUnit.length < 2) return null;
+
             int floor = Integer.parseInt(floorUnit[0]);
             int unit = Integer.parseInt(floorUnit[1]);
 
