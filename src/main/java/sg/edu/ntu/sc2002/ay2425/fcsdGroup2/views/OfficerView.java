@@ -72,6 +72,7 @@ public class OfficerView implements UserView {
         switch (choice) {
             case 1:
                 ApplicantView applicantView = new ApplicantView();
+                applicantView.start();
                 break;
 
             case 2:
