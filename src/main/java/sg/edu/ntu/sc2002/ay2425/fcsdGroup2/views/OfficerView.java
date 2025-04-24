@@ -9,6 +9,8 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.*;
 import java.util.List;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.core.pattern.EqualsIgnoreCaseReplacementConverter;
+
 public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
     UserAuthController controller = UserAuthController.getInstance();
@@ -72,11 +74,7 @@ public class OfficerView implements UserView {
                     System.out.print("Enter the project name to apply for as officer: ");
                     scanner = new Scanner(System.in);
                     String projName = scanner.nextLine();
-                    BTOProj proj = null;
-                    for (BTOProj p : repo.getAllProjects()) {
-                        if (p.getProjName() == projName)  {proj = p;}
-                    }
-                    if (currentController.submitApplication(proj)) {
+                    if (currentController.submitApplication(projName)) {
                         System.out.println("Succesfully applied as officer for " + projName);
                     }else {
                         System.out.println("Not allowed to apply for " + projName + "as officer.");
