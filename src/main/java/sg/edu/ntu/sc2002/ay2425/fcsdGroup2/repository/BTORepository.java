@@ -273,7 +273,6 @@ public class BTORepository implements BTOStorageProvider {
                 String applicantNric = row.get(0).trim();
                 Optional<User> user = userRepo.getUserByName(applicantNric, UserRoles.APPLICANT);
                 if (user.isEmpty()) {
-                    System.out.println("Applicant not found: " + applicantNric);
                     continue;
                 }
                 HDBApplicant applicant = (HDBApplicant) user.get();
@@ -287,7 +286,6 @@ public class BTORepository implements BTOStorageProvider {
                         .filter(p -> p.getProjId() == projId)
                         .findFirst();
                 if (matchedProject.isEmpty()) {
-                    System.out.println("Project ID not found: " + projId);
                     continue;
                 }
                 BTOProj project = matchedProject.get();

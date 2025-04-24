@@ -100,7 +100,7 @@ public class BTOProjectsView implements UserView {
         Scanner scanner = new Scanner(System.in);
         SessionStateManager session = SessionStateManager.getInstance();
         HDBManager manager = (HDBManager) session.getLoggedInUser();
-
+        exerciseController.insertExercisesFromRepo();
         List<BTOExercise> exercises = exerciseController.viewAllExercises();
         if (exercises.isEmpty()) {
             System.out.println("No BTO exercises found. Please create one first.");

@@ -28,6 +28,7 @@ public class ManagerViewHandler implements RoleHandler {
             System.out.println("4. Reply to My Project Enquiry");
             System.out.println("0. Back");
 
+            System.out.print("\nPlease select an option: ");
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1" -> displayAll();
@@ -39,28 +40,47 @@ public class ManagerViewHandler implements RoleHandler {
             }
         }
     }
-
     private void displayAll() {
         List<Enquiry> all = enquiryService.getAllEnquiries();
         for (Enquiry enq : all) {
-            System.out.println("Enquiry #" + enq.getEnquiryId() + " | " + enq.getForProj().getProjName() + " | " + enq.getMadeBy().getFirstName());
+            System.out.println("==================================================");
+            System.out.println("Enquiry #" + enq.getEnquiryId());
+            System.out.println("Project : " + enq.getForProj().getProjName());
+            System.out.println("Started by : " + enq.getMadeBy().getFirstName());
+            System.out.println();
+
             for (ProjectMessage msg : enq.getEnquiries()) {
-                System.out.println("[" + msg.getSender().getFirstName() + "] " + msg.getContent());
+                System.out.println("[" + msg.getSender().getFirstName() + "]");
+                System.out.println(msg.getContent());
+                System.out.println();
             }
+
+            System.out.println("--------------------------------------------------");
         }
     }
 
     private void displayOwnProjectEnquiries() {
-        List<Enquiry> own = manager.getAllProjs().stream().flatMap(p -> enquiryService.getEnquiryForAssignedProj(p).stream()).toList();
+        List<Enquiry> own = manager.getAllProjs().stream()
+                .flatMap(p -> enquiryService.getEnquiryForAssignedProj(p).stream())
+                .toList();
 
         if (own.isEmpty()) {
-            System.out.println("No enquiries found for your projects or you do not have any projects");
+            System.out.println("No enquiries found for your projects or you do not have any projects.");
         } else {
             for (Enquiry enq : own) {
-                System.out.println("Enquiry #" + enq.getEnquiryId() + " | " + enq.getForProj().getProjName() + " | " + enq.getMadeBy().getFirstName());
+                System.out.println("==================================================");
+                System.out.println("Enquiry #" + enq.getEnquiryId());
+                System.out.println("Project : " + enq.getForProj().getProjName());
+                System.out.println("Started by : " + enq.getMadeBy().getFirstName());
+                System.out.println();
+
                 for (ProjectMessage msg : enq.getEnquiries()) {
-                    System.out.println("[" + msg.getSender().getFirstName() + "] " + msg.getContent());
+                    System.out.println("[" + msg.getSender().getFirstName() + "]");
+                    System.out.println(msg.getContent());
+                    System.out.println();
                 }
+
+                System.out.println("--------------------------------------------------");
             }
         }
     }
@@ -70,11 +90,22 @@ public class ManagerViewHandler implements RoleHandler {
         int id = Integer.parseInt(scanner.nextLine());
 
         enquiryService.getEnquiryById(id).ifPresentOrElse(e -> {
+            System.out.println("==================================================");
+            System.out.println("Enquiry #" + e.getEnquiryId());
+            System.out.println("Project : " + e.getForProj().getProjName());
+            System.out.println("Started by : " + e.getMadeBy().getFirstName());
+            System.out.println();
+
             for (ProjectMessage m : e.getEnquiries()) {
-                System.out.println("[" + m.getSenderRole() + "] " + m.getSender().getFirstName() + ": " + m.getContent());
+                System.out.println("[" + m.getSender().getFirstName() + "]");
+                System.out.println(m.getContent());
+                System.out.println();
             }
+
+            System.out.println("--------------------------------------------------");
         }, () -> System.out.println("Enquiry not found."));
     }
+
 
     private void replyToProjectEnquiry() {
         displayOwnProjectEnquiries();
@@ -86,8 +117,4 @@ public class ManagerViewHandler implements RoleHandler {
         boolean success = enquiryService.replyEnquiry(id, reply, manager);
         System.out.println(success ? "Reply sent." : "Failed — not assigned to this project.");
     }
-
-
-
-
 }
