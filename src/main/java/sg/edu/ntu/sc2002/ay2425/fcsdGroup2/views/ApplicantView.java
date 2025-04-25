@@ -4,6 +4,7 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.ApplicantController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers.ApplicantViewHandler;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 
 import java.util.Scanner;
@@ -45,7 +46,7 @@ public class ApplicantView implements UserView {
         switch (choice) {
             case 1 -> controller.viewEligibleProjects();
             case 2 -> handleBTOApplicationMenu();
-            case 3 -> handleEnquiryMenu();
+            case 3 -> new ApplicantViewHandler((HDBApplicant) session.getLoggedInUser(), controller).displayEnquiryOptions();
             case 4 -> changePassword();
             case 5 -> System.out.println("Logging out...");
             default -> System.out.println("Invalid choice. Please try again.");
@@ -72,31 +73,6 @@ public class ApplicantView implements UserView {
                 default -> System.out.println("Invalid option. Please try again.");
             }
         } while (choice != 4);
-    }
-
-    public void handleEnquiryMenu() {
-        int choice;
-        do {
-            System.out.println("\n=== Enquiry Menu ===");
-            System.out.println("1. Submit new enquiry");
-            System.out.println("2. Add message to existing enquiry");
-            System.out.println("3. View enquiries");
-            System.out.println("4. Edit enquiry message");
-            System.out.println("5. Delete entire enquiry");
-            System.out.println("6. Back to main menu");
-
-            choice = getIntInput("Please select an enquiry option: ");
-
-            switch (choice) {
-                case 1 -> controller.submitEnquiry();
-                case 2 -> controller.submitExisting();
-                case 3 -> controller.showAllEnquiries();
-                case 4 -> controller.editEnquiryMessage();
-                case 5 -> controller.deleteEnquiry();
-                case 6 -> System.out.println("Returning to main menu...");
-                default -> System.out.println("Invalid option. Please try again.");
-            }
-        } while (choice != 6);
     }
 
     public void changePassword() {
