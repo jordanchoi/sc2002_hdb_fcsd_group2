@@ -336,6 +336,7 @@ public class BTOProjectsView implements UserView {
         System.out.println("Close Date       : " + selected.getAppCloseDate().toLocalDate());
         System.out.println("Visibility       : " + selected.getVisibility());
         System.out.println("Neighbourhood    : " + selected.getProjNbh());
+        System.out.println("Postal Code      : " + selected.getPostalCode());
 
         System.out.println("Flat Types");
         List<FlatType> flatTypes = selected.getAvailableFlatTypes();
@@ -536,17 +537,22 @@ public class BTOProjectsView implements UserView {
                 "ID", "NRIC", "Project Name", "Status", "Flat Type", "Booked Flat");
 
         for (Application app : apps) {
+            String applicantNric = (app.getApplicant() != null) ? app.getApplicant().getNric() : "-";
+            String projectName = (app.getProject() != null) ? app.getProject().getProjName() : "-";
+            String status = (app.getStatusEnum() != null) ? app.getStatusEnum().name() : "-";
+            String flatType = (app.getFlatType() != null) ? app.getFlatType().getTypeName() : "-";
+
             Flat flat = app.getFlat();
-            String bookedFlat = (flat != null)
+            String bookedFlat = (flat != null && flat.getBlock() != null)
                     ? "Blk " + flat.getBlock().getBlkNo() + " #" + flat.getFloorNo() + "-" + flat.getUnitNo()
                     : "-";
 
             System.out.printf("%-5d %-12s %-20s %-12s %-12s %-15s\n",
                     app.getAppId(),
-                    app.getApplicant().getNric(),
-                    app.getProject().getProjName(),
-                    app.getStatus(),
-                    app.getFlatType().getTypeName(),
+                    applicantNric,
+                    projectName,
+                    status,
+                    flatType,
                     bookedFlat);
         }
 
@@ -596,7 +602,7 @@ public class BTOProjectsView implements UserView {
             return;
         }
 
-        if (!selectedApp.getStatusEnum().equals(ApplicationStatus.PENDING)) {
+        if (selectedApp.getStatusEnum() != null && !selectedApp.getStatusEnum().equals(ApplicationStatus.PENDING)) {
             System.out.println("This application has already been processed.");
             return;
         }

@@ -141,7 +141,7 @@ public class ApplicationRepository {
 
             // If block not found, create a dummy one
             if (matchingBlock == null) {
-                matchingBlock = new Block("Unknown", blockNo, "000000", project);
+                matchingBlock = new Block("Unknown", blockNo, "000000", new ArrayList<>(), project);
                 project.getBlocks().add(matchingBlock);
             }
 

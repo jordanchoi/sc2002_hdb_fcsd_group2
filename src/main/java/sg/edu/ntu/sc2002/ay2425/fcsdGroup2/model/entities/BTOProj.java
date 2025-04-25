@@ -20,6 +20,7 @@ public class BTOProj {
     private BTOExercise exercise;
     private Neighbourhoods neighbourhood;
     private HDBManager managerIC;
+    private String postalCode;
     private List<Block> blocks;
     private List<Application> applications;
     private List<FlatType> flatTypesAvail;
@@ -28,6 +29,7 @@ public class BTOProj {
     private int officerSlots;
     private Map<FlatTypes, FlatType> flatUnits = new HashMap<>();
     private String rawOfficerNames;
+    private Map<FlatTypes, FlatType> flatMap = new HashMap<>();
 
     @Override
     public String toString() {
@@ -129,6 +131,7 @@ public class BTOProj {
     public void addFlatTypeWithPrice(FlatTypes type, int units, float sellingPrice) {
         FlatType newFlat = new FlatType(type.getDisplayName(), units, sellingPrice);
         flatUnits.put(type, newFlat);
+        flatMap.put(type, newFlat);
         flatTypesAvail.add(newFlat);
     }
     public Map<FlatTypes, FlatType> getFlatUnits() { return flatUnits; }
@@ -174,4 +177,15 @@ public class BTOProj {
     public void setOfficerSlots(int officerSlots) { this.officerSlots = officerSlots; }
     public BTOExercise getExercise() { return exercise; }
     public void setExercise(BTOExercise exercise) { this.exercise = exercise; }
+    public Map<FlatTypes, FlatType> getFlatMap() {
+        return flatMap;
+    }
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
 }

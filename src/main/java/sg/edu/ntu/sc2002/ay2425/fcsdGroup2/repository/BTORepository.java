@@ -165,6 +165,15 @@ public class BTORepository implements BTOStorageProvider {
                 System.out.println("Row has insufficient columns: " + row.size());
             }
 
+            // P - Postal Code
+            String postalCode = "";
+            try {
+                double postalCodeNum = Double.parseDouble(row.get(15).trim());
+                postalCode = String.valueOf((int) postalCodeNum);
+            } catch (Exception e) {
+                postalCode = row.get(15).trim(); // fallback
+            }
+
             // === Create and Add Project ===
             BTOProj project = new BTOProj(
                     projectId,
@@ -178,6 +187,8 @@ public class BTORepository implements BTOStorageProvider {
                     officerList,
                     visibilityOverride
             );
+
+            project.setPostalCode(postalCode);
 
             try {
                 assignedManager.assignProj(project);

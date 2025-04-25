@@ -1,6 +1,7 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatBookingStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 
 public class Application {
@@ -12,7 +13,7 @@ public class Application {
     private FlatType flatType;
     private Flat flatBooked;
     private ApplicationStatus previousStatus;
-
+    private FlatBookingStatus flatStatus;
 
     public Application(int id, HDBApplicant applicant, BTOProj project){
         this.applicationID = id;
@@ -48,10 +49,15 @@ public class Application {
         return this.project;
     }
 
+    public void setFlatType(FlatType flatType) {
+        this.flatType = flatType;
+    }
+
     public FlatType getFlatType() {
         return this.flatType;
     }
 
+    public void setFlat(Flat flat) { this.flatBooked = flat; }
     public Flat getFlat() {
         return this.flatBooked;
     }
@@ -79,5 +85,13 @@ public class Application {
 
     public ApplicationStatus getPreviousStatus() {
         return previousStatus;
+    }
+
+    public FlatBookingStatus getFlatBookingStatus() {
+        return flatStatus;
+    }
+
+    public void setFlatBookingStatus(FlatBookingStatus flatStatus) {
+        this.flatStatus = flatStatus;
     }
 }

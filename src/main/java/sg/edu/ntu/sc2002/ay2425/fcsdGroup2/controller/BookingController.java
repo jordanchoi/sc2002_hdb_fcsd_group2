@@ -48,7 +48,7 @@ public class BookingController {
         List<Application> apps = appRepo.getApplications();
 
         if (apps.isEmpty()) {
-            System.out.println("⚠ No applications found.");
+            System.out.println("No applications found.");
             return null;
         }
 
@@ -132,6 +132,16 @@ public class BookingController {
     }
 
     public void generateReceipt(Application app) {
+        if (app == null) {
+            System.out.println("Cannot generate receipt: Application is null.");
+            return;
+        }
+
+        if (app.getApplicant() == null) {
+            System.out.println("Missing applicant info. Receipt generation aborted.");
+            return;
+        }
+
         String fileName = "output/Receipt_" + app.getApplicant().getNric() + ".pdf";
 
         try (PDDocument doc = new PDDocument()) {
@@ -142,8 +152,8 @@ public class BookingController {
             float margin = 60;
             float y = 780;
             float spacing = 18;
-            float labelIndent = 20;
-            float labelWidth = 130;
+            float labelX = margin + 20;
+            float valueX = margin + 160;
 
             // Title
             content.setFont(PDType1Font.HELVETICA_BOLD, 18);
@@ -161,16 +171,12 @@ public class BookingController {
             content.endText();
             y -= spacing + 8;
 
-            // Line separator
             content.moveTo(margin, y);
             content.lineTo(page.getMediaBox().getWidth() - margin, y);
             content.stroke();
             y -= spacing;
 
-            float labelX = margin + 20;
-            float valueX = margin + 160; // fixed position for all values
-
-            // --- Applicant Details ---
+            // Applicant Details
             content.setFont(PDType1Font.HELVETICA_BOLD, 12);
             content.beginText();
             content.newLineAtOffset(margin, y);
@@ -180,10 +186,10 @@ public class BookingController {
 
             content.setFont(PDType1Font.HELVETICA, 11);
             String[][] applicantInfo = {
-                    {"Full Name", app.getApplicant().getFirstName()},
-                    {"NRIC", app.getApplicant().getNric()},
+                    {"Full Name", app.getApplicant().getFirstName() != null ? app.getApplicant().getFirstName() : "-"},
+                    {"NRIC", app.getApplicant().getNric() != null ? app.getApplicant().getNric() : "-"},
                     {"Age", String.valueOf(app.getApplicant().getAge())},
-                    {"Marital Status", app.getApplicant().getMaritalStatus().name()}
+                    {"Marital Status", app.getApplicant().getMaritalStatus() != null ? app.getApplicant().getMaritalStatus().name() : "-"}
             };
             for (String[] row : applicantInfo) {
                 content.beginText();
@@ -205,7 +211,7 @@ public class BookingController {
             content.stroke();
             y -= spacing;
 
-            // --- Booking Details ---
+            // Booking Details
             content.setFont(PDType1Font.HELVETICA_BOLD, 12);
             content.beginText();
             content.newLineAtOffset(margin, y);
@@ -214,15 +220,19 @@ public class BookingController {
             y -= spacing;
 
             content.setFont(PDType1Font.HELVETICA, 11);
-            String flatStr = app.getFlat() != null
-                    ? "Blk " + app.getFlat().getBlock().getBlkNo() + " #" + app.getFlat().getFloorNo() + "-" + app.getFlat().getUnitNo()
-                    : "NIL";
+            String flatStr = "-";
+            if (app.getFlat() != null && app.getFlat().getBlock() != null) {
+                flatStr = "Blk " + app.getFlat().getBlock().getBlkNo() +
+                        " #" + app.getFlat().getFloorNo() + "-" + app.getFlat().getUnitNo();
+            }
+
             String[][] bookingInfo = {
-                    {"Flat Type", app.getFlatType().getTypeName()},
-                    {"Project", app.getProject().getProjName()},
-                    {"Application Status", app.getStatus()},
+                    {"Project", app.getProject() != null ? app.getProject().getProjName() : "-"},
+                    {"Application Status", app.getStatus() != null ? app.getStatus() : "-"},
+                    {"Flat Type", app.getFlatType() != null ? app.getFlatType().getTypeName() : "-"},
                     {"Flat Booked", flatStr}
             };
+
             for (String[] row : bookingInfo) {
                 content.beginText();
                 content.newLineAtOffset(labelX, y);
@@ -250,9 +260,9 @@ public class BookingController {
             File outputDir = new File("output");
             if (!outputDir.exists()) outputDir.mkdir();
             doc.save(fileName);
-            System.out.println("\nOfficial receipt saved to: " + fileName + "\n");
+            System.out.println("Receipt saved to: " + fileName);
         } catch (Exception e) {
-            System.out.println("\nError generating receipt: " + e.getMessage() + "\n");
+            System.out.println("Error generating receipt: " + e.getMessage());
             e.printStackTrace();
         }
     }

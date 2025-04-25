@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.*;
 
 public class Block {
+    private int blockId;
     private int blkNo;
     private String streetAddr;
     private String postalCode;
@@ -12,7 +13,8 @@ public class Block {
     private BTOProj project;
 
     // Constructor
-    public Block(String streetAddr, int blkNo, String postal, BTOProj project) {
+    public Block(int blockId, String streetAddr, int blkNo, String postal, BTOProj project) {
+        this.blockId = blockId;
         this.streetAddr = streetAddr;
         this.blkNo = blkNo;
         this.postalCode = postal;
@@ -30,6 +32,10 @@ public class Block {
     }
 
     // Getters and Setters
+    public int getBlockId() {
+        return blockId;
+    }
+
     public int getBlkNo() {
         return blkNo;
     }

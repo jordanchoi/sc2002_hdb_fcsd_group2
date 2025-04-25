@@ -1,15 +1,13 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatBookingStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
@@ -25,132 +23,133 @@ public class OfficerView implements UserView {
     HDBOfficer currentOfficer = null;
     List<HDBApplicant> applicantList = user.getApplicants();
 
-    public OfficerView() {
-    }
+    public OfficerView() {}
 
     @Override
     public void start() {
         System.out.println("You are logged in as an officer.");
-        System.out.println("Welcome! Officer " + session.getLoggedInUser().getFirstName());
+        System.out.println("\nWelcome! Officer " + session.getLoggedInUser().getFirstName() + "!");
+        System.out.println("You are in the Officer Main Menu");
         for (HDBOfficer o : officerList) {
             if (o.getNric().equalsIgnoreCase(session.getLoggedInUser().getNric())) {
                 currentOfficer = o;
             }
         }
         int choice = 0;
-        while (choice != 12) {
+        while (choice != 10) {
             displayMenu();
             choice = handleUserInput();
-        }   
+        }
     }
+
     @Override
     public void displayMenu() {
-        System.out.println("Officer Menu:");
-        System.out.println("1. Open Applicant Menu");
-        System.out.println("2. Apply Project as Officer");
-        System.out.println("3. Check Project Registration Status");
-        System.out.println("4. View Project Details");
-        System.out.println("5. Update Flat Availablility");
-        System.out.println("6. Retrieve Applicant Application using NRIC");
-        System.out.println("7. Update Applicant Application Status");
-        System.out.println("8. Update Applicant Application Profile");
-        System.out.println("9. Generate Receipt");
-        System.out.println("10. Manage Enquiry");
-        System.out.println("11. Exit");
+        System.out.println("\nWhat would you like to do?\n");
+        System.out.println("1. Applicant Management");
+        System.out.println("2. Project Management");
+        System.out.println("3. Flat Booking");
+        System.out.println("4. Receipt & Reports");
+        System.out.println("5. Manage Enquiry");
+        System.out.println("10. Exit");
     }
 
     @Override
     public int handleUserInput() {
-        HDBOfficerController currentController = new HDBOfficerController(currentOfficer,repo);
-        System.out.print("Enter your choice: ");
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
         scanner.nextLine();
 
+        HDBOfficerController currentController = new HDBOfficerController(currentOfficer, repo);
+
         switch (choice) {
-            case 1:
+            case 1 -> {
+                System.out.println("\n-- Applicant Management --");
                 ApplicantView applicantView = new ApplicantView();
                 applicantView.start();
-                break;
-
-            case 2:
-                System.out.print("Enter the project name to apply for as officer: ");
-                scanner = new Scanner(System.in);
-                String projName = scanner.nextLine();
-                BTOProj proj = currentController.findProject(projName, repo);
-                if (currentController.submitApplication(proj)) {
-                    System.out.println("Successfully applied as officer for " + projName);
-                } else {
-                    System.out.println("Not allowed to apply for " + projName + "as officer.");
-                }
-                break;
-
-            case 3:
-                System.out.print("Enter the project name to check registration status: ");
-                String regProjName = scanner.nextLine();
-                String status = currentController.projRegStatus(regProjName);
-                System.out.println("Registration status for project \"" + regProjName + "\": " + status);
-                break;
-
-            case 4:
-                BTOProjsController projsController = new BTOProjsController();
-                HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
-                viewMyProjects(projsController, exerciseController);
-
-                break;
-
-            case 5:
-                Application flatUpdate = findApplication();
-
-                if (bookingController.updateFlatAvail(flatUpdate)) {
-                    System.out.println("Flat updated successfully.");
-                } else {
-                    System.out.println("Unsuccessful attempt.");
-                }
-                break;
-
-            case 6:
-                System.out.print("Enter the flat to update (based on NRIC): ");
-                String appID = scanner.nextLine();
-                HDBApplicant result = bookingController.retrieveApp(appID);
-                System.out.println(result);
-                //result.viewApplicationDetails();
-                break;
-
-            case 7:
-                Application statusUpdate = findApplication();
-
-                if (bookingController.updateAppStatus(statusUpdate)) {
-                    System.out.println("Status updated successfully.");
-                } else {
-                    System.out.println("Unsuccessful attempt.");
-                }
-                break;
-
-            case 8:
-                Application profileUpdate = findApplication();
-                System.out.print("Enter the new type of flat (2-Room or 3-Room): ");
-                String newProfile = scanner.nextLine();
-
-                if (bookingController.updateAppProfile(profileUpdate, newProfile, repo)) {
-                    System.out.println("Status updated successfully.");
-                } else {
-                    System.out.println("Unsuccessful attempt.");
-                }
-                break;
-
-            case 9:
-                Application receipt = findApplication();
-                bookingController.generateReceipt(receipt);
-                break;
-
-            case 10:
-                currentController.viewEnquiries();
-                break;
-            case 11:
-                break;
+            }
+            case 2 -> handleProjectSubMenu(currentController);
+            case 3 -> {
+                System.out.println("\n-- Flat Booking --");
+                handleFlatBookingByOfficer();
+            }
+            case 4 -> handleReceiptSubMenu();
+            case 5 -> currentController.viewEnquiries();
+            case 10 -> System.out.println("Exiting Officer Menu...");
+            default -> System.out.println("Invalid choice. Please try again.");
         }
         return choice;
+    }
+
+    private void handleProjectSubMenu(HDBOfficerController currentController) {
+        Scanner scanner = new Scanner(System.in);
+        int subChoice = -1;
+
+        do {
+            System.out.println("\n-- Project Management --");
+            System.out.println("1. View Project Details");
+            System.out.println("2. Check Project Registration Status");
+            System.out.println("3. Apply Project as Officer");
+            System.out.println("0. Back to Main Menu");
+            System.out.print("Select: ");
+            String input = scanner.nextLine().trim();
+
+            if (!input.matches("\\d+")) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
+
+            subChoice = Integer.parseInt(input);
+
+            switch (subChoice) {
+                case 1 -> {
+                    BTOProjsController projsController = new BTOProjsController();
+                    HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
+                    viewMyProjects(projsController, exerciseController);
+                }
+                case 2 -> {
+                    System.out.print("Enter the project name to check registration status: ");
+                    String regProjName = scanner.nextLine();
+                    String status = currentController.projRegStatus(regProjName);
+                    System.out.println("Registration status for project \"" + regProjName + "\": " + status);
+                }
+                case 3 -> {
+                    System.out.print("Enter the project name to apply for as officer: ");
+                    String projName = scanner.nextLine();
+                    BTOProj proj = currentController.findProject(projName, repo);
+                    if (currentController.submitApplication(proj)) {
+                        System.out.println("Successfully applied as officer for " + projName);
+                    } else {
+                        System.out.println("Not allowed to apply for " + projName + " as officer.");
+                    }
+                }
+                case 0 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid selection. Try again.");
+            }
+        } while (subChoice != 0);
+    }
+
+
+    private void handleReceiptSubMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int subChoice;
+        do {
+            System.out.println("\n-- Receipt --");
+            System.out.println("1. Generate Receipt");
+            System.out.println("0. Back to Main Menu");
+            System.out.print("Select: ");
+            subChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (subChoice) {
+                case 1 -> {
+                    Application receipt = findApplication();
+                    bookingController.generateReceipt(receipt);
+                }
+                case 0 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid selection. Try again.");
+            }
+        } while (subChoice != 0);
     }
 
     public Application findApplication() {
@@ -165,9 +164,9 @@ public class OfficerView implements UserView {
         }
 
         System.out.println("\n=== List of Applicant Applications ===");
-        System.out.printf("%-20s %-15s %-25s %-10s %-15s%n",
-                "Applicant Name", "NRIC", "Project", "Flat", "Status");
-        System.out.println("---------------------------------------------------------------------------------------");
+        System.out.printf("%-5s %-20s %-15s %-25s %-10s %-15s%n",
+                "No.", "Applicant Name", "NRIC", "Project", "Flat", "Status");
+        System.out.println("---------------------------------------------------------------------------------------------");
 
         for (int i = 0; i < apps.size(); i++) {
             Application app = apps.get(i);
@@ -177,23 +176,30 @@ public class OfficerView implements UserView {
             String flatType = app.getFlatType() != null ? app.getFlatType().getTypeName() : "NIL";
             String status = app.getStatus() != null ? app.getStatus() : "N/A";
 
-            System.out.printf("%-20s %-15s %-25s %-10s %-15s%n",
-                    name, nric, projectName, flatType, status);
+            System.out.printf("%-5d %-20s %-15s %-25s %-10s %-15s%n",
+                    i + 1, name, nric, projectName, flatType, status);
         }
 
-        System.out.println("---------------------------------------------------------------------------------------");
+        System.out.println("---------------------------------------------------------------------------------------------");
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter NRIC of the applicant to proceed: ");
-        String nricInput = scanner.nextLine().trim();
+        System.out.print("Enter the number corresponding to the application to proceed: ");
+        String input = scanner.nextLine().trim();
 
-        Application selectedApp = appRepo.getApplicationByNric(nricInput);
-        if (selectedApp == null) {
-            System.out.println("No application found for NRIC: " + nricInput);
+        if (!input.matches("\\d+")) {
+            System.out.println("Invalid input. Please enter a numeric value.");
+            return null;
         }
 
-        return selectedApp;
+        int selectedIndex = Integer.parseInt(input) - 1;
+        if (selectedIndex < 0 || selectedIndex >= apps.size()) {
+            System.out.println("Invalid selection. Please enter a valid number between 1 and " + apps.size());
+            return null;
+        }
+
+        return apps.get(selectedIndex);
     }
+
 
     // Displays only BTO projects created by the currently logged-in HDB Manager.
     // Uses the SessionStateManager to identify the manager.
@@ -306,5 +312,136 @@ public class OfficerView implements UserView {
         System.out.print("\nPress Enter to return to the menu...");
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();
+    }
+
+    public void handleFlatBookingByOfficer(){
+        try {
+            Scanner sc = new Scanner(System.in);
+
+            BlockListRepository blockRepo = new BlockListRepository(BTORepository.getInstance());
+            FlatsListRepository flatRepo = FlatsListRepository.getInstance(blockRepo);
+            ApplicationRepository appRepo = new ApplicationRepository(BTORepository.getInstance(), UserRepository.getInstance());
+
+            List<Application> allApplications = appRepo.getApplications();
+            List<Application> successfulApplications = new ArrayList<>();
+            List<Application> pendingApplications = new ArrayList<>();
+
+            for (Application app : allApplications) {
+                if (app.getStatusEnum() == ApplicationStatus.SUCCESSFUL) {
+                    successfulApplications.add(app);
+                } else if (app.getStatusEnum() == ApplicationStatus.PENDING) {
+                    pendingApplications.add(app);
+                }
+            }
+
+            // Display pending
+            System.out.println("\n=== List of Pending Applications (For Reference) ===");
+            if (pendingApplications.isEmpty()) {
+                System.out.println("No pending applications.");
+            } else {
+                System.out.printf("%-5s %-20s %-15s %-30s %-15s%n", "No.", "Applicant Name", "NRIC", "Project (Postal)", "Status");
+                int counter = 1;
+                for (Application app : pendingApplications) {
+                    BTOProj proj1 = app.getAppliedProj();
+                    System.out.printf("%-5d %-20s %-15s %-30s %-15s%n",
+                            counter++, app.getApplicant().getFirstName(), app.getApplicant().getNric(),
+                            proj1.getProjName() + " (" + proj1.getPostalCode() + ")", app.getStatusEnum().name());
+                }
+            }
+
+            // Display successful
+            System.out.println("\n=== List of Successful Applications (Select to Book Flat) ===");
+            if (successfulApplications.isEmpty()) {
+                System.out.println("No successful applications available for booking.");
+                return;
+            } else {
+                System.out.printf("%-5s %-20s %-15s %-30s %-15s%n", "No.", "Applicant Name", "NRIC", "Project (Postal)", "Status");
+                int counter = 1;
+                for (Application app : successfulApplications) {
+                    BTOProj proj1 = app.getAppliedProj();
+                    System.out.printf("%-5d %-20s %-15s %-30s %-15s%n",
+                            counter++, app.getApplicant().getFirstName(), app.getApplicant().getNric(),
+                            proj1.getProjName() + " (" + proj1.getPostalCode() + ")", app.getStatusEnum().name());
+                }
+            }
+
+            // Select applicant
+            System.out.print("\nSelect successful applicant by number to book flat: ");
+            int selectedIndex = Integer.parseInt(sc.nextLine()) - 1;
+            if (selectedIndex < 0 || selectedIndex >= successfulApplications.size()) {
+                System.out.println("Invalid selection.");
+                return;
+            }
+
+            Application selectedApp = successfulApplications.get(selectedIndex);
+            BTOProj project = selectedApp.getAppliedProj();
+
+            // Load flats for selected project
+            List<Flat> allFlats = flatRepo.getAllFlats();
+            List<Flat> availableFlats = new ArrayList<>();
+            for (Flat flat : allFlats) {
+                Block block = flat.getBlock();
+                BTOProj flatProj = block.getProject();
+
+                if (flatProj != null && flatProj.getProjId() == project.getProjId()
+                        && flat.getStatus() == FlatBookingStatus.AVAILABLE) {
+                    availableFlats.add(flat);
+                }
+            }
+
+            if (availableFlats.isEmpty()) {
+                System.out.println("No available flats in the applicant's project.");
+                return;
+            }
+
+            // Display available flats
+            System.out.println("\nAvailable Flats:");
+            for (int i = 0; i < availableFlats.size(); i++) {
+                Flat f = availableFlats.get(i);
+                System.out.printf("%d. Block: %d | Floor: %d | Unit: %d | Type: %s%n",
+                        i + 1, f.getBlock().getBlkNo(), f.getFloorNo(), f.getUnitNo(), f.getFlatType().getTypeName());
+            }
+
+            // Select flat
+            System.out.print("\nSelect flat by number: ");
+            int flatSelectedIndex = Integer.parseInt(sc.nextLine()) - 1;
+            if (flatSelectedIndex < 0 || flatSelectedIndex >= availableFlats.size()) {
+                System.out.println("Invalid flat selection.");
+                return;
+            }
+
+            Flat selectedFlat = availableFlats.get(flatSelectedIndex);
+
+            // (1) Mark flat as BOOKED
+            selectedFlat.setStatus(FlatBookingStatus.BOOKED);
+            flatRepo.updateFlat(selectedFlat);
+
+            // (2) Update applicant status to BOOKED & assign flat type
+            selectedApp.booked();
+            selectedApp.setFlatType(selectedFlat.getFlatType());
+            selectedApp.setFlat(selectedFlat);
+            appRepo.update(selectedApp);
+
+            // (3) Decrease flat count in project
+            FlatTypes type = FlatTypes.fromDisplayName(selectedFlat.getFlatType().getTypeName());
+            FlatType projFlat = project.getFlatMap().get(type);
+            if (projFlat != null) {
+                int updatedCount = projFlat.getTotalUnits() - 1;
+                projFlat.setTotalUnits(Math.max(updatedCount, 0));
+            }
+
+            // Summary
+            System.out.println("\nFlat successfully booked for applicant!");
+            System.out.println("Booking Summary:");
+            System.out.printf("NRIC         : %s%n", selectedApp.getApplicant().getNric());
+            System.out.printf("Project      : %s (%s)%n", project.getProjName(), project.getPostalCode());
+            System.out.printf("Flat Type    : %s%n", selectedFlat.getFlatType().getTypeName());
+            System.out.printf("Block No     : %d%n", selectedFlat.getBlock().getBlkNo());
+            System.out.printf("Floor-Unit   : %d-%d%n", selectedFlat.getFloorNo(), selectedFlat.getUnitNo());
+
+        } catch (Exception e) {
+            System.out.println("Error during flat booking: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
