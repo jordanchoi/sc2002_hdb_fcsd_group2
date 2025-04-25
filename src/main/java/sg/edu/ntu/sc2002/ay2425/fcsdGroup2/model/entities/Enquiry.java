@@ -9,17 +9,19 @@ public class Enquiry {
     private final List<ProjectMessage> thread;
     private final HDBApplicant madeBy;
     private final BTOProj forProj;
+    private int nextMessageId = 1;
 
+    // Constructor when user sends a new enquiry with a message
     public Enquiry(int enquiryID, String message, HDBApplicant madeBy, BTOProj forProj) {
         this.enquiryID = enquiryID;
-        this.thread = new ArrayList<>();;
+        this.thread = new ArrayList<>();
         this.madeBy = madeBy;
         this.forProj = forProj;
 
-        this.thread.add(new ProjectMessage(message, madeBy));
+        this.thread.add(new ProjectMessage(nextMessageId++, message, madeBy));
     }
 
-    // For loading from file.
+    // Constructor for loading from file (initialise with empty thread)
     public Enquiry(int enquiryID, HDBApplicant madeBy, BTOProj forProj) {
         this.enquiryID = enquiryID;
         this.thread = new ArrayList<>();
@@ -27,31 +29,27 @@ public class Enquiry {
         this.forProj = forProj;
     }
 
-    /* Problematic constructor
-    public Enquiry(String enquiry, HDBApplicant madeBy, BTOProj forProj) {
-        this.enquiryID = idCounter++;
-        this.thread = new ArrayList<>();
-        this.madeBy = madeBy;
-        this.forProj = forProj;
-
-        this.thread.add(new ProjectMessage(enquiry, madeBy));
-    }
-
-     */
-
     public int getEnquiryId() { return enquiryID; }
     public List<ProjectMessage> getEnquiries() { return thread; }
     public HDBApplicant getMadeBy() { return madeBy; }
     public BTOProj getForProj() { return forProj; }
 
+    // Add message with auto-assigned ID
     public void addMessage(String enquiry, User sender) {
         boolean alreadyExists = thread.stream().anyMatch(
                 m -> m.getContent().equals(enquiry) && m.getSender().equals(sender)
         );
         if (!alreadyExists) {
-            thread.add(new ProjectMessage(enquiry, sender));
+            thread.add(new ProjectMessage(nextMessageId++, enquiry, sender));
         }
-        //thread.add(new ProjectMessage(enquiry, sender));
+    }
+
+    // Add pre-created message (e.g., when loading from file)
+    public void addMessage(ProjectMessage message) {
+        thread.add(message);
+        if (message.getMessageId() >= nextMessageId) {
+            nextMessageId = message.getMessageId() + 1;
+        }
     }
 
     public ProjectMessage getMessageById(int messageId) {
@@ -66,7 +64,7 @@ public class Enquiry {
     public boolean editMessageById(int messageId, User currentUser, String newContent) {
         for (ProjectMessage m : thread) {
             if (m.getMessageId() == messageId && m.getSender().equals(currentUser)) {
-                m.setContent(newContent);  // does not recreate message
+                m.setContent(newContent);
                 return true;
             }
         }

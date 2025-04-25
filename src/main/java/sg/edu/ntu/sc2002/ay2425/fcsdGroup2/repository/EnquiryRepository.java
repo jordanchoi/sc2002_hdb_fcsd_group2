@@ -150,17 +150,28 @@ public class EnquiryRepository {
         return enq;
     }
 
-    public void update(Enquiry updated) {
-        delete(updated.getEnquiryId());   // remove old copy
-        enquiries.add(updated);           // add updated copy
-        saveToFile();                     // persist
-    /*
-     int id = updated.getEnquiryId();
-        delete(updated.getEnquiryId());
-        add(id, updated.get, updated.getMadeBy(), updated.getForProj());
-        saveToFile();
-     */
+//    public void update(Enquiry updated) {
+//        delete(updated.getEnquiryId());   // remove old copy
+//        enquiries.add(updated);           // add updated copy
+//        saveToFile();                     // persist
+//    /*
+//     int id = updated.getEnquiryId();
+//        delete(updated.getEnquiryId());
+//        add(id, updated.get, updated.getMadeBy(), updated.getForProj());
+//        saveToFile();
+//     */
+//
+//    }
 
+    public boolean update(Enquiry updated) {
+        for (int i = 0; i < enquiries.size(); i++) {
+            if (enquiries.get(i).getEnquiryId() == updated.getEnquiryId()) {
+                enquiries.set(i, updated); // Replace in place
+                saveToFile();              // Preserve order
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean delete(int id) {
