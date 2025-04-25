@@ -9,15 +9,29 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.RoleHandler;
 
 import java.util.List;
 import java.util.Scanner;
-
+/**
+ * Handles the manager-side view for managing project enquiries.
+ * Allows managers to view, search, and reply to enquiries related to their projects.
+ */
 public class ManagerViewHandler implements RoleHandler {
     private final HDBManager manager;
     private ManagerEnquiryService enquiryService = new EnquiryServiceImpl();
     private Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Constructs a ManagerViewHandler with the specified manager.
+     *
+     * @param manager the HDB manager using this handler
+     */
     public ManagerViewHandler(HDBManager manager) {
         this.manager = manager;
     }
+
+    /**
+     * Displays the enquiry management options for the manager.
+     * Provides options to view all enquiries, view own project enquiries,
+     * view a specific enquiry by ID, and reply to project enquiries.
+     */
     @Override
     public void displayEnquiryOptions() {
         while (true) {
@@ -40,6 +54,10 @@ public class ManagerViewHandler implements RoleHandler {
             }
         }
     }
+
+    /**
+     * Displays all enquiries across all projects.
+     */
     private void displayAll() {
         List<Enquiry> all = enquiryService.getAllEnquiries();
         for (Enquiry enq : all) {
@@ -59,6 +77,9 @@ public class ManagerViewHandler implements RoleHandler {
         }
     }
 
+    /**
+     * Displays enquiries only for projects managed by the current manager.
+     */
     private void displayOwnProjectEnquiries() {
         List<Enquiry> own = manager.getAllProjs().stream()
                 .flatMap(p -> enquiryService.getEnquiryForAssignedProj(p).stream())
@@ -85,6 +106,9 @@ public class ManagerViewHandler implements RoleHandler {
         }
     }
 
+    /**
+     * Displays a single enquiry identified by its ID.
+     */
     private void displayEnquiryById() {
         System.out.print("Enter Enquiry ID: ");
         int id = Integer.parseInt(scanner.nextLine());
@@ -106,7 +130,9 @@ public class ManagerViewHandler implements RoleHandler {
         }, () -> System.out.println("Enquiry not found."));
     }
 
-
+    /**
+     * Allows the manager to reply to a selected project enquiry.
+     */
     private void replyToProjectEnquiry() {
         displayOwnProjectEnquiries();
         System.out.print("Enter Enquiry ID to reply: ");

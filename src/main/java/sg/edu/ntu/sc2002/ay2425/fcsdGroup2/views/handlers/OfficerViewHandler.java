@@ -12,16 +12,29 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.RoleHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+/**
+ * Handles the officer-side view for managing project enquiries.
+ * Allows officers to view and reply to enquiries for their assigned projects.
+ */
 public class OfficerViewHandler implements RoleHandler {
     private final HDBOfficer officer;
     private final OfficerEnquiryService enquiryService = new EnquiryServiceImpl();
     private final Scanner scanner = new Scanner(System.in);
 
+
+    /**
+     * Constructs an OfficerViewHandler with the given officer.
+     *
+     * @param officer the HDB officer using this handler
+     */
     public OfficerViewHandler(HDBOfficer officer) {
         this.officer = officer;
     }
 
+    /**
+     * Displays the menu for officer enquiry management.
+     * Provides options to view project enquiries or reply to them.
+     */
     @Override
     public void displayEnquiryOptions() {
         while (true) {
@@ -42,6 +55,9 @@ public class OfficerViewHandler implements RoleHandler {
         }
     }
 
+    /**
+     * Displays all project enquiries related to the officer's assigned projects.
+     */
     private void displayOwnProjectEnquiries() {
         String officerNric = officer.getNric().trim();
 
@@ -84,6 +100,10 @@ public class OfficerViewHandler implements RoleHandler {
         }
     }
 
+    /**
+     * Displays officer's enquiries and prompts to send a reply
+     * to a selected enquiry.
+     */
     private void replyToProjectEnquiry() {
         displayOwnProjectEnquiries();
         System.out.print("Enter Enquiry ID to reply: ");

@@ -38,7 +38,8 @@ public class BTOProjsController {
             boolean isVisible,
             HDBManager manager,
             int officerSlots,
-            HDBOfficer[] officers) {
+            HDBOfficer[] officers,
+            String postalCode) {
 
         BTOProj proj = new BTOProj(id, name, appOpenDate, appCloseDate, isVisible);
 
@@ -46,6 +47,7 @@ public class BTOProjsController {
         proj.setManagerIC(manager);
         proj.setOfficerSlots(officerSlots);
         proj.setOfficersList(officers);
+        proj.setPostalCode(postalCode);
 
         for (Map.Entry<FlatTypes, FlatType> entry : flatUnits.entrySet()) {
             FlatTypes type = entry.getKey();

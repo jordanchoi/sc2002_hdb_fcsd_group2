@@ -466,6 +466,9 @@ public class BTORepository implements BTOStorageProvider {
             // O - Visibility
             row.add(String.valueOf(proj.getVisibility()));
 
+            // P - Postal Code
+            row.add(String.valueOf(proj.getPostalCode()));
+
             rows.add(row);
         }
 
