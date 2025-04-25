@@ -103,35 +103,6 @@ public class HDBOfficerController implements canApplyFlat {
         return true;
     }
 
-    /*public boolean submitApplication(String projName) {
-        BTOProj proj = findProject(projName, btoRepository);
-        if (!checkEligibility(proj)) return false;
-        for (OfficerProjectApplication a : officer.getRegisteredApps()) {
-            if (proj.getProjName().equalsIgnoreCase(a.getProj().getProjName())) {return false;}
-        }
-       
-        OfficerProjectApplication app = new OfficerProjectApplication(officer, proj, AssignStatus.PENDING);
-        officer.addApps(app);
-
-        OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
-        
-        // Use the addOfficerProjectApplication function to add it to the list and save it to Excel
-        appController.addOfficerProjectApplication(app);  // Adds the application to ProjectApplicationList.xlsx
-
-        return true;
-
-    }*/
-
-    /*public String projRegStatus(String projectName) {
-        for (BTOProj proj : btoRepository.getAllProjects()) {
-            if (proj.getProjName().equalsIgnoreCase(projectName)) {
-                for (HDBOfficer o : proj.getOfficersList()) {
-                    if (o.equals(officer)) {return "Registered";} else {return "Not Registered";}
-                }
-            }
-        }
-        return "Project not found";
-    }*/
     public void projRegStatus(String nric) {
         OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
         List<OfficerProjectApplication> appList = appController.getApplicationsByOfficer(nric);
