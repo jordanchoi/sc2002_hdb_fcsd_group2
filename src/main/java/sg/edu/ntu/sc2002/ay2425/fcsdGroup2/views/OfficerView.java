@@ -1,17 +1,35 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
 
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.*;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BookingController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBOfficerController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.UserAuthController;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Application;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOExercise;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.BTOProj;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Block;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Flat;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.FlatType;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatBookingStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BlockListRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.FlatsListRepository;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.BTOProjsController;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.HDBBTOExerciseController;
 
 public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
@@ -82,6 +100,8 @@ public class OfficerView implements UserView {
     }
 
     private void handleProjectSubMenu(HDBOfficerController currentController) {
+        BTOProjsController projsController = new BTOProjsController();
+        HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
         Scanner scanner = new Scanner(System.in);
         int subChoice = -1;
 
@@ -103,8 +123,6 @@ public class OfficerView implements UserView {
 
             switch (subChoice) {
                 case 1 -> {
-                    BTOProjsController projsController = new BTOProjsController();
-                    HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
                     viewMyProjects(projsController, exerciseController);
                 }
                 case 2 -> {
@@ -114,13 +132,14 @@ public class OfficerView implements UserView {
                     System.out.println("Registration status for project \"" + regProjName + "\": " + status);
                 }
                 case 3 -> {
-                    System.out.print("Enter the project name to apply for as officer: ");
-                    String projName = scanner.nextLine();
-                    BTOProj proj = currentController.findProject(projName, repo);
-                    if (currentController.submitApplication(proj)) {
-                        System.out.println("Successfully applied as officer for " + projName);
-                    } else {
-                        System.out.println("Not allowed to apply for " + projName + " as officer.");
+                    System.out.println("Register to handle BTO project as officer: ");
+                    BTOProj proj = findProject(projsController, exerciseController);
+                    if (proj != null) {
+                        if(currentController.submitApplication(proj)) {
+                            System.out.println("Successfully applied as officer for " + proj.getProjName());
+                        } else {
+                            System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
+                        }
                     }
                 }
                 case 0 -> System.out.println("Returning to main menu...");
@@ -220,6 +239,22 @@ public class OfficerView implements UserView {
             displayProjectDetails(selected);
         }
     }
+
+        public BTOProj findProject(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
+        projsController.insertProjectsFromRepo();
+        exerciseController.insertExercisesFromRepo();
+        List<BTOProj> allProjects = projsController.viewAllProjs();
+        List<BTOExercise> allExercises = exerciseController.viewAllExercises();
+        BTOProj selected = null;
+
+        if (allProjects == null || allProjects.isEmpty()) {
+            System.out.println("There are no projects available.");
+            return selected;
+        }
+
+        return selectProjectFromTable(allProjects, allExercises);
+    }
+
 
     // Displays a formatted table of BTO projects along with their associated exercises,
     // prompts the user to select a project by ID, and returns the selected project.
