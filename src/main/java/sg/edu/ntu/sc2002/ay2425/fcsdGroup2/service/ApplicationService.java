@@ -22,9 +22,7 @@ public class ApplicationService {
         if (currentApp != null) {
             ApplicationStatus status = currentApp.getStatusEnum();
 
-            // Only allow override if previous application is unsuccessful or withdrawn
             if (status == ApplicationStatus.UNSUCCESSFUL || status == ApplicationStatus.WITHDRAWN) {
-                // Use same app ID to override
                 int existingId = currentApp.getAppId();
                 Application newApp = new Application(existingId, applicant, project);
 
@@ -71,19 +69,28 @@ public class ApplicationService {
             return "No application found.";
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Application ID: ").append(app.getAppId()).append("\n");
-        sb.append("Project: ").append(app.getAppliedProj().getProjName()).append("\n");
-        sb.append("Status: ").append(app.getStatus()).append("\n");
+        BTOProj project = app.getAppliedProj();
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Application Details ===\n");
+        sb.append("Application ID     : ").append(app.getAppId()).append("\n");
+        sb.append("Status             : ").append(app.getStatus()).append("\n");
+
+        sb.append("\n--- Project Info ---\n");
+        sb.append("Project ID         : ").append(project.getProjId()).append("\n");
+        sb.append("Project Name       : ").append(project.getProjName()).append("\n");
+        sb.append("Neighbourhood      : ").append(project.getProjNbh()).append("\n");
+
+        sb.append("\n--- Selected Flat ---\n");
         if (app.getFlat() != null) {
             sb.append("Flat: Block ").append(app.getFlat().getBlock().getBlkNo()).append(", ");
             sb.append(app.getFlat().getBlock().getStreetAddr()).append(", ");
             sb.append("Postal Code: ").append(app.getFlat().getBlock().getPostalCode()).append(", ");
             sb.append("Unit: ").append(app.getFlat().getFloorUnit()).append("\n");
         } else {
-            sb.append("Chosen Flat: N/A\n");
+            sb.append("Chosen Flat        : N/A\n");
         }
+
         return sb.toString();
     }
 

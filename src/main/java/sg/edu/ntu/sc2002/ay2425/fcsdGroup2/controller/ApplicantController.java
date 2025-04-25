@@ -29,14 +29,32 @@ public class ApplicantController implements canApplyFlat {
     public void viewEligibleProjects() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
         System.out.println("\n=== Eligible BTO Projects ===");
+
         if (eligibleProjects.isEmpty()) {
             System.out.println("No eligible projects found.");
             return;
         }
+
         for (BTOProj project : eligibleProjects) {
-            System.out.println("- " + project.getProjName() + " (" + project.getProjNbh() + ")");
+            System.out.println("---------------------------------------");
+            System.out.println("Project ID          : " + project.getProjId());
+            System.out.println("Project Name        : " + project.getProjName());
+            System.out.println("Neighbourhood       : " + project.getProjNbh());
+            System.out.println("Application Opens   : " + project.getAppOpenDate());
+            System.out.println("Application Closes  : " + project.getAppCloseDate());
+            System.out.println("Available Flat Types:");
+            for (Map.Entry<FlatTypes, FlatType> entry : project.getFlatUnits().entrySet()) {
+                FlatType ft = entry.getValue();
+                System.out.printf("  - %s: %d units available\n", ft.getTypeName(), ft.getUnitsAvail());
+
+            }
+
+            System.out.println("---------------------------------------\n");
         }
     }
+
+
+
 
     public BTOProj selectProject(List<BTOProj> availableProjects) {
         System.out.println("\n=== Available BTO Projects ===");
@@ -94,10 +112,12 @@ public class ApplicantController implements canApplyFlat {
         if (maritalStatus == MaritalStatus.MARRIED && age >= 21) {
             return true;
         } else if (maritalStatus == MaritalStatus.SINGLE && age >= 35) {
-            return project.getFlatUnits().containsKey(FlatTypes.TWO_ROOM);
+            FlatType twoRoom = project.getFlatUnits().get(FlatTypes.TWO_ROOM);
+            return twoRoom != null && twoRoom.getUnitsAvail() > 0;
         }
         return false;
     }
+
 
     public void applyForProject() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
@@ -165,6 +185,12 @@ public class ApplicantController implements canApplyFlat {
         Integer enquiryId = promptForInt("Enter the Enquiry ID to add a message to (0 to return): ");
         if (enquiryId == null || enquiryId == 0) return;
 
+        Optional<Enquiry> enquiry = enquiryService.getEnquiryById(enquiryId);
+        if (enquiry.isEmpty()) {
+            System.out.println("Enquiry ID not found.");
+            return;
+        }
+
         System.out.println("Enter your message (or 0 to cancel): ");
         String message = scanner.nextLine();
         if (message.equals("0")) return;
@@ -176,70 +202,81 @@ public class ApplicantController implements canApplyFlat {
         Integer enquiryId = promptForInt("Enter Enquiry ID to edit message (0 to return):");
         if (enquiryId == null || enquiryId == 0) return;
 
-        Optional<Enquiry> enquiry = enquiryService.getEnquiryById(enquiryId);
-        if (enquiry.isEmpty()) {
-            System.out.println("Enquiry not found.");
-            return;
-        }
-
-        System.out.println("Messages in this Enquiry:");
-        for (ProjectMessage message : enquiry.get().getEnquiries()) {
-            System.out.println("Message ID: " + message.getMessageId());
-            System.out.println("Sender: " + message.getSender().getFirstName());
-            System.out.println("Content: " + message.getContent());
-            System.out.println("---------------------------");
-        }
-
-        System.out.println("Enter Message ID you want to edit (or 0 to return):");
-        String messageId = scanner.nextLine();
-        if (messageId.equals("0")) return;
-
-        System.out.println("Enter new message content (or 0 to cancel):");
-        String newMessage = scanner.nextLine();
-        if (newMessage.equals("0")) return;
-
-        boolean success = enquiryService.editOwnMessage(enquiryId, messageId, model, newMessage);
-
-        System.out.println(success ? "Message updated successfully." : "Failed to update message. Maybe you're not the sender?");
-    }
-
-    public void deleteEnquiry() {
-        Integer enquiryId = promptForInt("Enter Enquiry ID to delete (0 to return):");
-        if (enquiryId == null || enquiryId == 0) return;
-
-        boolean success = enquiryService.deleteEnquiry(enquiryId, model);
-
-        System.out.println(success ? "Enquiry deleted successfully." : "Failed to delete enquiry.");
-    }
-
-    public void deleteMessageInEnquiry() {
-        Integer enquiryId = promptForInt("Enter Enquiry ID (0 to return):");
-        if (enquiryId == null || enquiryId == 0) return;
-
         Optional<Enquiry> enquiryOpt = enquiryService.getEnquiryById(enquiryId);
         if (enquiryOpt.isEmpty()) {
-            System.out.println("Enquiry not found.");
+            System.out.println("Enquiry ID not found.");
             return;
         }
 
         Enquiry enquiry = enquiryOpt.get();
 
         System.out.println("Your messages in this enquiry:");
+        List<ProjectMessage> ownMessages = new ArrayList<>();
         for (ProjectMessage message : enquiry.getEnquiries()) {
             if (message.getSender().equals(model)) {
                 System.out.println("Message ID: " + message.getMessageId());
                 System.out.println("Content: " + message.getContent());
-                System.out.println("-----------------------");
+                System.out.println("---------------------------");
+                ownMessages.add(message);
             }
         }
 
-        Integer messageId = promptForInt("Enter Message ID to delete (0 to return):");
-        if (messageId == null || messageId == 0) return;
+        if (ownMessages.isEmpty()) {
+            System.out.println("You have no messages in this enquiry.");
+            return;
+        }
 
-        boolean success = enquiryService.deleteMessage(enquiryId, messageId, model);
+        System.out.println("Enter Message ID you want to edit (or 0 to return):");
+        String messageIdStr = scanner.nextLine();
+        if (messageIdStr.equals("0")) return;
 
-        System.out.println(success ? "Message deleted successfully." : "Failed to delete message. You may not be the sender.");
+        int parsedMessageId;
+        try {
+            parsedMessageId = Integer.parseInt(messageIdStr);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid Message ID.");
+            return;
+        }
+
+        boolean isValid = ownMessages.stream().anyMatch(m -> m.getMessageId() == parsedMessageId);
+        if (!isValid) {
+            System.out.println("Invalid Message ID.");
+            return;
+        }
+
+        System.out.println("Enter new message content (or 0 to cancel):");
+        String newMessage = scanner.nextLine();
+        if (newMessage.equals("0")) return;
+
+        boolean success = enquiryService.editOwnMessage(enquiryId, messageIdStr, model, newMessage);
+        System.out.println(success ? "Message updated successfully." : "Failed to update message.");
     }
+
+    public void deleteEnquiry() {
+        Integer enquiryId = promptForInt("Enter Enquiry ID to delete (0 to return):");
+        if (enquiryId == null || enquiryId == 0) return;
+
+        Optional<Enquiry> enquiryOpt = enquiryService.getEnquiryById(enquiryId);
+        if (enquiryOpt.isEmpty()) {
+            System.out.println("Enquiry ID not found.");
+            return;
+        }
+
+        Enquiry enquiry = enquiryOpt.get();
+
+        // Check if any message is not by the applicant
+        boolean hasRepliesFromOthers = enquiry.getEnquiries().stream()
+                .anyMatch(msg -> !msg.getSender().equals(model));
+
+        if (hasRepliesFromOthers) {
+            System.out.println("Cannot delete enquiry. It has replies from a manager or officer.");
+            return;
+        }
+
+        boolean success = enquiryService.deleteEnquiry(enquiryId, model);
+        System.out.println(success ? "Enquiry deleted successfully." : "Failed to delete enquiry.");
+    }
+
 
     private Integer promptForInt(String promptMessage) {
         while (true) {
@@ -252,4 +289,5 @@ public class ApplicantController implements canApplyFlat {
             }
         }
     }
+
 }

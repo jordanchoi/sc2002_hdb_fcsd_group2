@@ -67,27 +67,6 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
     }
 
     @Override
-    public boolean deleteMessage(int enquiryId, int messageId, User sender) {
-        Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
-        if (opt.isEmpty()) return false;
-
-        Enquiry enquiry = opt.get();
-
-        boolean success = enquiry.deleteMessageById(messageId, sender);
-        if (success) {
-            if (enquiry.getEnquiries().isEmpty()) {
-                enquiryRepo.delete(enquiryId);
-            } else {
-                enquiryRepo.update(enquiry);
-            }
-        }
-        return success;
-    }
-
-
-
-
-    @Override
     public boolean deleteEnquiry(int enquiryId, HDBApplicant applicant) {
         Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
         return opt.isPresent() && opt.get().getMadeBy().equals(applicant)

@@ -83,8 +83,7 @@ public class ApplicantView implements UserView {
             System.out.println("3. View enquiries");
             System.out.println("4. Edit enquiry message");
             System.out.println("5. Delete entire enquiry");
-            System.out.println("6. Delete message from an enquiry (coming soon)");
-            System.out.println("7. Back to main menu");
+            System.out.println("6. Back to main menu");
 
             choice = getIntInput("Please select an enquiry option: ");
 
@@ -94,14 +93,16 @@ public class ApplicantView implements UserView {
                 case 3 -> controller.showAllEnquiries();
                 case 4 -> controller.editEnquiryMessage();
                 case 5 -> controller.deleteEnquiry();
-                case 6 -> controller.deleteMessageInEnquiry();
-                case 7 -> System.out.println("Returning to main menu...");
+                case 6 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
-        } while (choice != 7);
+        } while (choice != 6);
     }
 
     public void changePassword() {
+        Scanner scanner = new Scanner(System.in);
+
+        // Change Password Attempt Count
         int attempts = 3;
 
         do {

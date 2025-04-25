@@ -9,5 +9,4 @@ import java.util.Optional;
 public interface BaseEnquiryService {
     Optional<Enquiry> getEnquiryById(int enquiryId);
     boolean addMessage(int enquiryId, String msg, String senderNric);
-    boolean deleteMessage(int enquiryId, int messageId, User sender);
 }
