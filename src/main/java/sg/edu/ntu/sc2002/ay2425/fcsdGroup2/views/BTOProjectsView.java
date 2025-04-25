@@ -39,9 +39,6 @@ public class BTOProjectsView implements UserView {
         } while (choice != 5); // Assuming 10 is the exit option
     }
 
-
-
-
     @Override
     public void displayMenu() {
         System.out.println("1. Manage BTO Project");
@@ -115,9 +112,10 @@ public class BTOProjectsView implements UserView {
 
         int choice;
         while (true) {
-            System.out.print("Enter exercise number: ");
+            System.out.print("Enter exercise number (0 to cancel): ");
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
+                if (choice == 0) return; // Cancel creating project
                 if (choice >= 1 && choice <= exercises.size()) break;
             }
             System.out.println("Invalid choice. Please enter a number between 1 and " + exercises.size());
@@ -192,11 +190,15 @@ public class BTOProjectsView implements UserView {
 
         Map<FlatTypes, FlatType> flatUnitMap = new HashMap<>();
         for (FlatTypes type : FlatTypes.values()) {
-            System.out.printf("Enter number of %s units: ", type.getDisplayName());
-            int units = scanner.nextInt();
-            System.out.printf("Enter selling price for %s units: ", type.getDisplayName());
-            float price = scanner.nextFloat();
-            flatUnitMap.put(type, new FlatType(type.getDisplayName(), units, price));
+            if (type == FlatTypes.NIL) {
+                flatUnitMap.put(type, new FlatType(type.getDisplayName(), 0, 0f));
+            } else {
+                System.out.printf("Enter number of %s units: ", type.getDisplayName());
+                int units = scanner.nextInt();
+                System.out.printf("Enter selling price for %s units: ", type.getDisplayName());
+                float price = scanner.nextFloat();
+                flatUnitMap.put(type, new FlatType(type.getDisplayName(), units, price));
+            }
         }
         scanner.nextLine();
 
@@ -213,6 +215,9 @@ public class BTOProjectsView implements UserView {
         }
         scanner.nextLine();
 
+        System.out.print("Enter Postal Code for the project: ");
+        String postalCode = scanner.nextLine().trim();
+
         // Create project and save
         BTOProj newProj = projsController.CreateProj(
                 id,
@@ -224,7 +229,8 @@ public class BTOProjectsView implements UserView {
                 visible,
                 manager,
                 officerSlots,
-                new HDBOfficer[0]
+                new HDBOfficer[0],
+                postalCode
         );
 
         // Link to Exercise and save
@@ -368,30 +374,37 @@ public class BTOProjectsView implements UserView {
     public void manageBTOProject() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose projects to view...\n");
+        System.out.println("0. Return to previous menu");
         System.out.println("1. View All Projects");
         System.out.println("2. View My Project");
         System.out.print("Enter choice: ");
         int choice = scanner.nextInt();
 
         switch (choice) {
+            case 0:
+                System.out.println("Returning to previous menu...");
+                return;
             case 1:
                 viewAllProjects(projsController, exerciseController);
                 break;
             case 2:
                 viewMyProjects(projsController, exerciseController);
+                break;
             default:
+                System.out.println("Invalid input.");
         }
     }
 
     public void manageSelectedProject(BTOProj selected) {
         System.out.println("\nWhat would you like to do next?");
+        System.out.println("0. Return to previous menu");
         System.out.println("1. Toggle Project Visibility");
-        System.out.println("2. Manage HDB Officer ");
+        System.out.println("2. Manage HDB Officer");
         System.out.println("3. Manage Applications");
-        System.out.println("4. Exit to main menu");
         Scanner scanner = new Scanner(System.in);
+
         int choice = -1;
-        while (choice < 1 || choice > 4) {
+        while (choice < 0 || choice > 3) {
             System.out.print("Enter choice: ");
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
@@ -403,6 +416,9 @@ public class BTOProjectsView implements UserView {
         }
 
         switch (choice) {
+            case 0 -> {
+                System.out.println("Returning to project list...");
+            }
             case 1 -> {
                 projsController.toggleProjVisibility(selected);
                 System.out.println("\nVisibility updated: " + (selected.getVisibility() ? "ON" : "OFF"));
@@ -412,12 +428,8 @@ public class BTOProjectsView implements UserView {
                 manageOfficerByProjectId(selected.getProjId());
             }
             case 3 -> {
-                // CONTINUE HERE
                 System.out.println("Managing Applications...");
                 manageApplicationsByProjectId(applicationController, selected.getProjId());
-            }
-            case 4 -> {
-                System.out.println("Returning to project list...");
             }
         }
     }
@@ -656,6 +668,7 @@ public class BTOProjectsView implements UserView {
         boolean done = false;
         while (!done) {
             System.out.println("\nEditing Project: " + name);
+            System.out.println("0. Cancel Editing");
             System.out.println("1. Name (current: " + name + ")");
             System.out.println("2. Neighbourhood (current: " + nbh + ")");
             System.out.println("3. Open Date (current: " + open.toLocalDate() + ")");
@@ -667,6 +680,10 @@ public class BTOProjectsView implements UserView {
             String input = scanner.nextLine().trim();
 
             switch (input) {
+                case "0" -> {
+                    System.out.println("Cancelling editing...");
+                    return;
+                }
                 case "1" -> {
                     System.out.print("Enter new name: ");
                     String inputName = scanner.nextLine().trim();
