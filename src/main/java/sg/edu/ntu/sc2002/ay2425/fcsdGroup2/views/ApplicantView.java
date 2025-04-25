@@ -71,8 +71,6 @@ public class ApplicantView implements UserView {
         return choice;
     }
 
-
-
     public void changePassword() {
         Scanner scanner = new Scanner(System.in);
 

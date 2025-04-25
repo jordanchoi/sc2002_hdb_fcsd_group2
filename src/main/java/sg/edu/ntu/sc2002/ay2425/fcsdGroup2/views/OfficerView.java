@@ -31,6 +31,11 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.UserView;
 
+/**
+ * Represents the view for HDB Officers.
+ * Provides options for managing applicants, projects, flat bookings,
+ * generating receipts and reports, and handling enquiries.
+ */
 public class OfficerView implements UserView {
     SessionStateManager session = SessionStateManager.getInstance();
     UserAuthController controller = UserAuthController.getInstance();
@@ -41,8 +46,16 @@ public class OfficerView implements UserView {
     HDBOfficer currentOfficer = null;
     List<HDBApplicant> applicantList = user.getApplicants();
 
+    /**
+     * Constructs a new OfficerView instance.
+     */
     public OfficerView() {}
 
+    /**
+     * Starts the Officer Main Menu session.
+     * Displays a welcome message and repeatedly shows menu options
+     * until the officer chooses to exit.
+     */
     @Override
     public void start() {
         System.out.println("You are logged in as an officer.");
@@ -60,6 +73,9 @@ public class OfficerView implements UserView {
         }
     }
 
+    /**
+     * Displays the main menu options for the officer.
+     */
     @Override
     public void displayMenu() {
         System.out.println("\nWhat would you like to do?\n");
@@ -71,6 +87,9 @@ public class OfficerView implements UserView {
         System.out.println("10. Exit");
     }
 
+    /**
+     * Displays the main menu options for the officer.
+     */
     @Override
     public int handleUserInput() {
         Scanner scanner = new Scanner(System.in);
@@ -99,6 +118,11 @@ public class OfficerView implements UserView {
         return choice;
     }
 
+    /**
+     * Handles project management submenu operations.
+     *
+     * @param currentController the current officer controller instance
+     */
     private void handleProjectSubMenu(HDBOfficerController currentController) {
         BTOProjsController projsController = new BTOProjsController();
         HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
@@ -149,6 +173,9 @@ public class OfficerView implements UserView {
     }
 
 
+    /**
+     * Handles the receipt submenu operations for generating receipts.
+     */
     private void handleReceiptSubMenu() {
         Scanner scanner = new Scanner(System.in);
         int subChoice;
@@ -171,6 +198,11 @@ public class OfficerView implements UserView {
         } while (subChoice != 0);
     }
 
+    /**
+     * Finds and returns an application selected by the officer.
+     *
+     * @return the selected application or null if invalid
+     */
     public Application findApplication() {
         BTORepository btoRepo = BTORepository.getInstance();
         UserRepository userRepo = UserRepository.getInstance();
@@ -220,9 +252,13 @@ public class OfficerView implements UserView {
     }
 
 
-    // Displays only BTO projects created by the currently logged-in HDB Manager.
-    // Uses the SessionStateManager to identify the manager.
-    // If any are found, displays a table and allows selection for details and management.
+    /**
+     * Lists all available projects and returns the selected project.
+     *
+     * @param projsController the BTO projects controller
+     * @param exerciseController the BTO exercises controller
+     * @return the selected project or null
+     */
     public void viewMyProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         projsController.insertProjectsFromRepo();
         exerciseController.insertExercisesFromRepo();
@@ -240,6 +276,13 @@ public class OfficerView implements UserView {
         }
     }
 
+        /**
+         * Lists all available projects and returns the selected project.
+         *
+         * @param projsController the BTO projects controller
+         * @param exerciseController the BTO exercises controller
+         * @return the selected project or null
+         */
         public BTOProj findProject(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         projsController.insertProjectsFromRepo();
         exerciseController.insertExercisesFromRepo();
@@ -256,9 +299,13 @@ public class OfficerView implements UserView {
     }
 
 
-    // Displays a formatted table of BTO projects along with their associated exercises,
-    // prompts the user to select a project by ID, and returns the selected project.
-    // If -1 is entered, returns null to indicate no selection.
+    /**
+     * Displays a table of projects with their associated exercises, prompts for selection.
+     *
+     * @param projects list of available projects
+     * @param exercises list of exercises
+     * @return the selected project or null
+     */
     private BTOProj selectProjectFromTable(List<BTOProj> projects, List<BTOExercise> exercises) {
         Scanner scanner = new Scanner(System.in);
 
@@ -304,11 +351,11 @@ public class OfficerView implements UserView {
         return null;
     }
 
-    // Prints detailed information about a single BTO project, including:
-    // - Project name, dates, visibility, and neighbourhood
-    // - Unique flat types offered
-    // - Officer slot information
-    // - Assigned officer names
+    /**
+     * Displays detailed information about a selected BTO project.
+     *
+     * @param selected the selected project to view
+     */
     private void displayProjectDetails(BTOProj selected) {
         System.out.println("\n=== Project Details ===");
         System.out.println("Project Name     : " + selected.getProjName());
@@ -349,6 +396,10 @@ public class OfficerView implements UserView {
         scanner.nextLine();
     }
 
+    /**
+     * Handles the flat booking process for applicants.
+     * Includes listing successful applicants, selecting flats, booking, and updating records.
+     */
     public void handleFlatBookingByOfficer(){
         try {
             Scanner sc = new Scanner(System.in);

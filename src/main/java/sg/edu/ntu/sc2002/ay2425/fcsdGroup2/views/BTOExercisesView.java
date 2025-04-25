@@ -10,14 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Represents the view for managing BTO Exercises.
+ * Allows creating, editing, deleting, and viewing BTO exercises.
+ */
 public class BTOExercisesView implements UserView {
     private final HDBBTOExerciseController exerciseController;
 
+    /**
+     * Constructs a new BTOExercisesView instance.
+     *
+     * @param exerciseController the controller managing BTO exercises
+     */
     public BTOExercisesView(HDBBTOExerciseController exerciseController) {
         // constructor for logic if required
         this.exerciseController = exerciseController;
     }
 
+    /**
+     * Starts the BTO Exercise Management Console session.
+     */
     public void start() {
         System.out.println("You are in the BTO Exercises Management Console.\nHere, you can manage BTO exercises, including creating of BTO Exercises or get statistics for a particular exercise.\n");
         System.out.println("What would you like to do?\n");
@@ -28,6 +40,9 @@ public class BTOExercisesView implements UserView {
         } while (choice != 5); // Assuming 10 is the exit option
     }
 
+    /**
+     * Displays the main menu for BTO Exercise management.
+     */
     @Override
     public void displayMenu() {
         System.out.println("1. View BTO Exercises");
@@ -37,6 +52,11 @@ public class BTOExercisesView implements UserView {
         System.out.println("5. Return to Main Menu");
     }
 
+    /**
+     * Handles user input selection from the BTO Exercise menu.
+     *
+     * @return the selected menu option
+     */
     @Override
     public int handleUserInput() {
         Scanner scanner = new Scanner(System.in);
@@ -86,6 +106,11 @@ public class BTOExercisesView implements UserView {
         return choice;
     }
 
+    /**
+     * Displays all existing BTO Exercises.
+     *
+     * @param exerciseController the controller used to fetch exercises
+     */
     // Displays all BTO exercises by fetching from the controller.
     public void viewAllExercises(HDBBTOExerciseController exerciseController) {
         exerciseController.insertExercisesFromRepo();
@@ -99,6 +124,11 @@ public class BTOExercisesView implements UserView {
         printAllExercises(exerciseList);
     }
 
+    /**
+     * Helper method to print a list of BTO exercises in a tabular format.
+     *
+     * @param exercises the list of exercises to print
+     */
     // Helper method to format and print a list of BTO exercises in tabular format.
     private void printAllExercises(List<BTOExercise> exercises) {
         System.out.println("=== All BTO Exercises ===");
@@ -123,6 +153,11 @@ public class BTOExercisesView implements UserView {
         }
     }
 
+    /**
+     * Prompts user to create a new BTO Exercise.
+     *
+     * @param exerciseController the controller to create the exercise
+     */
     // Creates a new BTO exercise by prompting the user for ID, name, applicants, and status.
     public void createBTOExercise(HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
@@ -196,6 +231,10 @@ public class BTOExercisesView implements UserView {
         System.out.println("\nExercise created");
     }
 
+    /**
+     * Allows editing the details of an existing BTO Exercise,
+     * including name, total applicants, and project status.
+     */
     // Allows the user to edit a selected BTO exercise's name, applicants, and status.
     // Changes are saved using the controller.
     private void editBTOExercise() {
@@ -282,6 +321,9 @@ public class BTOExercisesView implements UserView {
         }
     }
 
+    /**
+     * Deletes a selected BTO Exercise after confirmation.
+     */
     // Deletes a BTO exercise selected by ID after user confirmation.
     // The controller removes the exercise and persists changes to Excel.
     private void deleteExercise() {

@@ -15,6 +15,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
 import java.util.*;
 import java.time.LocalDateTime;
 
+/**
+ * Represents the view for managing BTO Projects.
+ * Allows creation, editing, deletion, viewing, and management of BTO projects.
+ */
 public class BTOProjectsView implements UserView {
     private final BTOProjsController projsController;
     private final HDBBTOExerciseController exerciseController;
@@ -22,6 +26,14 @@ public class BTOProjectsView implements UserView {
     private final OfficerProjectApplicationController officerProjectApplicationController;
     private SessionStateManager session = SessionStateManager.getInstance();
 
+    /**
+     * Constructs a BTOProjectsView instance.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     * @param applicationController controller for applications
+     * @param officerProjectApplication controller for officer project applications
+     */
     public BTOProjectsView(BTOProjsController projsController, HDBBTOExerciseController exerciseController, ApplicationController applicationController, OfficerProjectApplicationController officerProjectApplication) {
         this.projsController = projsController;
         this.exerciseController = exerciseController;
@@ -29,6 +41,9 @@ public class BTOProjectsView implements UserView {
         this.officerProjectApplicationController = officerProjectApplication;
     }
 
+    /**
+     * Starts the BTO Project Management Console session.
+     */
     public void start() {
         System.out.println("You are in the BTO Project Management Console.\nHere, you can manage BTO projects, including creating of BTO Project or get statistics for a particular Project.\n");
         System.out.println("What would you like to do?\n");
@@ -39,6 +54,9 @@ public class BTOProjectsView implements UserView {
         } while (choice != 5); // Assuming 10 is the exit option
     }
 
+    /**
+     * Displays the main menu options for managing BTO Projects.
+     */
     @Override
     public void displayMenu() {
         System.out.println("1. Manage BTO Project");
@@ -48,6 +66,11 @@ public class BTOProjectsView implements UserView {
         System.out.println("5. Return to Main Menu");
     }
 
+    /**
+     * Handles user input for the BTO Project Management Console.
+     *
+     * @return the selected menu choice
+     */
     @Override
     public int handleUserInput() {
         Scanner scanner = new Scanner(System.in);
@@ -92,6 +115,12 @@ public class BTOProjectsView implements UserView {
         return choice;
     }
 
+    /**
+     * Creates a new BTO Project and assigns it to a selected BTO Exercise.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     */
     // Allows the user to create a new BTO project and assign it to a selected BTO exercise.
     public void createBTOProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
@@ -240,6 +269,13 @@ public class BTOProjectsView implements UserView {
         System.out.println("\nProject created and assigned to: " + selectedExercise.getExerciseName());
     }
 
+    /**
+     * Displays all BTO Projects in the system, regardless of manager or visibility.
+     * Allows selecting and managing a specific project.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     */
     // Displays all BTO projects in the system (regardless of manager or visibility).
     // Shows a table view with basic info, allows user to select a project,
     // then displays its full details and opens the management menu.
@@ -261,6 +297,12 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Displays BTO Projects created by the currently logged-in HDB Manager only.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     */
     // Displays only BTO projects created by the currently logged-in HDB Manager.
     // Uses the SessionStateManager to identify the manager.
     // If any are found, displays a table and allows selection for details and management.
@@ -282,6 +324,14 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Displays a table of BTO Projects and associated exercises,
+     * allows the user to select one for further management.
+     *
+     * @param projects list of BTO projects
+     * @param exercises list of BTO exercises
+     * @return the selected BTO project or null if cancelled
+     */
     // Displays a formatted table of BTO projects along with their associated exercises,
     // prompts the user to select a project by ID, and returns the selected project.
     // If -1 is entered, returns null to indicate no selection.
@@ -330,6 +380,11 @@ public class BTOProjectsView implements UserView {
         return null;
     }
 
+    /**
+     * Displays detailed information about a single BTO project.
+     *
+     * @param selected the selected BTO project
+     */
     // Prints detailed information about a single BTO project, including:
     // - Project name, dates, visibility, and neighbourhood
     // - Unique flat types offered
@@ -371,6 +426,10 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Handles the management options for BTO Projects:
+     * viewing all projects, viewing own projects, or returning.
+     */
     public void manageBTOProject() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose projects to view...\n");
@@ -395,6 +454,12 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Manages further actions on a selected project such as toggling visibility,
+     * managing officers, and managing applications.
+     *
+     * @param selected the selected BTO project
+     */
     public void manageSelectedProject(BTOProj selected) {
         System.out.println("\nWhat would you like to do next?");
         System.out.println("0. Return to previous menu");
@@ -434,6 +499,11 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Manages officer applications for a selected BTO project.
+     *
+     * @param projectId the ID of the project
+     */
     public void manageOfficerByProjectId(int projectId) {
         BTORepository btoRepo = BTORepository.getInstance();
         UserRepository userRepo = UserRepository.getInstance();
@@ -532,6 +602,12 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Manages BTO applications (such as approving or rejecting) for a selected project.
+     *
+     * @param applicationController the application controller
+     * @param projectId the ID of the project
+     */
     public void manageApplicationsByProjectId(ApplicationController applicationController, int projectId) {
         BTORepository btoRepo = BTORepository.getInstance();
         UserRepository userRepo = UserRepository.getInstance();
@@ -642,7 +718,10 @@ public class BTOProjectsView implements UserView {
     }
 
 
-
+    /**
+     * Allows editing the details of an existing BTO project,
+     * such as project name, dates, flat types, and officer slots.
+     */
     // Allows the user to edit a selected BTO project.
     // Supports editing name, neighbourhood, dates, officer slots, and flat type details.
     private void editBTOProject() {
@@ -762,6 +841,9 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Allows deleting a selected BTO project after confirmation.
+     */
     // Allows the user to delete a BTO project after selecting from the list.
     // Confirms the action before delegating to the controller to persist changes.
     private void deleteBTOProject() {

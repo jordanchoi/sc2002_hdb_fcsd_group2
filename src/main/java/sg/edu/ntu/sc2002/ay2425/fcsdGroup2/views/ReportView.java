@@ -14,10 +14,23 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 
+/**
+ * Handles the generation of applicant booking reports.
+ * Allows filtering by marital status, flat type, and age group.
+ * Generates a PDF file summarizing the filtered applicant booking data.
+ */
 public class ReportView {
 
+    /**
+     * Constructs a ReportView instance.
+     */
     public ReportView() {}
 
+    /**
+     * Generates the applicant report as a PDF file.
+     * Allows the user to apply filters such as marital status, flat type, and age group.
+     * Fetches the necessary data from repositories, processes it, and outputs a formatted report.
+     */
     public void generateReport() {
         BTORepository btoRepo = BTORepository.getInstance();
         UserRepository userRepo = UserRepository.getInstance();
@@ -26,6 +39,8 @@ public class ReportView {
         List<HDBApplicant> applicants = userRepo.getApplicants();
 
         Scanner scanner = new Scanner(System.in);
+
+        // Input filters
         System.out.println("Select Marital Status to filter (press Enter to skip):");
         MaritalStatus[] statuses = MaritalStatus.values();
         for (int i = 0; i < statuses.length; i++) {
@@ -47,7 +62,6 @@ public class ReportView {
 
         System.out.println("\nSelect Flat Type to filter (press Enter to skip):");
         FlatTypes[] types = FlatTypes.values();
-        int flatDisplayIndex = 1;
         FlatTypes[] displayTypes = java.util.Arrays.stream(types)
                 .filter(t -> !t.equals(FlatTypes.NIL))
                 .toArray(FlatTypes[]::new);
@@ -85,6 +99,7 @@ public class ReportView {
         SessionStateManager session = SessionStateManager.getInstance();
         String generatedBy = session.isLoggedIn() ? session.getLoggedInUser().getFirstName() : "Unknown";
 
+        // PDF generation
         try (PDDocument doc = new PDDocument()) {
             PDPage page = new PDPage(new PDRectangle(PDRectangle.A4.getHeight(), PDRectangle.A4.getWidth()));
             doc.addPage(page);
@@ -94,6 +109,7 @@ public class ReportView {
             float rowHeight = 20;
             float y = yStart;
 
+            // Document title
             content.setFont(PDType1Font.HELVETICA_BOLD, 16);
             content.beginText();
             content.newLineAtOffset(50, y);
@@ -101,6 +117,7 @@ public class ReportView {
             content.endText();
             y -= rowHeight;
 
+            // Date generated
             content.setFont(PDType1Font.HELVETICA_OBLIQUE, 10);
             content.beginText();
             content.newLineAtOffset(50, y);
@@ -113,6 +130,7 @@ public class ReportView {
             content.stroke();
             y -= rowHeight;
 
+            // Filters applied
             StringBuilder filterSummary = new StringBuilder();
             if (!maritalFilter.isEmpty()) filterSummary.append("Marital: ").append(maritalFilter).append("  ");
             if (!flatTypeFilter.isEmpty()) filterSummary.append("Flat Type: ").append(flatTypeFilter).append("  ");
@@ -125,6 +143,7 @@ public class ReportView {
             content.endText();
             y -= rowHeight * 2;
 
+            // Table headers
             float[] colX = {50, 120, 200, 250, 320, 420, 520, 620};
             String[] headers = {"NRIC", "Name", "Age", "Marital", "Project", "Status", "Flat Type", "Flat Booked"};
             content.setFont(PDType1Font.HELVETICA_BOLD, 12);
@@ -136,6 +155,7 @@ public class ReportView {
             }
             y -= rowHeight;
 
+            // Populate rows with filtered data
             content.setFont(PDType1Font.HELVETICA, 10);
             for (Application app : apps) {
                 HDBApplicant matchedApplicant = applicants.stream()
@@ -181,6 +201,7 @@ public class ReportView {
                 y -= rowHeight;
             }
 
+            // Footer
             y -= rowHeight;
             content.setFont(PDType1Font.HELVETICA_OBLIQUE, 9);
             content.beginText();
