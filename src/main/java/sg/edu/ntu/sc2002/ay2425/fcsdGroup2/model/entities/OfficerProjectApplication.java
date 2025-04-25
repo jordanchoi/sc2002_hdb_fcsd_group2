@@ -1,5 +1,8 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
 
+import java.util.List;
+
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.OfficerProjectApplicationController;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.AssignStatus;
 
 public class OfficerProjectApplication {
@@ -27,7 +30,7 @@ public class OfficerProjectApplication {
 
     // Constructor - Default
     public OfficerProjectApplication() {
-        this.officerAppId = idCounter++;
+        this.officerAppId = getId();
     }
 
     // Constructor - With parameters
@@ -40,10 +43,20 @@ public class OfficerProjectApplication {
 
     // Constructor for auto-generating ID
     public OfficerProjectApplication(HDBOfficer officer, BTOProj proj, AssignStatus assignmentStatus) {
-        this.officerAppId = idCounter++; // Auto-increment
+        this.officerAppId = getId(); // Auto-increment
         this.officer = officer;
         this.proj = proj;
         this.assignmentStatus = assignmentStatus;
+    }
+
+    public int getId() {
+        int counter = 1;
+        OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
+        List<OfficerProjectApplication> officerAppList = appController.getAllOfficerProjectApplications();
+        for (OfficerProjectApplication officerApp : officerAppList) {
+            counter++;
+        }
+        return counter;
     }
 
     public int getOfficerAppId() {

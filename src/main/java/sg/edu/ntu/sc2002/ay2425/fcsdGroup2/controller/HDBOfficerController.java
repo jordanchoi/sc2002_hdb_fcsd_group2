@@ -1,6 +1,5 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -36,6 +35,23 @@ public class HDBOfficerController implements canApplyFlat {
         Application currentApp = officer.getCurrentApplication();
         if (currentApp != null && proj == currentApp.getAppliedProj()) {return false;}
 
+        OfficerProjectApplicationController officerAppController = new OfficerProjectApplicationController();
+        List<OfficerProjectApplication> officerAppList = officerAppController.getApplicationsByOfficer(officer.getNric());
+        for(OfficerProjectApplication officerApp : officerAppList) {
+            if(officerApp.getProj() == proj) {
+                System.out.println("There is an existing application for project " + proj.getProjName());
+                return false;
+            }
+        }
+
+        HDBOfficer[] officerList = proj.getOfficersList();
+        for (HDBOfficer newOfficer : officerList) {
+            if (officer.getNric().equalsIgnoreCase(newOfficer.getNric())) {
+                System.out.println("Already handling project " + proj.getProjName());
+                return false;
+            }
+        }
+
         LocalDateTime startNew = proj.getAppOpenDate();
         LocalDateTime endNew   = proj.getAppCloseDate();
         for (BTOProj handled : officer.getAllProj()) {
@@ -45,8 +61,25 @@ public class HDBOfficerController implements canApplyFlat {
             // overlap iff NOT (new ends before old starts OR new starts after old ends)
             boolean overlap = !( endNew.isBefore(startOld) || startNew.isAfter(endOld) );
 
-            if (overlap) {return false;}
+            if (overlap) {
+                System.out.println("application date overlaps with existing handled project " + handled.getProjName());
+                return false;
+            }
         }
+
+        for (OfficerProjectApplication a : officerAppList) {
+            LocalDateTime startOld = a.getProj().getAppOpenDate();
+            LocalDateTime endOld   = a.getProj().getAppCloseDate();
+
+            // overlap iff NOT (new ends before old starts OR new starts after old ends)
+            boolean overlap = !( endNew.isBefore(startOld) || startNew.isAfter(endOld) );
+
+            if (overlap) {
+                System.out.println("application date overlaps with existing applied project " + a.getProj().getProjName());
+                return false;
+            }
+        }
+
         // passed both checks!
         return true;
     }
@@ -89,7 +122,7 @@ public class HDBOfficerController implements canApplyFlat {
 
     }*/
 
-    public String projRegStatus(String projectName) {
+    /*public String projRegStatus(String projectName) {
         for (BTOProj proj : btoRepository.getAllProjects()) {
             if (proj.getProjName().equalsIgnoreCase(projectName)) {
                 for (HDBOfficer o : proj.getOfficersList()) {
@@ -98,6 +131,20 @@ public class HDBOfficerController implements canApplyFlat {
             }
         }
         return "Project not found";
+    }*/
+    public void projRegStatus(String nric) {
+        OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
+        List<OfficerProjectApplication> appList = appController.getApplicationsByOfficer(nric);
+        System.out.println("=== Status List of BTO Projects Applied ===");
+        System.out.printf("%-15s %-20s %-15s %-20s%n", "Project ID", "Project Name", "Application ID", "Application Status");
+        System.out.println("----------------------------------------------------------------------------------------");
+        for (OfficerProjectApplication officerProjApp : appList) {
+            System.out.printf("%-15d %-20s %-15d %-20s%n",
+                officerProjApp.getProj().getProjId(),
+                officerProjApp.getProj().getProjName(),
+                officerProjApp.getOfficerAppId(),
+                officerProjApp.getAssignmentStatus());
+        }
     }
 
     public java.util.List<String> viewProjDetails(BTOProj project) {

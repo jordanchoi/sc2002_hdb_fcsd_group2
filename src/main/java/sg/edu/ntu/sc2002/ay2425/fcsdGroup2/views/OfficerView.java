@@ -86,7 +86,7 @@ public class OfficerView implements UserView {
                 ApplicantView applicantView = new ApplicantView();
                 applicantView.start();
             }
-            case 2 -> handleProjectSubMenu(currentController);
+            case 2 -> handleProjectSubMenu();
             case 3 -> {
                 System.out.println("\n-- Flat Booking --");
                 handleFlatBookingByOfficer();
@@ -99,13 +99,14 @@ public class OfficerView implements UserView {
         return choice;
     }
 
-    private void handleProjectSubMenu(HDBOfficerController currentController) {
-        BTOProjsController projsController = new BTOProjsController();
-        HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
+    private void handleProjectSubMenu() {
         Scanner scanner = new Scanner(System.in);
         int subChoice = -1;
 
         do {
+            HDBOfficerController currentController = new HDBOfficerController(currentOfficer, repo);
+            BTOProjsController projsController = new BTOProjsController();
+            HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();
             System.out.println("\n-- Project Management --");
             System.out.println("1. View Project Details");
             System.out.println("2. Check Project Registration Status");
@@ -126,10 +127,12 @@ public class OfficerView implements UserView {
                     viewMyProjects(projsController, exerciseController);
                 }
                 case 2 -> {
-                    System.out.print("Enter the project name to check registration status: ");
+                    System.out.println("Check registration status: ");
+                    currentController.projRegStatus(currentOfficer.getNric());
+                    /*System.out.print("Enter the project name to check registration status: ");
                     String regProjName = scanner.nextLine();
                     String status = currentController.projRegStatus(regProjName);
-                    System.out.println("Registration status for project \"" + regProjName + "\": " + status);
+                    System.out.println("Registration status for project \"" + regProjName + "\": " + status);*/
                 }
                 case 3 -> {
                     System.out.println("Register to handle BTO project as officer: ");
