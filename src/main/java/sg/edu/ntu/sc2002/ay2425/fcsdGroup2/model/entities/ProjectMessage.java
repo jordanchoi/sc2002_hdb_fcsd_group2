@@ -6,12 +6,15 @@ import java.time.LocalDateTime;
  * Represents a single message exchanged in a project enquiry thread.
  */
 public class ProjectMessage {
-    private static int messageCounter = 1;
     private final int messageId;
     private String content;
     private final User sender;
     private final LocalDateTime timestamp;
 
+
+    // Main constructor (message ID is passed in)
+    public ProjectMessage(int messageId, String content, User sender) {
+        this.messageId = messageId;
     /**
      * Constructs a new project message.
      *
@@ -39,6 +42,8 @@ public class ProjectMessage {
         this.content = content;
         this.sender = sender;
         this.timestamp = timestamp;
+    }
+
     };
 
 

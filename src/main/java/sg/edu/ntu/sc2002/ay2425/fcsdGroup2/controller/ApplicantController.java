@@ -7,12 +7,8 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.ApplicationService;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.EnquiryServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Controller class for managing applicant actions.
@@ -21,14 +17,18 @@ import java.util.Scanner;
 public class ApplicantController implements canApplyFlat {
     private final HDBApplicant model;
     private final ApplicationService appService = new ApplicationService();
-    private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
+
     private final BTORepository projRepo = BTORepository.getInstance();
+    private final Scanner scanner = new Scanner(System.in);
+
+    private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
 
     /**
      * Constructs the ApplicantController with a given applicant model.
      *
      * @param model the HDBApplicant
      */
+  
     public ApplicantController(HDBApplicant model) {
         this.model = model;
     }
@@ -42,12 +42,27 @@ public class ApplicantController implements canApplyFlat {
     public void viewEligibleProjects() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
         System.out.println("\n=== Eligible BTO Projects ===");
+
         if (eligibleProjects.isEmpty()) {
             System.out.println("No eligible projects found.");
             return;
         }
+
         for (BTOProj project : eligibleProjects) {
-            System.out.println("- " + project.getProjName() + " (" + project.getProjNbh() + ")");
+            System.out.println("---------------------------------------");
+            System.out.println("Project ID          : " + project.getProjId());
+            System.out.println("Project Name        : " + project.getProjName());
+            System.out.println("Neighbourhood       : " + project.getProjNbh());
+            System.out.println("Application Opens   : " + project.getAppOpenDate());
+            System.out.println("Application Closes  : " + project.getAppCloseDate());
+            System.out.println("Available Flat Types:");
+            for (Map.Entry<FlatTypes, FlatType> entry : project.getFlatUnits().entrySet()) {
+                FlatType ft = entry.getValue();
+                System.out.printf("  - %s: %d units available\n", ft.getTypeName(), ft.getUnitsAvail());
+
+            }
+
+            System.out.println("---------------------------------------\n");
         }
     }
 
@@ -57,8 +72,8 @@ public class ApplicantController implements canApplyFlat {
      * @param availableProjects list of available BTO projects
      * @return selected BTO project or null
      */
+
     public BTOProj selectProject(List<BTOProj> availableProjects) {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("\n=== Available BTO Projects ===");
 
         if (availableProjects.isEmpty()) {
@@ -70,28 +85,24 @@ public class ApplicantController implements canApplyFlat {
             System.out.println(project.getProjId() + ". " + project.getProjName() + " (" + project.getProjNbh() + ")");
         }
 
-        System.out.println("\nEnter the Project ID of the project you want to apply for, or 0 to return to the main menu:");
+        while (true) {
+            System.out.println("\nEnter the Project ID of the project you want to apply for, or 0 to return:");
+            String input = scanner.nextLine();
 
-        int chosenProjId;
-        try {
-            chosenProjId = scanner.nextInt();
-        } catch (Exception e) {
-            System.out.println("Invalid input. Please enter a valid Project ID.");
-            return null;
-        }
+            try {
+                int chosenProjId = Integer.parseInt(input);
+                if (chosenProjId == 0) return null;
 
-        if (chosenProjId == 0) {
-            return null;
-        }
-
-        for (BTOProj project : availableProjects) {
-            if (project.getProjId() == chosenProjId) {
-                return project;
+                for (BTOProj project : availableProjects) {
+                    if (project.getProjId() == chosenProjId) {
+                        return project;
+                    }
+                }
+                System.out.println("Invalid Project ID. Please try again.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
             }
         }
-
-        System.out.println("Invalid Project ID. Please try again.");
-        return null;
     }
 
     /**
@@ -129,22 +140,22 @@ public class ApplicantController implements canApplyFlat {
         if (maritalStatus == MaritalStatus.MARRIED && age >= 21) {
             return true;
         } else if (maritalStatus == MaritalStatus.SINGLE && age >= 35) {
-            return project.getFlatUnits().containsKey(FlatTypes.TWO_ROOM);
+            FlatType twoRoom = project.getFlatUnits().get(FlatTypes.TWO_ROOM);
+            return twoRoom != null && twoRoom.getUnitsAvail() > 0;
         }
         return false;
     }
+
 
     /** Guides applicant through project application flow. */
     public void applyForProject() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
         BTOProj selectedProject = selectProject(eligibleProjects);
-        boolean result = submitApplication(selectedProject);
-        if (result){
-            System.out.println("Application submitted for project: " + selectedProject.getProjName());
+        if (selectedProject == null) {
+            System.out.println("Returning to main menu.");
+            return;
         }
-        else {
-            System.out.println("Application canceled.");
-        }
+        submitApplication(selectedProject);
     }
 
     /**

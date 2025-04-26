@@ -1,6 +1,8 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.Enquiry;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.User;
+
 import java.util.List;
 import java.util.Optional;
 

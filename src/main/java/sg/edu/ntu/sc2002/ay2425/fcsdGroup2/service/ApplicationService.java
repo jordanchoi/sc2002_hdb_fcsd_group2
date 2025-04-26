@@ -10,7 +10,6 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.UserRepository;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service class to handle application-related operations for HDB applicants.
@@ -28,17 +27,28 @@ public class ApplicationService {
      * @param project the BTO project
      */
     public void applyForProject(HDBApplicant applicant, BTOProj project) {
-        int newId = generateNextAppId();
-        if (applicant.getCurrentApplication() != null) {
-            ApplicationStatus status = applicant.getCurrentApplication().getStatusEnum();
+        Application currentApp = applicant.getCurrentApplication();
+
+        if (currentApp != null) {
+            ApplicationStatus status = currentApp.getStatusEnum();
+
             if (status == ApplicationStatus.UNSUCCESSFUL || status == ApplicationStatus.WITHDRAWN) {
-                applicant.setCurrentApplication(new Application(newId, applicant, project));
+                int existingId = currentApp.getAppId();
+                Application newApp = new Application(existingId, applicant, project);
+
+                applicant.setCurrentApplication(newApp);
+                applicationRepo.update(newApp);
+
                 System.out.println("Application submitted successfully for project: " + project.getProjName());
                 return;
             }
+
             System.out.println("You already have an ongoing application.");
             return;
         }
+
+        // New application
+        int newId = generateNextAppId();
         Application newApp = new Application(newId, applicant, project);
         applicant.setCurrentApplication(newApp);
         applicationRepo.add(newApp);
@@ -63,7 +73,13 @@ public class ApplicationService {
             return;
         }
 
+        if (current.getStatusEnum() == ApplicationStatus.UNSUCCESSFUL) {
+            System.out.println("Cannot withdraw an unsuccessful application.");
+            return;
+        }
+
         current.requestWithdrawal();
+        applicationRepo.update(current);
         System.out.println("Withdrawal request submitted.");
     }
 
@@ -79,19 +95,28 @@ public class ApplicationService {
             return "No application found.";
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Application ID: ").append(app.getAppId()).append("\n");
-        sb.append("Project: ").append(app.getAppliedProj().getProjName()).append("\n");
-        sb.append("Status: ").append(app.getStatus()).append("\n");
+        BTOProj project = app.getAppliedProj();
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Application Details ===\n");
+        sb.append("Application ID     : ").append(app.getAppId()).append("\n");
+        sb.append("Status             : ").append(app.getStatus()).append("\n");
+
+        sb.append("\n--- Project Info ---\n");
+        sb.append("Project ID         : ").append(project.getProjId()).append("\n");
+        sb.append("Project Name       : ").append(project.getProjName()).append("\n");
+        sb.append("Neighbourhood      : ").append(project.getProjNbh()).append("\n");
+
+        sb.append("\n--- Selected Flat ---\n");
         if (app.getFlat() != null) {
             sb.append("Flat: Block ").append(app.getFlat().getBlock().getBlkNo()).append(", ");
             sb.append(app.getFlat().getBlock().getStreetAddr()).append(", ");
             sb.append("Postal Code: ").append(app.getFlat().getBlock().getPostalCode()).append(", ");
             sb.append("Unit: ").append(app.getFlat().getFloorUnit()).append("\n");
         } else {
-            sb.append("Chosen Flat: N/A\n");
+            sb.append("Chosen Flat        : N/A\n");
         }
+
         return sb.toString();
     }
 
