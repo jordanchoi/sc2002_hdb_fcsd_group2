@@ -156,7 +156,11 @@ public class OfficerView implements UserView {
                 }
                 case 3 -> {
                     System.out.println("Register to handle BTO project as officer: ");
-                    registerProjectAsOfficer(projsController,exerciseController,currentController);
+                    boolean backToMenu = registerProjectAsOfficer(projsController, exerciseController, currentController);
+                    if (!backToMenu) {
+                        // User entered -1, returning to project menu
+                        continue;
+                    }
                 }   
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid selection. Try again.");
@@ -164,43 +168,49 @@ public class OfficerView implements UserView {
         } while (subChoice != 0);
     }
 
-    private void registerProjectAsOfficer(BTOProjsController projsController, HDBBTOExerciseController exerciseController, HDBOfficerController currentController) {
+    private boolean registerProjectAsOfficer(BTOProjsController projsController, HDBBTOExerciseController exerciseController, HDBOfficerController currentController) {
         boolean validResponse = false;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Register to handle BTO project as officer: ");
-
-            do {
-                try {
-                    BTOProj proj = findProject(projsController, exerciseController);
-
-                    if (proj != null) {
-                        System.out.print("Register to handle this BTO project as officer? (y/n): ");
-                        String confirmToRegister = scanner.nextLine().trim();
-
-                        if (confirmToRegister.equalsIgnoreCase("y")) {
-                            if (currentController.submitApplication(proj)) {
-                                System.out.println("Successfully applied as officer for " + proj.getProjName());
-                            } else {
-                                System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
-                            }
-                            validResponse = true;
-                        } else if (confirmToRegister.equalsIgnoreCase("n")) {
-                            System.out.println("Returning to the list of projects...");
-                            validResponse = false;  // continue the loop to view projects again
-                        } else {
-                            // If input is invalid, throw an exception
-                            throw new IllegalArgumentException("Invalid input, please enter 'y' or 'n'.");
-                        }
-                    }
-
-                } catch (IllegalArgumentException e) {
-                    // Handle invalid input exception here
-                    System.out.println(e.getMessage());  // Print the error message
-                    validResponse = false;  // Continue the loop for invalid input
+    
+        do {
+            try {
+                BTOProj proj = findProject(projsController, exerciseController);
+    
+                if (proj == null) {
+                    // User wants to go back to project selection, returning false to indicate this.
+                    System.out.println("No project selected, returning to project menu...");
+                    return false;
                 }
-
-            } while (!validResponse);
-        } 
+    
+                System.out.print("Register to handle this BTO project as officer? (y/n): ");
+                String confirmToRegister = scanner.nextLine().trim();
+    
+                if (confirmToRegister.equalsIgnoreCase("y")) {
+                    if (currentController.submitApplication(proj)) {
+                        System.out.println("Successfully applied as officer for " + proj.getProjName());
+                    } else {
+                        System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
+                    }
+                    validResponse = true;  // exit loop after successful registration
+                } else if (confirmToRegister.equalsIgnoreCase("n")) {
+                    System.out.println("Returning to the list of projects...");
+                    validResponse = false;  // continue loop to select new project
+                } else {
+                    throw new IllegalArgumentException("Invalid input, please enter 'y' or 'n'.");
+                }
+    
+            } catch (IllegalArgumentException e) {
+                // Handle invalid input exception here
+                System.out.println(e.getMessage());  // Print the error message
+                validResponse = false;  // Continue the loop for invalid input
+            }
+    
+        } while (!validResponse);
+    
+        return true;  // Successfully registered, return true
+    }
+    
     
     /**
      * Handles the receipt submenu operations for generating receipts.
