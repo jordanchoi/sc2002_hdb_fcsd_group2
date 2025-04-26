@@ -58,6 +58,11 @@ public class ApplicationService {
             return;
         }
 
+        if (current.getStatusEnum() == ApplicationStatus.UNSUCCESSFUL) {
+            System.out.println("Cannot withdraw an unsuccessful application.");
+            return;
+        }
+
         current.requestWithdrawal();
         applicationRepo.update(current);
         System.out.println("Withdrawal request submitted.");
