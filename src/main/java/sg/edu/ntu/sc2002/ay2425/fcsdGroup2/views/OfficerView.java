@@ -156,31 +156,43 @@ public class OfficerView implements UserView {
                     currentController.projRegStatus(currentOfficer.getNric());
                 }
                 case 3 -> {
-                    boolean validResponse = false;
                     System.out.println("Register to handle BTO project as officer: ");
-                    do {
-                        try {
-                            BTOProj proj = findProject(projsController, exerciseController);
+                    registerProjectAsOfficer(projsController,exerciseController,currentController);
+                }   
+                case 0 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid selection. Try again.");
+            }
+        } while (subChoice != 0);
+    }
 
-                            if (proj != null) {
-                                System.out.print("Register to handle this BTO project as officer? (y/n): ");
-                                String confirmToRegister = scanner.nextLine().trim();
+    private void registerProjectAsOfficer(BTOProjsController projsController, HDBBTOExerciseController exerciseController, HDBOfficerController currentController) {
+        boolean validResponse = false;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Register to handle BTO project as officer: ");
 
-                                if (confirmToRegister.equalsIgnoreCase("y")) {
-                                    if (currentController.submitApplication(proj)) {
-                                        System.out.println("Successfully applied as officer for " + proj.getProjName());
-                                    } else {
-                                       System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
-                                    }
-                                    validResponse = true;
-                                } else if (confirmToRegister.equalsIgnoreCase("n")) {
-                                    System.out.println("Returning to the list of projects...");
-                                    validResponse = false;  // continue the loop to view projects again
-                                } else {
-                                    // If input is invalid, throw an exception
-                                    throw new IllegalArgumentException("Invalid input, please enter 'y' or 'n'.");
-                                }
+            do {
+                try {
+                    BTOProj proj = findProject(projsController, exerciseController);
+
+                    if (proj != null) {
+                        System.out.print("Register to handle this BTO project as officer? (y/n): ");
+                        String confirmToRegister = scanner.nextLine().trim();
+
+                        if (confirmToRegister.equalsIgnoreCase("y")) {
+                            if (currentController.submitApplication(proj)) {
+                                System.out.println("Successfully applied as officer for " + proj.getProjName());
+                            } else {
+                                System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
                             }
+                            validResponse = true;
+                        } else if (confirmToRegister.equalsIgnoreCase("n")) {
+                            System.out.println("Returning to the list of projects...");
+                            validResponse = false;  // continue the loop to view projects again
+                        } else {
+                            // If input is invalid, throw an exception
+                            throw new IllegalArgumentException("Invalid input, please enter 'y' or 'n'.");
+                        }
+                    }
 
                         } catch (IllegalArgumentException e) {
                             // Handle invalid input exception here
@@ -190,12 +202,7 @@ public class OfficerView implements UserView {
 
                     } while (!validResponse);
                 } 
-                case 0 -> System.out.println("Returning to main menu...");
-                default -> System.out.println("Invalid selection. Try again.");
-            }
-        } while (subChoice != 0);
-    }
-
+    
     /**
      * Handles the receipt submenu operations for generating receipts.
      */
