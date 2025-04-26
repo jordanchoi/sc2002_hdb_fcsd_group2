@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository class to manage Application entities.
+ * Handles loading, saving, and manipulating applications from Excel files.
+ */
 public class ApplicationRepository {
     private static final String APPLICATION_FILE_PATH = "data/ApplicationLists.xlsx";
     private final List<Application> applications;
@@ -16,6 +20,12 @@ public class ApplicationRepository {
     private final BTORepository btoRepo;
     private final UserRepository userRepo;
 
+    /**
+     * Constructs a new ApplicationRepository.
+     *
+     * @param btoRepo BTO repository for project lookup
+     * @param userRepo User repository for applicant lookup
+     */
     public ApplicationRepository(BTORepository btoRepo, UserRepository userRepo) {
         this.applications = new ArrayList<>();
         this.btoRepo = btoRepo;
@@ -23,10 +33,14 @@ public class ApplicationRepository {
         loadApplicationsFromFile(APPLICATION_FILE_PATH, userRepo, btoRepo);
     }
 
+    /** @return all applications. */
     public List<Application> getApplications() {
         return applications;
     }
 
+    /**
+     * Loads application data from the file.
+     */
     private void loadApplicationsFromFile(String filePath, UserRepository userRepo, BTORepository btoRepo) {
         applications.clear();
 
@@ -109,7 +123,14 @@ public class ApplicationRepository {
         }
     }
 
-
+    /**
+     * Parses a flat object from a formatted flat string.
+     *
+     * @param flatStr formatted flat string (e.g., \"Blk 10 03-105\")
+     * @param type flat type
+     * @param project related project
+     * @return parsed Flat object or null
+     */
     private Flat parseFlatFromString(String flatStr, FlatType type, BTOProj project) {
         try {
             // Skip if placeholder or invalid
@@ -157,7 +178,9 @@ public class ApplicationRepository {
         return null;
     }
 
-
+    /**
+     * Saves all applications back to the Excel file.
+     */
     public void saveToFile() {
         List<List<String>> data = new ArrayList<>();
         data.add(List.of("Applicant NRIC", "Application ID", "Project ID", "Status", "Flat Type", "Booked Flat", "Previous Status"));
@@ -182,30 +205,50 @@ public class ApplicationRepository {
                     previousStatus
             ));
         }
-
         FileIO.writeExcelFile(APPLICATION_FILE_PATH, data);
     }
 
-
+    /**
+     * Adds a new application to the repository and saves.
+     *
+     * @param application the application to add
+     */
     public void add(Application application) {
         applications.add(application);
         saveToFile();
     }
 
+    /**
+     * Updates an existing application.
+     *
+     * @param updated the updated application
+     */
     public void update(Application updated) {
         delete(updated.getAppId());
         add(updated);
     }
 
+    /**
+     * Deletes an application by ID.
+     *
+     * @param id application ID
+     */
     public void delete(int id) {
         applications.removeIf(app -> app.getAppId() == id);
         saveToFile();
     }
 
+    /** @return a copy of all applications. */
     public List<Application> getAll() {
         return new ArrayList<>(applications);
     }
 
+    /**
+     * Retrieves applications by project ID.
+     *
+     * @param projId the project ID
+     * @return list of applications
+     */
     public List<Application> getApplicationsByProjectId(int projId) {
         List<Application> result = new ArrayList<>();
         for (Application app : applications) {
@@ -216,6 +259,12 @@ public class ApplicationRepository {
         return result;
     }
 
+    /**
+     * Retrieves an application by applicant's NRIC.
+     *
+     * @param nric the NRIC
+     * @return matching application or null
+     */
     public Application getApplicationByNric(String nric) {
         for (Application app : applications) {
             if (app.getApplicant().getNric().equalsIgnoreCase(nric)) {
@@ -224,6 +273,4 @@ public class ApplicationRepository {
         }
         return null;
     }
-
-
 }

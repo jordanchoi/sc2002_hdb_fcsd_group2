@@ -118,11 +118,6 @@ public class OfficerView implements UserView {
         return choice;
     }
 
-    /**
-     * Handles project management submenu operations.
-     *
-     * @param currentController the current officer controller instance
-     */
     private void handleProjectSubMenu() {
         HDBOfficerController currentController = new HDBOfficerController(currentOfficer, repo);
         BTOProjsController projsController = new BTOProjsController();
@@ -419,21 +414,6 @@ public class OfficerView implements UserView {
                     successfulApplications.add(app);
                 } else if (app.getStatusEnum() == ApplicationStatus.PENDING) {
                     pendingApplications.add(app);
-                }
-            }
-
-            // Display pending
-            System.out.println("\n=== List of Pending Applications (For Reference) ===");
-            if (pendingApplications.isEmpty()) {
-                System.out.println("No pending applications.");
-            } else {
-                System.out.printf("%-5s %-20s %-15s %-30s %-15s%n", "No.", "Applicant Name", "NRIC", "Project (Postal)", "Status");
-                int counter = 1;
-                for (Application app : pendingApplications) {
-                    BTOProj proj1 = app.getAppliedProj();
-                    System.out.printf("%-5d %-20s %-15s %-30s %-15s%n",
-                            counter++, app.getApplicant().getFirstName(), app.getApplicant().getNric(),
-                            proj1.getProjName() + " (" + proj1.getPostalCode() + ")", app.getStatusEnum().name());
                 }
             }
 

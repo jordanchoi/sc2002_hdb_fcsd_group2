@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller class to manage creation, editing, viewing, and deletion of project enquiries.
+ */
 public class EnquiryController {
     private static EnquiryController instance;
     private final UserRepository userRepo = UserRepository.getInstance();
@@ -19,10 +22,16 @@ public class EnquiryController {
     private final EnquiryRepository enquiryRepository = EnquiryRepository.getInstance();
     //private final List<Enquiry> enquiries;
 
+    /** Default constructor. */
     public EnquiryController() {
         //this.enquiries = enquiryRepository.getAllEnquiries();
     }
 
+    /**
+     * Returns the singleton instance of EnquiryController.
+     *
+     * @return EnquiryController instance
+     */
     public static EnquiryController getInstance() {
         if (instance == null) {
             instance = new EnquiryController();
@@ -30,11 +39,24 @@ public class EnquiryController {
         return instance;
     }
 
+    /**
+     * Creates a new enquiry for a project by an applicant.
+     *
+     * @param msg the enquiry message
+     * @param applicant the applicant making the enquiry
+     * @param project the project related to the enquiry
+     */
     public void createEnquiry(String msg, HDBApplicant applicant, BTOProj project) {
         Enquiry enquiry = enquiryRepository.add(msg, applicant, project);
         //enquiries.add(enquiry);
     }
 
+    /**
+     * Retrieves an enquiry by its ID.
+     *
+     * @param id enquiry ID
+     * @return Enquiry object or null
+     */
     public Enquiry getEnquiryById(int id) {
         Optional<Enquiry> e = enquiryRepository.getById(id);
         if (e.isPresent()) {
@@ -43,6 +65,14 @@ public class EnquiryController {
         return null;
     }
 
+    /**
+     * Adds a message to an existing enquiry.
+     *
+     * @param id enquiry ID
+     * @param msg message content
+     * @param sender user sending the message
+     * @return true if message added successfully
+     */
     public boolean addMessage(int id, String msg, User sender) {
         Enquiry e = getEnquiryById(id);
         if (e != null) {
@@ -52,6 +82,15 @@ public class EnquiryController {
         return false;
     }
 
+    /**
+     * Edits a message within an enquiry if sender matches.
+     *
+     * @param enquiryId enquiry ID
+     * @param messageId message ID
+     * @param currentUser user attempting to edit
+     * @param newContent new message content
+     * @return true if edit successful
+     */
     public boolean editMessageById(int enquiryId, int messageId, User currentUser, String newContent) {
         Enquiry e = getEnquiryById(enquiryId);
         if (e != null) {
@@ -60,8 +99,12 @@ public class EnquiryController {
         return false;
     }
 
-
-
+    /**
+     * Deletes an enquiry by its ID.
+     *
+     * @param id enquiry ID
+     * @return true if deleted successfully
+     */
     public boolean deleteEnquiry(int id) {
         if (enquiryRepository.getById(id).isPresent()) {
             enquiryRepository.delete(id);
@@ -70,10 +113,21 @@ public class EnquiryController {
         return false;
     }
 
+    /**
+     * Retrieves all enquiries.
+     *
+     * @return list of all enquiries
+     */
     public List<Enquiry> listEnquiries() {
         return enquiryRepository.getAll();
     }
 
+    /**
+     * Retrieves all enquiries made by a specific applicant.
+     *
+     * @param applicant the applicant
+     * @return list of enquiries
+     */
     public List<Enquiry> getEnquiriesByApplicant(HDBApplicant applicant) {
         return enquiryRepository.getByApplicant(applicant);
     }

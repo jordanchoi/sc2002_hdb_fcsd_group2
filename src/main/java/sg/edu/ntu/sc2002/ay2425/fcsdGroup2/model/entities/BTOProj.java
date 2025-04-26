@@ -10,6 +10,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
 
+/**
+ * Represents a Build-To-Order (BTO) project managed by HDB.
+ * Contains project details, flats, applications, officers, and enquiries.
+ */
 public class BTOProj {
     private int btoProjId;
     private String projectName;
@@ -31,6 +35,7 @@ public class BTOProj {
     private String rawOfficerNames;
     private Map<FlatTypes, FlatType> flatMap = new HashMap<>();
 
+    /** Returns a string summary of the BTO project. */
     @Override
     public String toString() {
         return "BTOProj{" +
@@ -50,6 +55,7 @@ public class BTOProj {
                 '}';
     }
 
+    /** Constructors */
     public BTOProj(int id, String name, Neighbourhoods nbh, List<FlatType> flatTypesAvail,
                    LocalDateTime open, LocalDateTime close, HDBManager manager,
                    int officerSlots, List<HDBOfficer> officerList, Boolean overrideVisibility) {
@@ -92,6 +98,7 @@ public class BTOProj {
         this.status = visible ? ProjStatus.OPEN : ProjStatus.CLOSED;
     }
 
+    /** Project details accessors */
     public int getProjId() { return btoProjId; }
     public void setProjId(int id) { this.btoProjId = id; }
     public String getProjName() { return projectName; }
@@ -110,14 +117,20 @@ public class BTOProj {
     public void setProjStatus(ProjStatus status) { this.status = status; }
     public Neighbourhoods getProjNbh() { return neighbourhood; }
     public void setProjNbh(Neighbourhoods nbh) { this.neighbourhood = nbh; }
+
+    /** Manager accessors */
     public HDBManager getManagerIC() { return managerIC; }
     public void setManagerIC(HDBManager manager) { this.managerIC = manager; }
+
+    /** Block accessors */
     public List<Block> getBlocks() { return blocks; }
     public void setBlocks(List<Block> blocks) { this.blocks = blocks; }
     public boolean addBlock(Block b) { return blocks.add(b); }
     public boolean removeBlock(int blkNo) {
         return blocks.removeIf(b -> b.getBlkNo() == blkNo);
     }
+
+    /** Application accessors */
     public void setApplications(List<Application> apps) { this.applications = apps; }
     public boolean addApp(Application app) { return applications.add(app); }
     public boolean removeApp(int id) { return applications.removeIf(a -> a.getAppId() == id); }
@@ -125,6 +138,8 @@ public class BTOProj {
         return applications.stream().filter(a -> a.getAppId() == id).findFirst().orElse(null);
     }
     public List<Application> getAllApp() { return applications; }
+
+    /** Flat type accessors */
     public List<FlatType> getAvailableFlatTypes() { return flatTypesAvail; }
     public void setAvailableFlatTypes(List<FlatType> list) { this.flatTypesAvail = list; }
     public void addAvailFlatType(FlatType type) { flatTypesAvail.add(type); }
@@ -135,6 +150,8 @@ public class BTOProj {
         flatTypesAvail.add(newFlat);
     }
     public Map<FlatTypes, FlatType> getFlatUnits() { return flatUnits; }
+
+    /** Enquiry accessors */
     public List<Enquiry> getAllEnquiries() { return enquiries; }
     public void setEnquiries(List<Enquiry> enquiryList) { this.enquiries = enquiryList; }
     public void addEnquiryToProj(Enquiry e) { enquiries.add(e); }
@@ -143,7 +160,7 @@ public class BTOProj {
         return enquiries.stream().filter(e -> e.getEnquiryId() == id).findFirst().orElse(null);
     }
 
-    // Officer List
+    /** Officer accessors */
     public HDBOfficer[] getOfficersList() { return officersList; }
 
     public void setOfficersList(HDBOfficer[] officersList) { this.officersList = officersList; }
@@ -175,6 +192,8 @@ public class BTOProj {
 
     public int getOfficerSlots() { return officerSlots; }
     public void setOfficerSlots(int officerSlots) { this.officerSlots = officerSlots; }
+
+    /** Exercise accessors */
     public BTOExercise getExercise() { return exercise; }
     public void setExercise(BTOExercise exercise) { this.exercise = exercise; }
     public Map<FlatTypes, FlatType> getFlatMap() {
@@ -187,5 +206,4 @@ public class BTOProj {
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
-
 }

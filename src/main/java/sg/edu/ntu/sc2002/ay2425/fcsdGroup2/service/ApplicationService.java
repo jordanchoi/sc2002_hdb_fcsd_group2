@@ -12,11 +12,21 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class to handle application-related operations for HDB applicants.
+ * Supports applying for projects, withdrawing, and viewing application details.
+ */
 public class ApplicationService {
     private final BTORepository btoRepo = BTORepository.getInstance();
     private final UserRepository userRepo = UserRepository.getInstance();
     private final ApplicationRepository applicationRepo = new ApplicationRepository(btoRepo, userRepo);
 
+    /**
+     * Submits a new application for an applicant to a given project.
+     *
+     * @param applicant the applicant
+     * @param project the BTO project
+     */
     public void applyForProject(HDBApplicant applicant, BTOProj project) {
         int newId = generateNextAppId();
         if (applicant.getCurrentApplication() != null) {
@@ -35,6 +45,11 @@ public class ApplicationService {
         System.out.println("Application submitted successfully for project: " + project.getProjName());
     }
 
+    /**
+     * Requests withdrawal of an existing application for an applicant.
+     *
+     * @param applicant the applicant
+     */
     public void withdrawApplication(HDBApplicant applicant) {
         Application current = applicant.getCurrentApplication();
         if (current == null) {
@@ -52,6 +67,12 @@ public class ApplicationService {
         System.out.println("Withdrawal request submitted.");
     }
 
+    /**
+     * Views the details of an applicant's current application.
+     *
+     * @param applicant the applicant
+     * @return string representation of the application details
+     */
     public String viewApplicationDetails(HDBApplicant applicant) {
         Application app = applicant.getCurrentApplication();
         if (app == null) {
@@ -74,6 +95,11 @@ public class ApplicationService {
         return sb.toString();
     }
 
+    /**
+     * Generates the next application ID based on existing applications.
+     *
+     * @return new application ID
+     */
     private int generateNextAppId() {
         List<Application> applications = applicationRepo.getApplications();
         return applications.stream()

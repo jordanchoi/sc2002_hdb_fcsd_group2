@@ -8,16 +8,26 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation class handling applicant, officer, and manager enquiry operations.
+ * Implements ApplicantEnquiryService, OfficerEnquiryService, and ManagerEnquiryService.
+ */
 public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnquiryService, ManagerEnquiryService {
     EnquiryRepository enquiryRepo = EnquiryRepository.getInstance();
     BTORepository btoRepo = BTORepository.getInstance();
     SessionStateManager session = SessionStateManager.getInstance();
 
+    /**
+     * Retrieves an enquiry by ID.
+     */
     @Override
     public Optional<Enquiry> getEnquiryById(int enquiryId) {
         return enquiryRepo.getById(enquiryId);
     }
 
+    /**
+     * Adds a message to an enquiry.
+     */
     @Override
     public boolean addMessage(int enquiryId, String msg, String senderNric) {
         Optional<Enquiry> enquiryOpt = getEnquiryById(enquiryId);
@@ -32,16 +42,25 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         return true;
     }
 
+    /**
+     * Submits a new enquiry by an applicant.
+     */
     @Override
     public Enquiry submitEnquiry(String message, HDBApplicant applicant, BTOProj proj) {
         return enquiryRepo.add(message, applicant, proj);
     }
 
+    /**
+     * Retrieves all enquiries made by a specific applicant.
+     */
     @Override
     public List<Enquiry> getEnquiriesByApplicant(HDBApplicant applicant) {
         return enquiryRepo.getByApplicant(applicant);
     }
 
+    /**
+     * Allows an applicant to edit their own enquiry message.
+     */
     @Override
     public boolean editOwnMessage(int enquiryId, String msgIdStr, HDBApplicant applicant, String newContent) {
         Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
@@ -65,6 +84,9 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         return false;
     }
 
+    /**
+     * Deletes an enquiry made by an applicant.
+     */
     @Override
     public boolean deleteEnquiry(int enquiryId, HDBApplicant applicant) {
         Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
@@ -72,11 +94,17 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
                 && enquiryRepo.delete(enquiryId);
     }
 
+    /**
+     * Retrieves all enquiries in the system.
+     */
     @Override
     public List<Enquiry> getAllEnquiries() {
         return enquiryRepo.getAll();
     }
 
+    /**
+     * Manager replying to an enquiry regarding their project.
+     */
     @Override
     public boolean replyEnquiry(int enquiryId, String reply, HDBManager manager) {
         Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
@@ -91,11 +119,17 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         return false;
     }
 
+    /**
+     * Retrieves all enquiries for a specific project assigned to an officer.
+     */
     @Override
     public List<Enquiry> getEnquiryForAssignedProj(BTOProj proj) {
         return enquiryRepo.getByProject(proj);
     }
 
+    /**
+     * Officer replying to an enquiry of a project they are assigned to.
+     */
     @Override
     public boolean replyEnquiry(int enquiryId, String reply, HDBOfficer officer) {
         Optional<Enquiry> opt = enquiryRepo.getById(enquiryId);
@@ -110,6 +144,9 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         return true;
     }
 
+    /**
+     * Retrieves all enquiries handled by a specific officer.
+     */
     @Override
     public List<Enquiry> getEnquiriesByOfficer(HDBOfficer officer) {
         return btoRepo.getAllProjects().stream()

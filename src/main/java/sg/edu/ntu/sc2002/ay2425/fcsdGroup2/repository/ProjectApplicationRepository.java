@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository class for managing Officer Project Applications.
+ * Handles loading, saving, adding, updating, and deleting officer project applications.
+ */
 public class ProjectApplicationRepository {
     private static final String FILE_PATH = "data/ProjectApplicationList.xlsx";
     private final List<OfficerProjectApplication> officerApplications;
@@ -22,7 +26,9 @@ public class ProjectApplicationRepository {
         this.officerApplications = new ArrayList<>();
         loadFromFile();
     }
-
+    /**
+     * Loads officer project applications from the Excel file.
+     */
     private void loadFromFile() {
         officerApplications.clear();
         List<List<String>> data;
@@ -61,6 +67,9 @@ public class ProjectApplicationRepository {
         }
     }
 
+    /**
+     * Saves officer project applications to the Excel file.
+     */
     public void saveToFile() {
         List<List<String>> data = new ArrayList<>();
         data.add(List.of("Officer NRIC", "Application ID", "Project ID", "Status"));
@@ -77,25 +86,51 @@ public class ProjectApplicationRepository {
         FileIO.writeExcelFile(FILE_PATH, data);
     }
 
+    /**
+     * Adds a new officer project application and saves.
+     *
+     * @param app the application to add
+     */
     public void add(OfficerProjectApplication app) {
         officerApplications.add(app);
         saveToFile();
     }
 
+    /**
+     * Updates an existing officer project application by replacing it.
+     *
+     * @param updated the updated application
+     */
     public void update(OfficerProjectApplication updated) {
         delete(updated.getOfficerAppId());
         add(updated);
     }
 
+    /**
+     * Deletes an officer project application by application ID.
+     *
+     * @param officerAppId ID of the application to delete
+     */
     public void delete(int officerAppId) {
         officerApplications.removeIf(app -> app.getOfficerAppId() == officerAppId);
         saveToFile();
     }
 
+    /**
+     * Retrieves all officer project applications.
+     *
+     * @return list of applications
+     */
     public List<OfficerProjectApplication> getAll() {
         return new ArrayList<>(officerApplications);
     }
 
+    /**
+     * Retrieves applications related to a specific project.
+     *
+     * @param projId project ID
+     * @return list of applications
+     */
     public List<OfficerProjectApplication> getByProjectId(int projId) {
         List<OfficerProjectApplication> result = new ArrayList<>();
         for (OfficerProjectApplication app : officerApplications) {
@@ -106,6 +141,12 @@ public class ProjectApplicationRepository {
         return result;
     }
 
+    /**
+     * Retrieves applications submitted by a specific officer.
+     *
+     * @param nric officer NRIC
+     * @return list of applications
+     */
     public List<OfficerProjectApplication> getByOfficerNric(String nric) {
         List<OfficerProjectApplication> result = new ArrayList<>();
         for (OfficerProjectApplication app : officerApplications) {

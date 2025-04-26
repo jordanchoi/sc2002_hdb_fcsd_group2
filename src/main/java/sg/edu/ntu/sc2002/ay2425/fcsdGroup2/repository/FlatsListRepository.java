@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository class for managing Flat entities.
+ * Handles loading, saving, and searching flats in Excel files.
+ */
 public class FlatsListRepository {
     private static FlatsListRepository instance;
     private static final String FLATS_FILE_PATH = "data/FlatsList.xlsx";
@@ -17,12 +21,19 @@ public class FlatsListRepository {
     private final List<Flat> flats;
     private final BlockListRepository blockRepo;
 
+    /** Private constructor for Singleton pattern. */
     private FlatsListRepository(BlockListRepository blockRepo) {
         this.blockRepo = blockRepo;
         this.flats = new ArrayList<>();
         loadFlatsFromFile();
     }
 
+    /**
+     * Returns the singleton instance of FlatsListRepository.
+     *
+     * @param blockRepo block repository dependency
+     * @return FlatsListRepository instance
+     */
     public static FlatsListRepository getInstance(BlockListRepository blockRepo) {
         if (instance == null) {
             instance = new FlatsListRepository(blockRepo);
@@ -30,6 +41,7 @@ public class FlatsListRepository {
         return instance;
     }
 
+    /** Loads flats from the Excel file. */
     private void loadFlatsFromFile() {
         flats.clear();
         List<List<String>> data;
@@ -73,7 +85,7 @@ public class FlatsListRepository {
             }
         }
     }
-
+    /** Saves all flats to the Excel file. */
     public void saveFlatsToFile() {
         List<List<String>> data = new ArrayList<>();
         data.add(List.of("Postal Code", "Floor", "Unit", "Status", "Flat Type"));
@@ -89,16 +101,29 @@ public class FlatsListRepository {
         FileIO.writeExcelFile(FLATS_FILE_PATH, data);
     }
 
+    /**
+     * Adds a new flat and saves immediately.
+     *
+     * @param flat flat to add
+     */
     public void addFlat(Flat flat) {
         flats.add(flat);
         saveFlatsToFile();
     }
 
+    /**
+     * Updates a flat (deletes old, adds new).
+     *
+     * @param updated the updated flat
+     */
     public void updateFlat(Flat updated) {
         deleteFlat(updated.getFloorNo(), updated.getUnitNo(), updated.getBlock().getBlockId());
         addFlat(updated);
     }
 
+    /**
+     * Deletes a flat based on floor, unit, and block ID.
+     */
     public void deleteFlat(int floor, int unit, int blockId) {
         flats.removeIf(f ->
                 f.getFloorNo() == floor &&
@@ -107,10 +132,14 @@ public class FlatsListRepository {
         saveFlatsToFile();
     }
 
+    /** @return all flats (copy). */
     public List<Flat> getAllFlats() {
         return new ArrayList<>(flats);
     }
 
+    /**
+     * Retrieves flats belonging to a specific block.
+     */
     public List<Flat> getFlatsByBlockId(int blockId) {
         List<Flat> result = new ArrayList<>();
         for (Flat f : flats) {
@@ -121,6 +150,9 @@ public class FlatsListRepository {
         return result;
     }
 
+    /**
+     * Retrieves a specific flat based on floor, unit, and block ID.
+     */
     public Flat getFlat(int floor, int unit, int blockId) {
         for (Flat flat : flats) {
             if (flat.getFloorNo() == floor && flat.getUnitNo() == unit && flat.getBlock().getBlockId() == blockId) {

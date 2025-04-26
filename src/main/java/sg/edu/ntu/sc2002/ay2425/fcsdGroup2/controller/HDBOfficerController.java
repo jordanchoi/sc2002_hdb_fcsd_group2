@@ -17,17 +17,33 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.EnquiryView;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers.OfficerViewHandler;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.RoleHandler;
 
+/**
+ * Controller class for managing HDB Officer operations.
+ * Handles project applications, project registration statuses, and replying to project enquiries.
+ */
 public class HDBOfficerController implements canApplyFlat {
     private HDBOfficer officer;
     private BTORepository btoRepository;
 
     BTOProj selectedProject = null;
 
+    /**
+     * Constructs the HDBOfficerController with officer and repository references.
+     *
+     * @param officer the logged-in officer
+     * @param btoRepository the project repository
+     */
     public HDBOfficerController (HDBOfficer officer, BTORepository btoRepository) {
         this.officer = officer;
         this.btoRepository = btoRepository;
     }
-    
+
+    /**
+     * Checks if the officer is eligible to apply for the given project.
+     *
+     * @param proj the project
+     * @return true if eligible
+     */
     @Override
     public boolean checkEligibility(BTOProj proj) {
         //questionable need to wait for Applicant to know the different applications applied before
@@ -84,6 +100,12 @@ public class HDBOfficerController implements canApplyFlat {
         return true;
     }
 
+    /**
+     * Submits an officer project application if eligible.
+     *
+     * @param proj the project to apply for
+     * @return true if application submitted successfully
+     */
     @Override
     public boolean submitApplication(BTOProj proj) {
         // Need to be implemented.
@@ -103,6 +125,11 @@ public class HDBOfficerController implements canApplyFlat {
         return true;
     }
 
+    /**
+     * Displays the registration status of all projects the officer has applied to.
+     *
+     * @param nric the officer's NRIC
+     */
     public void projRegStatus(String nric) {
         OfficerProjectApplicationController appController = new OfficerProjectApplicationController();
         List<OfficerProjectApplication> appList = appController.getApplicationsByOfficer(nric);
@@ -118,6 +145,12 @@ public class HDBOfficerController implements canApplyFlat {
         }
     }
 
+    /**
+     * Displays detailed information about a project.
+     *
+     * @param project the project
+     * @return list of details
+     */
     public java.util.List<String> viewProjDetails(BTOProj project) {
         java.util.List<String> details = new java.util.ArrayList<>();
         if (project == null) {return details;}
@@ -129,6 +162,9 @@ public class HDBOfficerController implements canApplyFlat {
         return details;
     }
 
+    /**
+     * Displays the list of enquiries related to the officer's assigned projects.
+     */
     public void viewEnquiries() {
         SessionStateManager session = SessionStateManager.getInstance();
         HDBOfficer officer = (HDBOfficer) session.getLoggedInUser();
@@ -140,6 +176,13 @@ public class HDBOfficerController implements canApplyFlat {
     }
 
 
+    /**
+     * Finds a project by name in the repository.
+     *
+     * @param projName the project name
+     * @param repo the repository
+     * @return found project or null
+     */
     public BTOProj findProject(String projName, BTORepository repo) {
         BTOProj proj = null;
         for (BTOProj p : repo.getAllProjects()) {
@@ -148,6 +191,9 @@ public class HDBOfficerController implements canApplyFlat {
         return proj;
     }
 
+    /**
+     * Allows the officer to reply to enquiries linked to projects they handle.
+     */
     public void replyEnquiries() {
         Scanner scanner = new Scanner(System.in);
         

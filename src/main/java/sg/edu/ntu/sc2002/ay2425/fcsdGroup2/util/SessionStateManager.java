@@ -21,43 +21,73 @@ public class SessionStateManager {
     private UserRoles loggedInUserType;
     private boolean isLoggedIn;
 
-    // private constructor to prevent instantiation
+    /**
+     * Private constructor to enforce singleton pattern.
+     */
     private SessionStateManager() {
     }
 
-    // public accessor
+    /**
+     * Gets the singleton instance of SessionStateManager.
+     *
+     * @return the instance
+     */
     public static SessionStateManager getInstance() {
         return instance;
     }
 
-    // Set current logged in user
+    /**
+     * Logs a user into the session.
+     *
+     * @param user the logged-in user
+     * @param userType the type of user
+     */
     public void login(User user, UserRoles userType) {
         this.loggedInUser = user;
         this.isLoggedIn = true;
         this.loggedInUserType = userType;
     }
 
-    // Clear session
+    /**
+     * Logs out the current user and clears session state.
+     */
     public void logout() {
         this.loggedInUser = null;
         this.isLoggedIn = false;
     }
 
-    // Get current logged in user
+    /**
+     * Retrieves the currently logged-in user.
+     *
+     * @return the logged-in user
+     */
     public User getLoggedInUser() {
         return this.loggedInUser;
     }
 
-    // Check if user is logged in
+    /**
+     * Checks whether a user is currently logged in.
+     *
+     * @return true if a user is logged in, false otherwise
+     */
     public boolean isLoggedIn() {
         return this.isLoggedIn;
     }
 
-    // Get current logged in user type
+    /**
+     * Retrieves the role of the currently logged-in user.
+     *
+     * @return the user's role
+     */
     public UserRoles getLoggedInUserType() {
         return this.loggedInUserType;
     }
-    // Set current logged in user type
+
+    /**
+     * Sets the role of the currently logged-in user.
+     *
+     * @param loggedInUserType the user's role
+     */
     public void setLoggedInUserType(UserRoles loggedInUserType) {
         this.loggedInUserType = loggedInUserType;
     }

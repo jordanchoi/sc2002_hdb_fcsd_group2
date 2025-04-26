@@ -406,6 +406,12 @@ public class BTOProjectsView implements UserView {
         } else {
             Set<String> printed = new HashSet<>();
             for (FlatType type : flatTypes) {
+                // Check if the flat type is NIL and skip it
+                FlatTypes flatEnum = FlatTypes.fromDisplayName(type.getTypeName());
+                if (flatEnum == FlatTypes.NIL) {
+                    continue;
+                }
+
                 String key = type.getTypeName() + ":" + type.getTotalUnits() + ":" + type.getSellingPrice();
                 if (printed.add(key)) {
                     System.out.printf("  - %-12s : %d units at $%.2f%n",

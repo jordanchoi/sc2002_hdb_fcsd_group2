@@ -9,6 +9,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+/**
+ * Repository class for managing Enquiry entities.
+ * Handles loading, saving, adding, updating, deleting, and retrieving enquiries.
+ */
 public class EnquiryRepository {
     // This class is responsible for managing the data access layer for enquiries
     // It will handle CRUD operations and any other data-related tasks for enquiries.
@@ -24,7 +28,7 @@ public class EnquiryRepository {
     // Singleton
     private static EnquiryRepository instance;
 
-    // Constructor
+    /** Private constructor for Singleton pattern. */
     private EnquiryRepository() {
         this.userRepo = UserRepository.getInstance();
         this.btoRepo = BTORepository.getInstance();
@@ -32,7 +36,11 @@ public class EnquiryRepository {
         loadFromFile();
     }
 
-    // Singleton instance
+    /**
+     * Returns the singleton instance of EnquiryRepository.
+     *
+     * @return instance of EnquiryRepository
+     */
     public static EnquiryRepository getInstance() {
         if (instance == null) {
             instance = new EnquiryRepository();
@@ -40,12 +48,13 @@ public class EnquiryRepository {
         return instance;
     }
 
-    // Example method to get all enquiries
+    /** @return all enquiries. */
     public List<Enquiry> getAllEnquiries() {
         // Implementation here
         return enquiries;
     }
 
+    /** Loads enquiries from Excel file. */
     private void loadFromFile() {
         enquiries.clear();
         List<List<String>> rows = FileIO.readExcelFileLocal(FILE_PATH);
@@ -99,6 +108,7 @@ public class EnquiryRepository {
         int maxId = enquiryMap.keySet().stream().max(Integer::compareTo).orElse(0);
     }
 
+    /** Saves enquiries to Excel file. */
     private void saveToFile() {
         List<List<String>> data = new ArrayList<>();
         data.add(List.of("Enquiry ID", "Project Name", "Applicant NRIC", "Message ID", "Content", "Sender NRIC", "Sender Role", "Timestamp"));
@@ -129,6 +139,14 @@ public class EnquiryRepository {
 
      */
 
+    /**
+     * Adds a new enquiry with new ID.
+     *
+     * @param message enquiry content
+     * @param applicant applicant making the enquiry
+     * @param project related BTO project
+     * @return the created Enquiry
+     */
     public Enquiry add(String message, HDBApplicant applicant, BTOProj project) {
         int newId = getNextEnquiryId();
         Enquiry enquiry = new Enquiry(newId, message, applicant, project);
@@ -137,6 +155,9 @@ public class EnquiryRepository {
         return enquiry;
     }
 
+    /**
+     * Adds a new enquiry with specific ID.
+     */
     public Enquiry add(int id, String message, HDBApplicant applicant, BTOProj project) {
         Enquiry enquiry = new Enquiry(id, message, applicant, project);
         enquiries.add(enquiry);
@@ -144,12 +165,20 @@ public class EnquiryRepository {
         return enquiry;
     }
 
+    /**
+     * Adds an existing Enquiry object.
+     */
     public Enquiry add(Enquiry enq) {
         enquiries.add(enq);
         saveToFile();
         return enq;
     }
 
+    /**
+     * Updates an existing enquiry.
+     *
+     * @param updated the updated enquiry
+     */
     public void update(Enquiry updated) {
         delete(updated.getEnquiryId());   // remove old copy
         enquiries.add(updated);           // add updated copy
@@ -163,6 +192,12 @@ public class EnquiryRepository {
 
     }
 
+    /**
+     * Deletes an enquiry by ID.
+     *
+     * @param id enquiry ID
+     * @return true if successful
+     */
     public boolean delete(int id) {
         if (getById(id).isPresent()) {
             getById(id).ifPresent(enquiries::remove);
@@ -172,25 +207,35 @@ public class EnquiryRepository {
         return false;
     }
 
-    // Return ALL enquiries
+    /** @return all enquiries (copy). */
     public List<Enquiry> getAll() {
         return new ArrayList<>(enquiries);
     }
 
-    // Get specific enquiry by ID
+    /**
+     * Retrieves an enquiry by ID.
+     */
     public Optional<Enquiry> getById(int id) {
         return enquiries.stream().filter(e -> e.getEnquiryId() == id).findFirst();
     }
 
-    // Get list of enquiries by applicant
+    /**
+     * Retrieves enquiries submitted by a specific applicant.
+     */
     public List<Enquiry> getByApplicant(HDBApplicant applicant) {
         return enquiries.stream().filter(e -> e.getMadeBy().equals(applicant)).toList();
     }
 
+    /**
+     * Retrieves enquiries associated with a specific project.
+     */
     public List<Enquiry> getByProject(BTOProj project) {
         return enquiries.stream().filter(e -> e.getForProj().equals(project)).toList();
     }
 
+    /**
+     * Checks if an enquiry already exists with same applicant, project, and message content.
+     */
     public boolean enquiryExists(HDBApplicant applicant, BTOProj project, String messageContent) {
         return enquiries.stream()
                 .filter(e -> e.getMadeBy().equals(applicant) && e.getForProj().equals(project))
@@ -198,6 +243,7 @@ public class EnquiryRepository {
                 .anyMatch(m -> m.getContent().equalsIgnoreCase(messageContent));
     }
 
+    /** @return next available enquiry ID. */
     private int getNextEnquiryId() {
         return enquiries.stream()
                 .mapToInt(Enquiry::getEnquiryId)

@@ -14,20 +14,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Controller class for managing applicant actions.
+ * Handles project applications, enquiries, and eligibility checking for HDB applicants.
+ */
 public class ApplicantController implements canApplyFlat {
     private final HDBApplicant model;
     private final ApplicationService appService = new ApplicationService();
     private final EnquiryServiceImpl enquiryService = new EnquiryServiceImpl();
     private final BTORepository projRepo = BTORepository.getInstance();
 
+    /**
+     * Constructs the ApplicantController with a given applicant model.
+     *
+     * @param model the HDBApplicant
+     */
     public ApplicantController(HDBApplicant model) {
         this.model = model;
     }
 
+    /** Withdraws the current application of the applicant. */
     public void withdrawApplication() {
         appService.withdrawApplication(model);
     }
 
+    /** Displays all BTO projects the applicant is eligible to apply for. */
     public void viewEligibleProjects() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
         System.out.println("\n=== Eligible BTO Projects ===");
@@ -40,6 +51,12 @@ public class ApplicantController implements canApplyFlat {
         }
     }
 
+    /**
+     * Allows the applicant to select a project from a list.
+     *
+     * @param availableProjects list of available BTO projects
+     * @return selected BTO project or null
+     */
     public BTOProj selectProject(List<BTOProj> availableProjects) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\n=== Available BTO Projects ===");
@@ -77,6 +94,11 @@ public class ApplicantController implements canApplyFlat {
         return null;
     }
 
+    /**
+     * Retrieves a list of BTO projects the applicant is eligible for.
+     *
+     * @return list of eligible BTO projects
+     */
     public List<BTOProj> getEligibleProjs() {
         List<BTOProj> allProjs = projRepo.getAllProjects();
         List<BTOProj> eligibleProjects = new ArrayList<>();
@@ -89,6 +111,12 @@ public class ApplicantController implements canApplyFlat {
         return eligibleProjects;
     }
 
+    /**
+     * Checks if the applicant is eligible for a given project.
+     *
+     * @param project BTO project
+     * @return true if eligible
+     */
     @Override
     public boolean checkEligibility(BTOProj project) {
         if (project.getProjStatus() == ProjStatus.CLOSED) {
@@ -106,6 +134,7 @@ public class ApplicantController implements canApplyFlat {
         return false;
     }
 
+    /** Guides applicant through project application flow. */
     public void applyForProject() {
         List<BTOProj> eligibleProjects = getEligibleProjs();
         BTOProj selectedProject = selectProject(eligibleProjects);
@@ -118,6 +147,12 @@ public class ApplicantController implements canApplyFlat {
         }
     }
 
+    /**
+     * Submits an application to the selected project.
+     *
+     * @param selectedProject project to apply for
+     * @return true if submission successful
+     */
     @Override
     public boolean submitApplication(BTOProj selectedProject) {
         if (selectedProject != null) {
@@ -127,11 +162,13 @@ public class ApplicantController implements canApplyFlat {
         return false;
     }
 
+    /** Displays the details of the current application. */
     public void showApplicantApplicationDetails() {
         String applicationDetails = appService.viewApplicationDetails(model);
         System.out.println(applicationDetails);
     }
 
+    /** Displays all enquiries made by the applicant. */
     public void showAllEnquiries(){
         List<Enquiry> applicantEnquiry = enquiryService.getEnquiriesByApplicant(model);
         if (applicantEnquiry.isEmpty()) {
@@ -150,6 +187,7 @@ public class ApplicantController implements canApplyFlat {
         }
     }
 
+    /** Submits a new enquiry regarding a selected project. */
     public void submitEnquiry() {
         Scanner scanner = new Scanner(System.in);
 
@@ -167,6 +205,7 @@ public class ApplicantController implements canApplyFlat {
         }
     }
 
+    /** Submits a message to an existing enquiry. */
     public void submitExisting() {
         Scanner scanner = new Scanner(System.in);
 
@@ -180,6 +219,7 @@ public class ApplicantController implements canApplyFlat {
         enquiryService.addMessage(enquiryId, message, model.getNric());
     }
 
+    /** Edits a message in an existing enquiry. */
     public void editEnquiryMessage() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter Enquiry ID to edit message:");
@@ -216,6 +256,7 @@ public class ApplicantController implements canApplyFlat {
         }
     }
 
+    /** Deletes an entire enquiry made by the applicant. */
     public void deleteEnquiry() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter Enquiry ID to delete:");

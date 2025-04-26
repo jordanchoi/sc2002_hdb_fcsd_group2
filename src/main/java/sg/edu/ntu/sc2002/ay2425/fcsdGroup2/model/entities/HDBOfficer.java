@@ -6,20 +6,26 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+/**
+ * Represents an HDB Officer who handles assigned BTO projects and officer applications.
+ */
 public class HDBOfficer extends HDBApplicant {
     private int officerId;
     private List<BTOProj> projectsHandled;
     private List<OfficerProjectApplication> registrationApps;
 
-
+    /**
+     * Constructs an HDB Officer with basic applicant information.
+     */
     public HDBOfficer(String firstName, String nric, int age, MaritalStatus maritalStatus, String password) {
         super(firstName, nric, age, maritalStatus, password);
         this.projectsHandled = new ArrayList<>();
         this.registrationApps = new ArrayList<>();
     }
 
-    // Constructor we will use for this project
+    /**
+     * Constructs an HDB Officer with an officer ID and basic details.
+     */
     public HDBOfficer(int officerId, String name, String nric, int age, MaritalStatus maritalStatus, String password) {
         super(name, nric, age, maritalStatus, password);
         this.projectsHandled = new ArrayList<>();
@@ -68,33 +74,38 @@ public class HDBOfficer extends HDBApplicant {
         return true;
     }*/
 
-    public int getOfficerId() {
-        return officerId;
-    }
+    /** Returns the officer ID. */
+    public int getOfficerId() { return officerId; }
 
-    public void setOfficerId(int id) {
-        this.officerId = id;
-    }
+    /** Sets the officer ID. */
+    public void setOfficerId(int id) { this.officerId = id; }
 
-    public List<BTOProj> getAllProj() {
-        return projectsHandled;
-    }
+    /** Returns all projects handled by this officer. */
+    public List<BTOProj> getAllProj() { return projectsHandled; }
 
-    public void setProj(List<BTOProj> projects) {
-        this.projectsHandled = projects;
-    }
+    /** Sets the list of projects handled by this officer. */
+    public void setProj(List<BTOProj> projects) { this.projectsHandled = projects; }
 
-    public void addProj(BTOProj proj) {
-        this.projectsHandled.add(0,proj);
-    }
+    /** Adds a project to the officer's handled list. */
+    public void addProj(BTOProj proj) { this.projectsHandled.add(0, proj); }
 
+    /**
+     * Removes a project by project ID.
+     *
+     * @throws NoSuchElementException if project not found
+     */
     public void removeProj(int projId) {
         boolean removed = projectsHandled.removeIf(p -> p.getProjId() == projId);
         if (!removed) {
-        throw new NoSuchElementException("No project with ID " + projId);
+            throw new NoSuchElementException("No project with ID " + projId);
         }
     }
 
+    /**
+     * Retrieves a project by ID.
+     *
+     * @throws NoSuchElementException if project not found
+     */
     public BTOProj getProj(int projId) {
         for (BTOProj p : projectsHandled) {
             if (p.getProjId() == projId) {return p;}
@@ -102,18 +113,20 @@ public class HDBOfficer extends HDBApplicant {
         throw new NoSuchElementException("No project with ID " + projId);
     }
 
-    public List<OfficerProjectApplication> getRegisteredApps() {
-        return registrationApps;
-    }
+    /** Returns the list of officer project registration applications. */
+    public List<OfficerProjectApplication> getRegisteredApps() { return registrationApps; }
 
-    public void setRegisteredApps(List<OfficerProjectApplication> apps) {
-        this.registrationApps = apps;
-    }
+    /** Sets the officer's registration applications. */
+    public void setRegisteredApps(List<OfficerProjectApplication> apps) { this.registrationApps = apps; }
 
-    public void addApps(OfficerProjectApplication app) {
-        this.registrationApps.add(0,app);
-    }
+    /** Adds a registration application for the officer. */
+    public void addApps(OfficerProjectApplication app) { this.registrationApps.add(0, app); }
 
+    /**
+     * Removes a registration application by application ID.
+     *
+     * @throws NoSuchElementException if application not found
+     */
     public void removeApps(int appId) {
         boolean removed = registrationApps.removeIf(a -> a.getOfficerAppId() == appId);
         if (!removed) {
@@ -121,6 +134,11 @@ public class HDBOfficer extends HDBApplicant {
         }
     }
 
+    /**
+     * Retrieves a registration application by ID.
+     *
+     * @throws NoSuchElementException if application not found
+     */
     public OfficerProjectApplication getApps(int appId) {
         for (OfficerProjectApplication a : registrationApps) {
             if (a.getOfficerAppId() == appId) {return a;}

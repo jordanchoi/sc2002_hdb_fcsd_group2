@@ -13,13 +13,23 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controller class for managing booking and receipt generation operations for HDB applicants.
+ */
 public class BookingController {
 
+    /** Default constructor. */
     public BookingController () {}
     UserRepository user = UserRepository.getInstance();
     List<HDBApplicant> applicantList = user.getApplicants();
     BTORepository repo = BTORepository.getInstance();
 
+    /**
+     * Retrieves an HDB applicant by NRIC.
+     *
+     * @param NRIC applicant's NRIC
+     * @return HDBApplicant object if found
+     */
     public HDBApplicant retrieveApp(String NRIC) {
         HDBApplicant app = null;
         for (HDBApplicant applicant : applicantList) {
@@ -30,6 +40,12 @@ public class BookingController {
         return app;
     }
 
+    /**
+     * Finds the application associated with a given NRIC.
+     *
+     * @param nric applicant's NRIC
+     * @return Application object or null if not found
+     */
     public Application findApplication(String nric) {
         /*Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the flat to update (based on NRIC): ");
@@ -83,6 +99,12 @@ public class BookingController {
         return selectedApp;
     */}
 
+    /**
+     * Updates the available flat count after a successful booking.
+     *
+     * @param app the application linked to the booking
+     * @return true if updated successfully
+     */
     public boolean updateFlatAvail(Application app) {
         //FlatType flatToUpdate = app.getFlatTypeObj();
         List<FlatType> project = app.getAppliedProj().getAvailableFlatTypes();
@@ -110,11 +132,25 @@ public class BookingController {
         }
     }
 
+    /**
+     * Updates the status of an application to approved.
+     *
+     * @param app the application
+     * @return true if status updated
+     */
     public boolean updateAppStatus(Application app) {
         app.approve();
         return true;
     }
 
+    /**
+     * Updates the applicant profile with the new flat type.
+     *
+     * @param app the application
+     * @param newtype the new flat type
+     * @param repo the BTO repository
+     * @return true if updated successfully
+     */
     public boolean updateAppProfile(Application app, String newtype, BTORepository repo) {
         BTOProj proj = null;
         for (BTOProj p : repo.getAllProjects()) {
@@ -131,6 +167,11 @@ public class BookingController {
         return false;
     }
 
+    /**
+     * Generates a PDF receipt for a successful flat booking.
+     *
+     * @param app the application used for receipt generation
+     */
     public void generateReceipt(Application app) {
         if (app == null) {
             System.out.println("Cannot generate receipt: Application is null.");

@@ -11,7 +11,6 @@ public class FlatTypeFactory {
      * @param typeStartIndex the index of the flat type name (e.g., 2 or 5)
      * @return FlatType object
      */
-
     public static FlatType fromRow(List<String> row, int typeStartIndex) {
         String flatTypeName = row.get(typeStartIndex);
         int units = (int) Double.parseDouble(row.get(typeStartIndex + 1));;

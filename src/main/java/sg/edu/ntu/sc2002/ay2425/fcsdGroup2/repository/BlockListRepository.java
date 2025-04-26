@@ -8,17 +8,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository class to manage Block entities.
+ * Handles loading, saving, and searching blocks by various attributes.
+ */
 public class BlockListRepository {
     private static final String FILE_PATH = "data/BlocksList.xlsx";
     private final List<Block> blocks;
     private final BTORepository btoRepo;
 
+    /**
+     * Constructs a BlockListRepository and loads data.
+     *
+     * @param btoRepo BTO repository for linking projects
+     */
     public BlockListRepository(BTORepository btoRepo) {
         this.btoRepo = btoRepo;
         this.blocks = new ArrayList<>();
         loadFromFile();
     }
 
+    /** Loads all blocks from file into memory. */
     private void loadFromFile() {
         blocks.clear();
         List<List<String>> data;
@@ -66,6 +76,7 @@ public class BlockListRepository {
         }
     }
 
+    /** Saves all blocks to file. */
     public void saveToFile() {
         List<List<String>> data = new ArrayList<>();
         data.add(List.of("Block ID", "Blk No", "Street Address", "Postal Code", "Project ID"));
@@ -83,6 +94,12 @@ public class BlockListRepository {
         FileIO.writeExcelFile(FILE_PATH, data);
     }
 
+    /**
+     * Finds a block by its postal code.
+     *
+     * @param postalCode postal code
+     * @return matching block or null
+     */
     public Block getByPostalCode(int postalCode) {
         for (Block b : blocks) {
             try {
@@ -97,25 +114,47 @@ public class BlockListRepository {
         return null;
     }
 
+    /**
+     * Adds a new block and saves.
+     *
+     * @param block the block to add
+     */
     public void add(Block block) {
         blocks.add(block);
         saveToFile();
     }
 
+    /**
+     * Updates an existing block by replacing and saving.
+     *
+     * @param updated the updated block
+     */
     public void update(Block updated) {
         delete(updated.getBlockId());
         add(updated);
     }
 
+    /**
+     * Deletes a block by block ID.
+     *
+     * @param blockId the block ID
+     */
     public void delete(int blockId) {
         blocks.removeIf(b -> b.getBlockId() == blockId);
         saveToFile();
     }
 
+    /** @return a copy of all blocks. */
     public List<Block> getAll() {
         return new ArrayList<>(blocks);
     }
 
+    /**
+     * Retrieves all blocks belonging to a project by project ID.
+     *
+     * @param projId project ID
+     * @return list of blocks
+     */
     public List<Block> getByProjectId(int projId) {
         List<Block> result = new ArrayList<>();
         for (Block b : blocks) {
@@ -126,6 +165,12 @@ public class BlockListRepository {
         return result;
     }
 
+    /**
+     * Retrieves a block by its ID.
+     *
+     * @param blockId block ID
+     * @return matching block or null
+     */
     public Block getById(int blockId) {
         for (Block b : blocks) {
             if (b.getBlockId() == blockId) return b;

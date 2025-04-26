@@ -5,40 +5,49 @@ import java.util.List;
 
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 
+/**
+ * Represents an HDB Manager who manages BTO projects and officer applications.
+ */
 public class HDBManager extends User {
     private int managerId;
     private final List<BTOProj> managedProjs;
 
-    // Constructor we will use for this project
+    /**
+     * Constructs an HDB Manager with basic information.
+     */
     public HDBManager(int managerId, String name, String nric, int age, MaritalStatus maritalStatus, String password) {
         super(name, nric, age, maritalStatus, password);
         this.managerId = 0;
         managedProjs = new ArrayList<>();
     }
 
-    // Constructor closer to the real world
+    /**
+     * Constructs an HDB Manager with full real-world details.
+     */
     public HDBManager(int userId, String nric, String password, String firstName, String lastName, String middleName,int age, MaritalStatus maritalStatus, int managerId) {
         super(userId, nric, password, firstName, lastName, middleName, age, maritalStatus);
         this.managerId = managerId;
         managedProjs = new ArrayList<>();
     }
 
-    public int getManagerId() {
-        return managerId;
-    }
+    /** Returns the manager ID. */
+    public int getManagerId() { return managerId; }
 
-    public void setManagerId(int id) {
-        this.managerId = id;
-    }
+    /** Sets the manager ID. */
+    public void setManagerId(int id) { this.managerId = id; }
 
-    public void assignProj(BTOProj project) {
-        managedProjs.add(project);
-    }
+    /** Assigns a project to the manager. */
+    public void assignProj(BTOProj project) { managedProjs.add(project); }
 
-    public void unAssignProj(BTOProj project) {
-        managedProjs.remove(project);
-    }
+    /** Unassigns a project from the manager. */
+    public void unAssignProj(BTOProj project) { managedProjs.remove(project); }
 
+    /**
+     * Retrieves a project managed by this manager by project ID.
+     *
+     * @param id project ID
+     * @return the project if found, else null
+     */
     public BTOProj getProj(int id) {
         for (BTOProj p : managedProjs) {
             if (p.getProjId() == id) return p;
@@ -46,10 +55,10 @@ public class HDBManager extends User {
         return null;
     }
 
-    public List<BTOProj> getAllProjs() {
-        return managedProjs;
-    }
+    /** Returns the list of all managed projects. */
+    public List<BTOProj> getAllProjs() { return managedProjs; }
 
+    /** Returns a copy of the current list of managed projects. */
     public List<BTOProj> getCurrentProj() {
         List<BTOProj> result = new ArrayList<>();
         for (int i = 0; i < managedProjs.size(); i++) {
@@ -58,10 +67,16 @@ public class HDBManager extends User {
         return result;
     }
 
+    /**
+     * Checks if the manager can still be assigned to new projects.
+     *
+     * @return true if under limit (3 projects), false otherwise
+     */
     public boolean canBeAssigned() {
         return managedProjs.size() < 3;
     }
 
+    /** Displays the menu options for an HDB Manager. */
     @Override
     public void viewMenu() {
         System.out.println("\n=== HDB Manager Menu ===");
