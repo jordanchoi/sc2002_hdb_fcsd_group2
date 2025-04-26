@@ -193,14 +193,14 @@ public class OfficerView implements UserView {
                         }
                     }
 
-                        } catch (IllegalArgumentException e) {
-                            // Handle invalid input exception here
-                            System.out.println(e.getMessage());  // Print the error message
-                            validResponse = false;  // Continue the loop for invalid input
-                        }
+                } catch (IllegalArgumentException e) {
+                    // Handle invalid input exception here
+                    System.out.println(e.getMessage());  // Print the error message
+                    validResponse = false;  // Continue the loop for invalid input
+                }
 
-                    } while (!validResponse);
-                } 
+            } while (!validResponse);
+        } 
     
     /**
      * Handles the receipt submenu operations for generating receipts.
