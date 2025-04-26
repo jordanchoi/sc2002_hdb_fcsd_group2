@@ -54,6 +54,7 @@ public class ApplicantView implements UserView {
         return choice;
     }
 
+
     private void handleBTOApplicationMenu() {
         int choice;
         do {
@@ -74,6 +75,7 @@ public class ApplicantView implements UserView {
             }
         } while (choice != 4);
     }
+
 
     public void changePassword() {
         Scanner scanner = new Scanner(System.in);

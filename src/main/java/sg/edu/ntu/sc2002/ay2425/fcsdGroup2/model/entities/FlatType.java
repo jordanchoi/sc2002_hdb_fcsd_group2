@@ -5,6 +5,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a type of flat in a BTO project.
+ * Contains details like size, total units, selling price, and target applicant groups.
+ */
 public class FlatType {
     // Should be not needed
     // private int flatTypeId;
@@ -18,9 +22,13 @@ public class FlatType {
     private float sellingPrice;
     private List<MaritalStatus> openTo;
 
-    // Constructor for Given Data in Provided Excel File
-
-    // This constructor is used to create a FlatType object with the given parameters
+    /**
+     * Constructs a FlatType from given parameters (Excel file version).
+     *
+     * @param name flat type name
+     * @param totalUnits number of units
+     * @param sellingPrice price per unit
+     */
     public FlatType(String name, int totalUnits, float sellingPrice) {
         // this.flatTypeId = id;
         this.typeName = name;
@@ -45,7 +53,9 @@ public class FlatType {
         }
     }
 
-    // Constructor 1
+    /**
+     * Constructs a FlatType with given parameters (no selling price).
+     */
     public FlatType(int id, String name, int sqm, int totalUnits) {
         //this.flatTypeId = id;
         this.typeName = name;
@@ -56,7 +66,9 @@ public class FlatType {
         this.flats = new ArrayList<>();
     }
 
-    // Constructor 2
+    /**
+     * Constructs a FlatType with full details.
+     */
     public FlatType(int id, String name, int sqm, int totalUnits, int bookedUnits, int availUnits, List<Flat> flatsList) {
         //this.flatTypeId = id;
         this.typeName = name;
@@ -128,7 +140,12 @@ public class FlatType {
         this.flats = flatsList;
     }
 
-    // Add model.entities.Flat
+    /**
+     * Adds a flat to the list if not already present.
+     *
+     * @param flat the flat to add
+     * @return true if added successfully, false if duplicate
+     */
     public boolean addFlatsToList(Flat flat) {
         if (!flats.contains(flat)) {
             flats.add(flat);
@@ -137,12 +154,20 @@ public class FlatType {
         return false;
     }
 
-    // Remove model.entities.Flat by floor number and unit number
+    /**
+     * Removes a flat from the list based on floor and unit number.
+     *
+     * @param floorNo floor number
+     * @param unitNo unit number
+     * @return true if removed successfully
+     */
     public boolean removeFlatFromList(int floorNo, int unitNo) {
         return flats.removeIf(f -> f.getFloorNo() == floorNo && f.getUnitNo() == unitNo);
     }
 
-    // Update availability when booking or canceling
+    /**
+     * Recalculates the number of available units.
+     */
     private void recalculateAvailability() {
         this.unitsAvail = totalUnits - unitsBooked;
     }
@@ -171,11 +196,17 @@ public class FlatType {
         this.openTo = openTo;
     }
 
+    /**
+     * Adds an allowed marital status for this flat type.
+     */
     public void addOpenTo(MaritalStatus status) {
         if (!openTo.contains(status))
             openTo.add(status);
     }
 
+    /**
+     * Removes an allowed marital status from this flat type.
+     */
     public void removeOpenTo(MaritalStatus status) {
         openTo.remove(status);
     }

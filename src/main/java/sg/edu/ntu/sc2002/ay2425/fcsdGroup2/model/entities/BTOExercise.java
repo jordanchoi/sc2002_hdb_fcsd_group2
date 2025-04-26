@@ -1,26 +1,39 @@
 package sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities;
+
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
-
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a BTO Exercise that groups multiple BTO Projects together.
+ * Tracks exercise name, status, total applicants, and associated projects.
+ */
 public class BTOExercise {
 
-    // Attributes
     private int exerciseId;
     private String exerciseName;
     private int totalApplicants;
     private ProjStatus status;
     private List<BTOProj> projects;
-    private BTORepository btoRepo;
 
-    // Default constructor
+    /**
+     * Default constructor.
+     * Initializes an empty project list.
+     */
     public BTOExercise() {
         this.projects = new ArrayList<>();
     }
 
-    // Overloaded constructor
+    /**
+     * Overloaded constructor to initialize full BTOExercise details.
+     *
+     * @param id exercise ID
+     * @param name exercise name
+     * @param totalApplicants number of applicants
+     * @param status project status
+     * @param projects list of associated BTO projects
+     */
     public BTOExercise(int id, String name, int totalApplicants, ProjStatus status, List<BTOProj> projects) {
         this.exerciseId = id;
         this.exerciseName = name;
@@ -29,49 +42,82 @@ public class BTOExercise {
         this.projects = projects;
     }
 
-    // Getters
-    public int getExerciseId() {
-        return exerciseId;
-    }
+    // Getters and Setters with JavaDoc below...
 
-    public String getExerciseName() {
-        return exerciseName;
-    }
+    /**
+     * Returns the exercise ID.
+     *
+     * @return exercise ID
+     */
+    public int getExerciseId() { return exerciseId; }
 
-    public int getTotalApplicants() {
-        return totalApplicants;
-    }
+    /**
+     * Returns the exercise name.
+     *
+     * @return exercise name
+     */
+    public String getExerciseName() { return exerciseName; }
 
-    public ProjStatus getProjStatus() {
-        return status;
-    }
+    /**
+     * Returns the total number of applicants.
+     *
+     * @return number of applicants
+     */
+    public int getTotalApplicants() { return totalApplicants; }
 
-    public List<BTOProj> getExerciseProjs() {
-        return new ArrayList<>(projects); // return copy to protect internal list
-    }
+    /**
+     * Returns the project status of the exercise.
+     *
+     * @return project status
+     */
+    public ProjStatus getProjStatus() { return status; }
 
-    // Setters
-    public void setExerciseId(int id) {
-        this.exerciseId = id;
-    }
+    /**
+     * Returns a copy of the list of associated projects.
+     *
+     * @return list of BTO projects
+     */
+    public List<BTOProj> getExerciseProjs() { return new ArrayList<>(projects); }
 
-    public void setExerciseName(String name) {
-        this.exerciseName = name;
-    }
+    /**
+     * Sets the exercise ID.
+     *
+     * @param id exercise ID
+     */
+    public void setExerciseId(int id) { this.exerciseId = id; }
 
-    public void setTotalApplicants(int totalApps) {
-        this.totalApplicants = totalApps;
-    }
+    /**
+     * Sets the exercise name.
+     *
+     * @param name exercise name
+     */
+    public void setExerciseName(String name) { this.exerciseName = name; }
 
-    public void setProjStatus(ProjStatus status) {
-        this.status = status;
-    }
+    /**
+     * Sets the total number of applicants.
+     *
+     * @param totalApps total applicants
+     */
+    public void setTotalApplicants(int totalApps) { this.totalApplicants = totalApps; }
 
-    public void setExerciseProjs(List<BTOProj> exerciseProjs) {
-        this.projects = exerciseProjs;
-    }
+    /**
+     * Sets the project status of the exercise.
+     *
+     * @param status project status
+     */
+    public void setProjStatus(ProjStatus status) { this.status = status; }
 
-    public void addProject(BTOProj proj) {
-        projects.add(proj);
-    }
+    /**
+     * Sets the associated projects of the exercise.
+     *
+     * @param exerciseProjs list of projects
+     */
+    public void setExerciseProjs(List<BTOProj> exerciseProjs) { this.projects = exerciseProjs; }
+
+    /**
+     * Adds a project to the exercise.
+     *
+     * @param proj project to add
+     */
+    public void addProject(BTOProj proj) { projects.add(proj); }
 }

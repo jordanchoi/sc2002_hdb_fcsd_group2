@@ -11,7 +11,18 @@ import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+/**
+ * Utility class for reading from and writing to Excel files.
+ * Supports both local and resource-based file operations.
+ */
 public class FileIO {
+
+    /**
+     * Reads an Excel file from the local filesystem.
+     *
+     * @param filePath the path to the local Excel file
+     * @return list of rows, each row as a list of strings
+     */
     public static List<List<String>> readExcelFileLocal(String filePath) {
         List<List<String>> data = new ArrayList<>();
         File file = new File(filePath);
@@ -46,6 +57,12 @@ public class FileIO {
     }
 
 
+    /**
+     * Reads an Excel file from the project resources.
+     *
+     * @param filePath the path to the resource Excel file
+     * @return list of rows, each row as a list of strings
+     */
     // Generic method to read data from an Excel file
     public static List<List<String>> readExcelFile(String filePath) {
         List<List<String>> data = new ArrayList<>();
@@ -80,6 +97,12 @@ public class FileIO {
         return data;
     }
 
+    /**
+     * Writes data to a new Excel file.
+     *
+     * @param filePath the path to save the Excel file
+     * @param data the data to write
+     */
     // Generic method to write data to an Excel file
     public static void writeExcelFile(String filePath, List<List<String>> data) {
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -108,6 +131,13 @@ public class FileIO {
         }
     }
 
+    /**
+     * Reads and merges Excel data from both resource and local files,
+     * prioritizing local file data in case of duplicates.
+     *
+     * @param filePath the path to the resource/local Excel file
+     * @return merged list of rows
+     */
     public static List<List<String>> readMergedExcelFile(String filePath) {
         Map<String, List<String>> uniqueDataMap = new LinkedHashMap<>();
 
@@ -145,6 +175,12 @@ public class FileIO {
         return new ArrayList<>(uniqueDataMap.values());
     }
 
+    /**
+     * Extracts a normalized key from a raw string or numeric value.
+     *
+     * @param raw the raw string
+     * @return a normalized key
+     */
     // Helper to normalize numeric or string keys
     private static String extractKey(String raw) {
         try {
@@ -155,8 +191,13 @@ public class FileIO {
         }
     }
 
-
-
+    /**
+     * Reads an Excel file from an input stream and converts it to a list of rows.
+     *
+     * @param fis the input stream
+     * @return list of rows, each row as a list of strings
+     * @throws IOException if an error occurs during reading
+     */
     private static List<List<String>> readFromWorkbookStream(InputStream fis) throws IOException {
         List<List<String>> data = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(fis)) {

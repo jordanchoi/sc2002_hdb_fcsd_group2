@@ -15,10 +15,16 @@ public enum FlatTypes {
     }
 
     public static FlatTypes fromDisplayName(String input) {
-        switch (input.trim().toUpperCase()) {
-            case "2-ROOM":
+        if (input == null || input.trim().isEmpty()) {
+            return NIL;
+        }
+
+        String normalized = input.trim().replaceAll("\\s+", "").replace("-", "").toUpperCase();
+
+        switch (normalized) {
+            case "2ROOM":
                 return TWO_ROOM;
-            case "3-ROOM":
+            case "3ROOM":
                 return THREE_ROOM;
             case "NIL":
                 return NIL;
