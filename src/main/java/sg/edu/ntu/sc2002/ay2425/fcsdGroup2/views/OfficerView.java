@@ -133,7 +133,6 @@ public class OfficerView implements UserView {
             HDBBTOExerciseController exerciseController = new HDBBTOExerciseController();*/
             System.out.println("\n-- Project Management --");
             System.out.println("1. View Project Details");
-            //displayActiveFilters();
             System.out.println("2. Check Project Registration Status");
             System.out.println("3. Apply Project as Officer");
             System.out.println("0. Back to Main Menu");
