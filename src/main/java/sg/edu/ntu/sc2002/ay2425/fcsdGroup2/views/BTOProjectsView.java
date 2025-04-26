@@ -15,6 +15,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.*;
 import java.util.*;
 import java.time.LocalDateTime;
 
+/**
+ * Represents the view for managing BTO Projects.
+ * Allows creation, editing, deletion, viewing, and management of BTO projects.
+ */
 public class BTOProjectsView implements UserView {
     private final BTOProjsController projsController;
     private final HDBBTOExerciseController exerciseController;
@@ -22,6 +26,14 @@ public class BTOProjectsView implements UserView {
     private final OfficerProjectApplicationController officerProjectApplicationController;
     private SessionStateManager session = SessionStateManager.getInstance();
 
+    /**
+     * Constructs a BTOProjectsView instance.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     * @param applicationController controller for applications
+     * @param officerProjectApplication controller for officer project applications
+     */
     public BTOProjectsView(BTOProjsController projsController, HDBBTOExerciseController exerciseController, ApplicationController applicationController, OfficerProjectApplicationController officerProjectApplication) {
         this.projsController = projsController;
         this.exerciseController = exerciseController;
@@ -29,6 +41,9 @@ public class BTOProjectsView implements UserView {
         this.officerProjectApplicationController = officerProjectApplication;
     }
 
+    /**
+     * Starts the BTO Project Management Console session.
+     */
     public void start() {
         System.out.println("You are in the BTO Project Management Console.\nHere, you can manage BTO projects, including creating of BTO Project or get statistics for a particular Project.\n");
         System.out.println("What would you like to do?\n");
@@ -39,9 +54,9 @@ public class BTOProjectsView implements UserView {
         } while (choice != 5); // Assuming 10 is the exit option
     }
 
-
-
-
+    /**
+     * Displays the main menu options for managing BTO Projects.
+     */
     @Override
     public void displayMenu() {
         System.out.println("1. Manage BTO Project");
@@ -51,6 +66,11 @@ public class BTOProjectsView implements UserView {
         System.out.println("5. Return to Main Menu");
     }
 
+    /**
+     * Handles user input for the BTO Project Management Console.
+     *
+     * @return the selected menu choice
+     */
     @Override
     public int handleUserInput() {
         Scanner scanner = new Scanner(System.in);
@@ -95,12 +115,18 @@ public class BTOProjectsView implements UserView {
         return choice;
     }
 
+    /**
+     * Creates a new BTO Project and assigns it to a selected BTO Exercise.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     */
     // Allows the user to create a new BTO project and assign it to a selected BTO exercise.
     public void createBTOProjects(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         Scanner scanner = new Scanner(System.in);
         SessionStateManager session = SessionStateManager.getInstance();
         HDBManager manager = (HDBManager) session.getLoggedInUser();
-
+        exerciseController.insertExercisesFromRepo();
         List<BTOExercise> exercises = exerciseController.viewAllExercises();
         if (exercises.isEmpty()) {
             System.out.println("No BTO exercises found. Please create one first.");
@@ -115,9 +141,10 @@ public class BTOProjectsView implements UserView {
 
         int choice;
         while (true) {
-            System.out.print("Enter exercise number: ");
+            System.out.print("Enter exercise number (0 to cancel): ");
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
+                if (choice == 0) return; // Cancel creating project
                 if (choice >= 1 && choice <= exercises.size()) break;
             }
             System.out.println("Invalid choice. Please enter a number between 1 and " + exercises.size());
@@ -192,11 +219,15 @@ public class BTOProjectsView implements UserView {
 
         Map<FlatTypes, FlatType> flatUnitMap = new HashMap<>();
         for (FlatTypes type : FlatTypes.values()) {
-            System.out.printf("Enter number of %s units: ", type.getDisplayName());
-            int units = scanner.nextInt();
-            System.out.printf("Enter selling price for %s units: ", type.getDisplayName());
-            float price = scanner.nextFloat();
-            flatUnitMap.put(type, new FlatType(type.getDisplayName(), units, price));
+            if (type == FlatTypes.NIL) {
+                flatUnitMap.put(type, new FlatType(type.getDisplayName(), 0, 0f));
+            } else {
+                System.out.printf("Enter number of %s units: ", type.getDisplayName());
+                int units = scanner.nextInt();
+                System.out.printf("Enter selling price for %s units: ", type.getDisplayName());
+                float price = scanner.nextFloat();
+                flatUnitMap.put(type, new FlatType(type.getDisplayName(), units, price));
+            }
         }
         scanner.nextLine();
 
@@ -213,6 +244,9 @@ public class BTOProjectsView implements UserView {
         }
         scanner.nextLine();
 
+        System.out.print("Enter Postal Code for the project: ");
+        String postalCode = scanner.nextLine().trim();
+
         // Create project and save
         BTOProj newProj = projsController.CreateProj(
                 id,
@@ -224,7 +258,8 @@ public class BTOProjectsView implements UserView {
                 visible,
                 manager,
                 officerSlots,
-                new HDBOfficer[0]
+                new HDBOfficer[0],
+                postalCode
         );
 
         // Link to Exercise and save
@@ -234,6 +269,13 @@ public class BTOProjectsView implements UserView {
         System.out.println("\nProject created and assigned to: " + selectedExercise.getExerciseName());
     }
 
+    /**
+     * Displays all BTO Projects in the system, regardless of manager or visibility.
+     * Allows selecting and managing a specific project.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     */
     // Displays all BTO projects in the system (regardless of manager or visibility).
     // Shows a table view with basic info, allows user to select a project,
     // then displays its full details and opens the management menu.
@@ -255,6 +297,12 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Displays BTO Projects created by the currently logged-in HDB Manager only.
+     *
+     * @param projsController controller for BTO projects
+     * @param exerciseController controller for BTO exercises
+     */
     // Displays only BTO projects created by the currently logged-in HDB Manager.
     // Uses the SessionStateManager to identify the manager.
     // If any are found, displays a table and allows selection for details and management.
@@ -276,6 +324,14 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Displays a table of BTO Projects and associated exercises,
+     * allows the user to select one for further management.
+     *
+     * @param projects list of BTO projects
+     * @param exercises list of BTO exercises
+     * @return the selected BTO project or null if cancelled
+     */
     // Displays a formatted table of BTO projects along with their associated exercises,
     // prompts the user to select a project by ID, and returns the selected project.
     // If -1 is entered, returns null to indicate no selection.
@@ -324,6 +380,11 @@ public class BTOProjectsView implements UserView {
         return null;
     }
 
+    /**
+     * Displays detailed information about a single BTO project.
+     *
+     * @param selected the selected BTO project
+     */
     // Prints detailed information about a single BTO project, including:
     // - Project name, dates, visibility, and neighbourhood
     // - Unique flat types offered
@@ -336,6 +397,7 @@ public class BTOProjectsView implements UserView {
         System.out.println("Close Date       : " + selected.getAppCloseDate().toLocalDate());
         System.out.println("Visibility       : " + selected.getVisibility());
         System.out.println("Neighbourhood    : " + selected.getProjNbh());
+        System.out.println("Postal Code      : " + selected.getPostalCode());
 
         System.out.println("Flat Types");
         List<FlatType> flatTypes = selected.getAvailableFlatTypes();
@@ -344,6 +406,12 @@ public class BTOProjectsView implements UserView {
         } else {
             Set<String> printed = new HashSet<>();
             for (FlatType type : flatTypes) {
+                // Check if the flat type is NIL and skip it
+                FlatTypes flatEnum = FlatTypes.fromDisplayName(type.getTypeName());
+                if (flatEnum == FlatTypes.NIL) {
+                    continue;
+                }
+
                 String key = type.getTypeName() + ":" + type.getTotalUnits() + ":" + type.getSellingPrice();
                 if (printed.add(key)) {
                     System.out.printf("  - %-12s : %d units at $%.2f%n",
@@ -364,33 +432,50 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Handles the management options for BTO Projects:
+     * viewing all projects, viewing own projects, or returning.
+     */
     public void manageBTOProject() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose projects to view...\n");
+        System.out.println("0. Return to previous menu");
         System.out.println("1. View All Projects");
         System.out.println("2. View My Project");
         System.out.print("Enter choice: ");
         int choice = scanner.nextInt();
 
         switch (choice) {
+            case 0:
+                System.out.println("Returning to previous menu...");
+                return;
             case 1:
                 viewAllProjects(projsController, exerciseController);
                 break;
             case 2:
                 viewMyProjects(projsController, exerciseController);
+                break;
             default:
+                System.out.println("Invalid input.");
         }
     }
 
+    /**
+     * Manages further actions on a selected project such as toggling visibility,
+     * managing officers, and managing applications.
+     *
+     * @param selected the selected BTO project
+     */
     public void manageSelectedProject(BTOProj selected) {
         System.out.println("\nWhat would you like to do next?");
+        System.out.println("0. Return to previous menu");
         System.out.println("1. Toggle Project Visibility");
-        System.out.println("2. Manage HDB Officer ");
+        System.out.println("2. Manage HDB Officer");
         System.out.println("3. Manage Applications");
-        System.out.println("4. Exit to main menu");
         Scanner scanner = new Scanner(System.in);
+
         int choice = -1;
-        while (choice < 1 || choice > 4) {
+        while (choice < 0 || choice > 3) {
             System.out.print("Enter choice: ");
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
@@ -402,6 +487,9 @@ public class BTOProjectsView implements UserView {
         }
 
         switch (choice) {
+            case 0 -> {
+                System.out.println("Returning to project list...");
+            }
             case 1 -> {
                 projsController.toggleProjVisibility(selected);
                 System.out.println("\nVisibility updated: " + (selected.getVisibility() ? "ON" : "OFF"));
@@ -411,16 +499,17 @@ public class BTOProjectsView implements UserView {
                 manageOfficerByProjectId(selected.getProjId());
             }
             case 3 -> {
-                // CONTINUE HERE
                 System.out.println("Managing Applications...");
                 manageApplicationsByProjectId(applicationController, selected.getProjId());
-            }
-            case 4 -> {
-                System.out.println("Returning to project list...");
             }
         }
     }
 
+    /**
+     * Manages officer applications for a selected BTO project.
+     *
+     * @param projectId the ID of the project
+     */
     public void manageOfficerByProjectId(int projectId) {
         BTORepository btoRepo = BTORepository.getInstance();
         UserRepository userRepo = UserRepository.getInstance();
@@ -461,7 +550,6 @@ public class BTOProjectsView implements UserView {
             }
         }
 
-        // No need for final variable: use appId directly in lambda
         int finalAppId = appId;
         OfficerProjectApplication selectedApp = applications.stream()
                 .filter(a -> a.getOfficerAppId() == finalAppId)
@@ -491,15 +579,41 @@ public class BTOProjectsView implements UserView {
         }
 
         boolean approved = decision.equals("yes");
-        boolean result = controller.processOfficerDecision(selectedApp, approved);
 
+        BTOProj project = btoRepo.getProjById(projectId);
+        if (project == null) {
+            System.out.println("\nProject not found.");
+            return;
+        }
+
+        if (approved) {
+            if (project.getOfficersList().length >= project.getOfficerSlots()) {
+                System.out.println("\nCannot approve: Officer slots are already filled.");
+                return;
+            } else {
+                boolean added = project.assignOfficer(selectedApp.getOfficer());
+                if (!added) {
+                    System.out.println("\nThis officer is already assigned to the project.");
+                    return;
+                }
+                btoRepo.saveProject();  // Save changes to Excel
+            }
+        }
+
+        boolean result = controller.processOfficerDecision(selectedApp, approved);
         if (result) {
             System.out.println(approved ? "\nOfficer application approved.\n" : "\nOfficer application rejected.\n");
         } else {
-            System.out.println("Action failed. Please check application status or data consistency.");
+            System.out.println("\nAction failed. Please check application status or data consistency.");
         }
     }
 
+    /**
+     * Manages BTO applications (such as approving or rejecting) for a selected project.
+     *
+     * @param applicationController the application controller
+     * @param projectId the ID of the project
+     */
     public void manageApplicationsByProjectId(ApplicationController applicationController, int projectId) {
         BTORepository btoRepo = BTORepository.getInstance();
         UserRepository userRepo = UserRepository.getInstance();
@@ -517,17 +631,22 @@ public class BTOProjectsView implements UserView {
                 "ID", "NRIC", "Project Name", "Status", "Flat Type", "Booked Flat");
 
         for (Application app : apps) {
+            String applicantNric = (app.getApplicant() != null) ? app.getApplicant().getNric() : "-";
+            String projectName = (app.getProject() != null) ? app.getProject().getProjName() : "-";
+            String status = (app.getStatusEnum() != null) ? app.getStatusEnum().name() : "-";
+            String flatType = (app.getFlatType() != null) ? app.getFlatType().getTypeName() : "-";
+
             Flat flat = app.getFlat();
-            String bookedFlat = (flat != null)
+            String bookedFlat = (flat != null && flat.getBlock() != null)
                     ? "Blk " + flat.getBlock().getBlkNo() + " #" + flat.getFloorNo() + "-" + flat.getUnitNo()
                     : "-";
 
             System.out.printf("%-5d %-12s %-20s %-12s %-12s %-15s\n",
                     app.getAppId(),
-                    app.getApplicant().getNric(),
-                    app.getProject().getProjName(),
-                    app.getStatus(),
-                    app.getFlatType().getTypeName(),
+                    applicantNric,
+                    projectName,
+                    status,
+                    flatType,
                     bookedFlat);
         }
 
@@ -577,7 +696,7 @@ public class BTOProjectsView implements UserView {
             return;
         }
 
-        if (!selectedApp.getStatusEnum().equals(ApplicationStatus.PENDING)) {
+        if (selectedApp.getStatusEnum() != null && !selectedApp.getStatusEnum().equals(ApplicationStatus.PENDING)) {
             System.out.println("This application has already been processed.");
             return;
         }
@@ -605,7 +724,10 @@ public class BTOProjectsView implements UserView {
     }
 
 
-
+    /**
+     * Allows editing the details of an existing BTO project,
+     * such as project name, dates, flat types, and officer slots.
+     */
     // Allows the user to edit a selected BTO project.
     // Supports editing name, neighbourhood, dates, officer slots, and flat type details.
     private void editBTOProject() {
@@ -631,6 +753,7 @@ public class BTOProjectsView implements UserView {
         boolean done = false;
         while (!done) {
             System.out.println("\nEditing Project: " + name);
+            System.out.println("0. Cancel Editing");
             System.out.println("1. Name (current: " + name + ")");
             System.out.println("2. Neighbourhood (current: " + nbh + ")");
             System.out.println("3. Open Date (current: " + open.toLocalDate() + ")");
@@ -642,6 +765,10 @@ public class BTOProjectsView implements UserView {
             String input = scanner.nextLine().trim();
 
             switch (input) {
+                case "0" -> {
+                    System.out.println("Cancelling editing...");
+                    return;
+                }
                 case "1" -> {
                     System.out.print("Enter new name: ");
                     String inputName = scanner.nextLine().trim();
@@ -720,6 +847,9 @@ public class BTOProjectsView implements UserView {
         }
     }
 
+    /**
+     * Allows deleting a selected BTO project after confirmation.
+     */
     // Allows the user to delete a BTO project after selecting from the list.
     // Confirms the action before delegating to the controller to persist changes.
     private void deleteBTOProject() {

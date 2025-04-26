@@ -11,6 +11,10 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller class handling user authentication.
+ * Manages login, logout, password change, and session validation operations.
+ */
 public class UserAuthController {
 
     // This class handles user authentication and login functionality.
@@ -29,10 +33,14 @@ public class UserAuthController {
     private final UserRepository userRepository = UserRepository.getInstance();
     private final SessionStateManager session = SessionStateManager.getInstance();
 
-    // Private constructor to prevent instantiation
+    /** Private constructor to enforce Singleton pattern. */
     private UserAuthController() {}
 
-    // Public accessor
+    /**
+     * Returns the singleton instance of UserAuthController.
+     *
+     * @return instance of UserAuthController
+     */
     public static UserAuthController getInstance() {
         if (instance == null) {
             instance = new UserAuthController();
@@ -40,7 +48,13 @@ public class UserAuthController {
         return instance;
     }
 
-    // This method handles user login and authentication.
+    /**
+     * Attempts to login a user with given NRIC and password.
+     *
+     * @param nric the user's NRIC
+     * @param password the user's password
+     * @return the logged-in User object or null if login fails
+     */
     public User login(String nric, String password) {
         // This method handles user login and authentication.
         // It takes a list of users as input and checks if the provided NRIC and password match any user in the list.
@@ -79,6 +93,11 @@ public class UserAuthController {
         return null; // Placeholder return statement
     }
 
+    /**
+     * Logs out the currently logged-in user.
+     *
+     * @return true if logout successful
+     */
     public boolean logout() {
         // This method handles user logout functionality.
         // It clears the session state and logs out the user.
@@ -88,6 +107,13 @@ public class UserAuthController {
         return true;
     }
 
+    /**
+     * Changes the password for the currently logged-in user.
+     *
+     * @param oldPassword the old password
+     * @param newPassword the new password
+     * @return true if password change successful
+     */
     public boolean changePassword(String oldPassword, String newPassword) {
         // This method handles password change functionality.
         // It checks if the old password matches the current password and updates it to the new password.
@@ -112,10 +138,14 @@ public class UserAuthController {
             System.out.println("User is not logged in. Please log in first.");
             return false;
         }
-
-
     }
 
+    /**
+     * Validates a given password against the logged-in user's password.
+     *
+     * @param password the password to validate
+     * @return true if passwords match
+     */
     public boolean validatePassword(String password) {
         // This method validates the provided password against the stored password for the given NRIC.
         // It returns true if the password is valid, false otherwise.

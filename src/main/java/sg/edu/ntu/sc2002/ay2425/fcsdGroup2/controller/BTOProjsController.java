@@ -11,23 +11,37 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.Neighbourhoods;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.UserRoles;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util.SessionStateManager;
-
+/**
+ * Controller class for managing BTO project creation, editing, deletion, and visibility toggling.
+ * Also provides project filtering and officer application handling functionalities.
+ */
 public class BTOProjsController {
     private List<BTOProj> projects = new ArrayList<>();
     private List<HDBManager> managers;
     private List<Enquiry> enquiries;
     private final BTORepository btoRepo = BTORepository.getInstance();
 
+    /** Default constructor. */
     public BTOProjsController() {
         this.managers = new ArrayList<>();
     }
 
+    /**
+     * Full constructor for project controller.
+     *
+     * @param p list of BTO projects
+     * @param m list of HDB managers
+     * @param e list of enquiries
+     */
     public BTOProjsController(List<BTOProj> p, List<HDBManager> m, List<Enquiry> e) {
         this.projects = p;
         this.managers = m;
         this.enquiries = e;
     }
 
+    /**
+     * Creates a new BTO project and adds it to the repository.
+     */
     public BTOProj CreateProj(
             int id,
             String name,
@@ -38,7 +52,8 @@ public class BTOProjsController {
             boolean isVisible,
             HDBManager manager,
             int officerSlots,
-            HDBOfficer[] officers) {
+            HDBOfficer[] officers,
+            String postalCode) {
 
         BTOProj proj = new BTOProj(id, name, appOpenDate, appCloseDate, isVisible);
 
@@ -46,6 +61,7 @@ public class BTOProjsController {
         proj.setManagerIC(manager);
         proj.setOfficerSlots(officerSlots);
         proj.setOfficersList(officers);
+        proj.setPostalCode(postalCode);
 
         for (Map.Entry<FlatTypes, FlatType> entry : flatUnits.entrySet()) {
             FlatTypes type = entry.getKey();
@@ -61,6 +77,9 @@ public class BTOProjsController {
         return proj;
     }
 
+    /**
+     * Edits an existing BTO project.
+     */
     public boolean editProj(BTOProj proj,
                                  String newName,
                                  Neighbourhoods newNbh,
@@ -91,6 +110,9 @@ public class BTOProjsController {
         return true;
     }
 
+    /**
+     * Deletes a BTO project based on ID.
+     */
     public boolean deleteProjId(int id) {
         List<BTOProj> repoProj = btoRepo.getAllProjects();
         Iterator<BTOProj> iterator = repoProj.iterator();
@@ -110,6 +132,9 @@ public class BTOProjsController {
         return found;
     }
 
+    /**
+     * Toggles visibility status of a BTO project by ID.
+     */
     public boolean toggleVisibilityById(int id) {
         for (BTOProj proj : viewAllProjs()) {
             if (proj.getProjId() == id) {
@@ -120,15 +145,24 @@ public class BTOProjsController {
         return false;
     }
 
+    /**
+     * Toggles visibility for a given project and saves.
+     */
     public void toggleProjVisibility(BTOProj proj) {
         proj.setVisibility(!proj.getVisibility());
         btoRepo.saveProject(); // make sure this updates the file
     }
 
+    /**
+     * Retrieves all projects in memory.
+     */
     public List<BTOProj> viewAllProjs() {
          return new ArrayList<>(projects); // Return a copy to avoid direct modification
     }
 
+    /**
+     * Retrieves all projects created by all managers.
+     */
     public List<BTOProj> viewProjsByAllManagers() {
         List<BTOProj> result = new ArrayList<>();
         for (HDBManager manager : managers) {
@@ -139,6 +173,9 @@ public class BTOProjsController {
         return result;
     }
 
+    /**
+     * Retrieves only projects created by the logged-in manager.
+     */
     public List<BTOProj> viewOwnProjs() {
         SessionStateManager session = SessionStateManager.getInstance();
 
@@ -160,6 +197,35 @@ public class BTOProjsController {
         return myProjects;
     }
 
+    /**
+     * Retrieves projects handled by the logged-in officer.
+     */
+    public List<BTOProj> viewOwnProjsOfficer() {
+        SessionStateManager session = SessionStateManager.getInstance();
+
+        // Ensure the logged-in user is an officer
+        if (session.getLoggedInUserType() != UserRoles.OFFICER) {
+            return Collections.emptyList();
+        }
+
+        HDBOfficer currentOfficer = (HDBOfficer) session.getLoggedInUser();
+        String officerNric = currentOfficer.getNric();
+
+        List<BTOProj> officerProjects = new ArrayList<>();
+        for (BTOProj project : projects) {
+            if (project.getOfficersList() != null) {
+                for (HDBOfficer officer : project.getOfficersList()) {
+                    if (officer.getNric().equalsIgnoreCase(officerNric)) {
+                        officerProjects.add(project);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return officerProjects;
+    }
+
     public void approveOfficerApplication(OfficerProjectApplication app, BTOProj proj) {
 
     }
@@ -172,6 +238,9 @@ public class BTOProjsController {
 
     }
 
+    /**
+     * Retrieves all enquiries.
+     */
     public List<Enquiry> getAllEnq() {
         return enquiries;
     }
@@ -191,6 +260,9 @@ public class BTOProjsController {
 
     }
 
+    /**
+     * Checks if a manager is available to handle a new project based on time overlap.
+     */
     public boolean isManagerAvailable(HDBManager manager, LocalDateTime newOpen, LocalDateTime newClose, List<BTOExercise> allExercises) {
         for (BTOExercise ex : allExercises) {
             for (BTOProj proj : ex.getExerciseProjs()) {
@@ -205,6 +277,9 @@ public class BTOProjsController {
         return true;
     }
 
+    /**
+     * Checks if a project ID is unique across projects.
+     */
     public boolean isProjectIdUnique(int id) {
         for (BTOProj proj : viewAllProjs()) {
             if (proj.getProjId() == id) {
@@ -214,6 +289,9 @@ public class BTOProjsController {
         return true;
     }
 
+    /**
+     * Inserts projects from the BTO repository into memory.
+     */
     public void insertProjectsFromRepo() {
         projects.clear();
         List<BTOProj> repoProjects = btoRepo.getAllProjects();
@@ -222,6 +300,9 @@ public class BTOProjsController {
         }
     }
 
+    /**
+     * Adds a project to memory.
+     */
     public void addProject(BTOProj project) {
         projects.add(project);
     }

@@ -10,13 +10,25 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces.RoleHandler;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Represents the view for handling enquiries for different user roles.
+ * Delegates display and action control to the associated role handler.
+ */
 public class EnquiryView {
     private final RoleHandler roleHandler;
 
+    /**
+     * Constructs an EnquiryView with a specific role handler.
+     *
+     * @param roleHandler the handler for enquiry-related actions based on user role
+     */
     public EnquiryView(RoleHandler roleHandler) {
         this.roleHandler = roleHandler;
     }
 
+    /**
+     * Displays enquiry options according to the role's permissions.
+     */
     public void display() {
         roleHandler.displayEnquiryOptions();
     }

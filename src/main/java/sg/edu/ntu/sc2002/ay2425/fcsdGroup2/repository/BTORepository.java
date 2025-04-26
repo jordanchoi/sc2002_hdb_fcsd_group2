@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Singleton Repository class for managing BTO projects, exercises, and applications.
+ * Handles loading from and saving to Excel files.
+ * Provides methods to add, retrieve, and persist data related to BTO operations.
+ */
 public class BTORepository implements BTOStorageProvider {
     private static UserRepository userRepo = UserRepository.getInstance();
     private static BTORepository instance;
@@ -43,6 +47,11 @@ public class BTORepository implements BTOStorageProvider {
         }
     }
 
+    /**
+     * Returns the singleton instance of BTORepository.
+     *
+     * @return the BTORepository instance
+     */
     public static BTORepository getInstance() {
         if (instance == null) {
             instance = new BTORepository();
@@ -165,6 +174,15 @@ public class BTORepository implements BTOStorageProvider {
                 System.out.println("Row has insufficient columns: " + row.size());
             }
 
+            // P - Postal Code
+            String postalCode = "";
+            try {
+                double postalCodeNum = Double.parseDouble(row.get(15).trim());
+                postalCode = String.valueOf((int) postalCodeNum);
+            } catch (Exception e) {
+                postalCode = row.get(15).trim(); // fallback
+            }
+
             // === Create and Add Project ===
             BTOProj project = new BTOProj(
                     projectId,
@@ -178,6 +196,8 @@ public class BTORepository implements BTOStorageProvider {
                     officerList,
                     visibilityOverride
             );
+
+            project.setPostalCode(postalCode);
 
             try {
                 assignedManager.assignProj(project);
@@ -273,7 +293,6 @@ public class BTORepository implements BTOStorageProvider {
                 String applicantNric = row.get(0).trim();
                 Optional<User> user = userRepo.getUserByName(applicantNric, UserRoles.APPLICANT);
                 if (user.isEmpty()) {
-                    System.out.println("Applicant not found: " + applicantNric);
                     continue;
                 }
                 HDBApplicant applicant = (HDBApplicant) user.get();
@@ -287,7 +306,6 @@ public class BTORepository implements BTOStorageProvider {
                         .filter(p -> p.getProjId() == projId)
                         .findFirst();
                 if (matchedProject.isEmpty()) {
-                    System.out.println("Project ID not found: " + projId);
                     continue;
                 }
                 BTOProj project = matchedProject.get();
@@ -372,36 +390,69 @@ public class BTORepository implements BTOStorageProvider {
     }
 
 
+    /**
+     * Retrieves all BTO projects.
+     *
+     * @return list of BTOProj
+     */
     @Override
     public List<BTOProj> getAllProjects() {
         return projects;
     }
 
+    /**
+     * Retrieves all BTO exercises.
+     *
+     * @return list of BTOExercise
+     */
     @Override
     public List<BTOExercise> getAllExercises() {
         return exercises;
     }
 
+    /**
+     * Retrieves all BTO applications.
+     *
+     * @return list of Application
+     */
     @Override
     public List<Application> getAllApplications() { return applications;}
 
+    /**
+     * Adds a new project and saves to storage.
+     *
+     * @param project the BTO project to add
+     */
     public void addProject(BTOProj project) {
         projects.add(project);
         this.saveProject();
     }
 
+    /**
+     * Adds a new exercise and saves to storage.
+     *
+     * @param exercise the BTO exercise to add
+     */
     @Override
     public void addExercise(BTOExercise exercise) {
         exercises.add(exercise);
         this.saveExercise();
     }
 
+    /**
+     * Adds a new application and saves to storage.
+     *
+     * @param application the Application to add
+     */
     @Override
     public void addApplication(Application application) {
         applications.add(application);
         this.saveApplication();
     }
 
+    /**
+     * Saves all projects to the Excel file.
+     */
     @Override
     public void saveProject() {
         System.out.println("Saving project...");
@@ -457,13 +508,18 @@ public class BTORepository implements BTOStorageProvider {
             // O - Visibility
             row.add(String.valueOf(proj.getVisibility()));
 
+            // P - Postal Code
+            row.add(String.valueOf(proj.getPostalCode()));
+
             rows.add(row);
         }
 
         FileIO.writeExcelFile(PROJECTS_FILE_PATH, rows);
     }
 
-
+    /**
+     * Saves all exercises to the Excel file.
+     */
     @Override
     public void saveExercise() {
         List<List<String>> rows = new ArrayList<>();
@@ -497,6 +553,9 @@ public class BTORepository implements BTOStorageProvider {
         FileIO.writeExcelFile(EXERCISES_FILE_PATH, rows);
     }
 
+    /**
+     * Saves all applications to the Excel file.
+     */
     @Override
     public void saveApplication() {
 
