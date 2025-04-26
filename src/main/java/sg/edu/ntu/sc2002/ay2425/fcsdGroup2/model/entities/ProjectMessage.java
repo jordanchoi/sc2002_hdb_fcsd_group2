@@ -15,18 +15,16 @@ public class ProjectMessage {
     // Main constructor (message ID is passed in)
     public ProjectMessage(int messageId, String content, User sender) {
         this.messageId = messageId;
+        this.content = content;
+        this.sender = sender;
+        this.timestamp = LocalDateTime.now();
+    }
     /**
      * Constructs a new project message.
      *
      * @param content the message content
      * @param sender the user who sent the message
      */
-    public ProjectMessage(String content, User sender) {
-        this.messageId = messageCounter++;
-        this.content = content;
-        this.sender = sender;
-        this.timestamp = LocalDateTime.now();
-    }
 
     /**
      * Constructs a project message with specific ID and timestamp (for loading from file).
@@ -43,8 +41,6 @@ public class ProjectMessage {
         this.sender = sender;
         this.timestamp = timestamp;
     }
-
-    };
 
 
     /** @return the unique message ID. */

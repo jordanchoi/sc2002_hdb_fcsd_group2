@@ -196,23 +196,24 @@ public class EnquiryRepository {
             }
         }
         return false;
+    }
     /**
      * Updates an existing enquiry.
      *
      * @param updated the updated enquiry
      */
-    public void update(Enquiry updated) {
-        delete(updated.getEnquiryId());   // remove old copy
-        enquiries.add(updated);           // add updated copy
-        saveToFile();                     // persist
-    /*
-     int id = updated.getEnquiryId();
-        delete(updated.getEnquiryId());
-        add(id, updated.get, updated.getMadeBy(), updated.getForProj());
-        saveToFile();
-     */
-
-    }
+//    public void update(Enquiry updated) {
+//        delete(updated.getEnquiryId());   // remove old copy
+//        enquiries.add(updated);           // add updated copy
+//        saveToFile();                     // persist
+//    /*
+//     int id = updated.getEnquiryId();
+//        delete(updated.getEnquiryId());
+//        add(id, updated.get, updated.getMadeBy(), updated.getForProj());
+//        saveToFile();
+//     */
+//
+//    }
 
     /**
      * Deletes an enquiry by ID.

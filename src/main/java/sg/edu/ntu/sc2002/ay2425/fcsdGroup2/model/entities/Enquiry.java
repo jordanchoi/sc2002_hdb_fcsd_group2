@@ -143,16 +143,4 @@ public class Enquiry {
         }
         return false;
     }
-
-    public boolean deleteMessageById(int messageId, User sender) {
-        Iterator<ProjectMessage> iterator = thread.iterator();
-        while (iterator.hasNext()) {
-            ProjectMessage message = iterator.next();
-            if (message.getMessageId() == messageId && message.getSender().equals(sender)) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
-    }
 }
