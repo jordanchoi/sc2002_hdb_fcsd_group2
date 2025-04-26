@@ -79,7 +79,7 @@ public class ApplicantView implements UserView {
             System.out.println("\nChoose filter options (multiple choices allowed, enter numbers separated by commas):");
             System.out.println("1. Filter by Application Closing Date Range");
             System.out.println("2. Filter by Flat Type");
-            System.out.println("3. Sort by Lowest Price");
+            System.out.println("3. Filter by Price");
             System.out.println("4. Search by Project Name");
             System.out.println("5. Search by Neighbourhood");
             System.out.println("6. Clear All Filters");
