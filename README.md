@@ -238,11 +238,11 @@ The application follows the MVC (Model-View-Controller) to achieve the separatio
 
 
 ### UML Class Diagram
--
+![UML Class Diagram](https://github.com/jordanchoi/sc2002_hdb_fcsd_group2/blob/main/UML%20Diagrams/SC2002%20Object-Oriented%20Design%20%26%20Programming%2C%20Semester%202%20AY24-25%2C%20FCSD%20Group%202%20Class%20Diagram.png)
 
 ### Sequence Diagram
-
-
+![SD - RegisterToHandleProject](https://github.com/jordanchoi/sc2002_hdb_fcsd_group2/blob/main/UML%20Diagrams/SD1-RegisterToHandleProject.png)
+![SD - BookingForBTO](https://github.com/jordanchoi/sc2002_hdb_fcsd_group2/blob/main/UML%20Diagrams/SD2-BookingForBTO.png)
 
 ## How to Run
 1. Clone or download this repository.
