@@ -37,6 +37,13 @@ public class EnquiryServiceImpl implements ApplicantEnquiryService, OfficerEnqui
         User sender = session.getLoggedInUser();
         if (sender == null) return false;
 
+        if (sender instanceof HDBApplicant applicant) {
+            if (!enquiry.getMadeBy().equals(applicant)) {
+                System.out.println("You cannot add messages to someone else's enquiry!");
+                return false;
+            }
+        }
+
         enquiry.addMessage(msg, sender);
         enquiryRepo.update(enquiry); // Just use update, don't delete/add
         return true;

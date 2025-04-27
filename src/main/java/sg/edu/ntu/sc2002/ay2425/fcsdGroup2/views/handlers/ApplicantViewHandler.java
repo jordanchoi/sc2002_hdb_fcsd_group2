@@ -167,7 +167,11 @@ public class ApplicantViewHandler implements RoleHandler {
 
         Enquiry enquiry = enquiryOpt.get();
 
-        // Check if any message is not by the applicant
+        if (!enquiry.getMadeBy().equals(applicant)) {
+            System.out.println("You can only delete your own enquiries.");
+            return;
+        }
+
         boolean hasRepliesFromOthers = enquiry.getEnquiries().stream()
                 .anyMatch(msg -> !msg.getSender().equals(applicant));
 

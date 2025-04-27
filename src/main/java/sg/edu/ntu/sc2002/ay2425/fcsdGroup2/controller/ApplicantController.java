@@ -5,101 +5,25 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.*;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.MaritalStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ProjStatus;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FilterOption;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.BTORepository;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.ApplicationService;
-import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service.ProjectFilterService;
 
-import java.time.LocalDate;
 import java.util.*;
 
 public class ApplicantController implements canApplyFlat {
     private final HDBApplicant model;
     private final ApplicationService appService = new ApplicationService();
     private final BTORepository projRepo = BTORepository.getInstance();
-    private final ProjectFilterService filterService;
     private final Scanner scanner = new Scanner(System.in);
 
     public ApplicantController(HDBApplicant model) {
         this.model = model;
-        this.filterService = new ProjectFilterService();
-    }
-
-    // Setters now set filters in the service directly
-    public void setDateRange(LocalDate startDate, LocalDate endDate) {
-        filterService.setDateRange(startDate, endDate);
-    }
-
-    public void setProjectNameSearch(String search) {
-        filterService.setProjectNameSearch(search);
-    }
-
-    public void setSelectedFlatType(FlatTypes flatType) {
-        filterService.setSelectedFlatType(flatType);
-    }
-
-    public void setPriceRange(double minPrice, double maxPrice) {
-        filterService.setPriceRange(minPrice, maxPrice);
-    }
-
-    public void setNeighbourhoodSearch(String neighbourhoodSearch) {
-        filterService.setNeighbourhoodSearch(neighbourhoodSearch);
-    }
-
-    public void clearAllFilters() {
-        filterService.clearAllFilters();
     }
 
     public void withdrawApplication() {
         appService.withdrawApplication(model);
     }
 
-    public void viewEligibleProjects(List<FilterOption> filters) {
-        List<BTOProj> eligibleProjects = getEligibleProjs();
-
-        // Apply filters through the service
-        List<BTOProj> filteredProjects = filterService.applyFilters(eligibleProjects, filters);
-
-        System.out.println("\n=== Eligible BTO Projects ===");
-
-        if (filteredProjects.isEmpty()) {
-            System.out.println("No eligible projects found.");
-            return;
-        }
-
-        for (BTOProj project : filteredProjects) {
-            System.out.println("---------------------------------------");
-            System.out.println("Project ID          : " + project.getProjId());
-            System.out.println("Project Name        : " + project.getProjName());
-            System.out.println("Neighbourhood       : " + project.getProjNbh());
-            System.out.println("Application Opens   : " + project.getAppOpenDate());
-            System.out.println("Application Closes  : " + project.getAppCloseDate());
-
-            System.out.println("Available Flat Types:");
-            Map<FlatTypes, FlatType> flatUnits = project.getFlatUnits();
-
-            if (flatUnits.isEmpty()) {
-                System.out.println("  - No flat types available.");
-            } else {
-                for (FlatTypes type : FlatTypes.values()) {
-                    FlatType flat = flatUnits.get(type);
-                    if (flat != null && flat.getUnitsAvail() > 0) {
-                        System.out.printf("  - %s: %d units available ($%.2f)\n",
-                                flat.getTypeName(), flat.getUnitsAvail(), flat.getSellingPrice());
-                    }
-                }
-            }
-            System.out.println("---------------------------------------\n");
-        }
-    }
-
-    private double getLowestFlatPrice(BTOProj project) {
-        return project.getFlatUnits().values().stream()
-                .filter(flat -> flat.getUnitsAvail() > 0)
-                .mapToDouble(FlatType::getSellingPrice)
-                .min()
-                .orElse(Double.MAX_VALUE);
-    }
 
     public BTOProj selectProject(List<BTOProj> availableProjects) {
         System.out.println("\n=== Available BTO Projects ===");
