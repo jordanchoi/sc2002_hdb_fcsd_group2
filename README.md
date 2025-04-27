@@ -253,6 +253,7 @@ The application follows the MVC (Model-View-Controller) to achieve the separatio
 ```bash
 mvn clean compile
 mvn exec:java -Dexec.mainClass="sg.edu.ntu.sc2002.ay2425.fcsdGroup2.Main"
+```
 
 ## Acknowledgments
 - NTU SC2002 Teaching Team & Lecture Material
