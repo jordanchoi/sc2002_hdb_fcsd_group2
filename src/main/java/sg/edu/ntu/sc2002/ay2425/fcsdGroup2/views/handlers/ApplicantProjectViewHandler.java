@@ -77,7 +77,7 @@ public class ApplicantProjectViewHandler {
             }
 
             filterService.setDateRange(startDate, endDate);
-            activeFilters.add(FilterOption.CLOSING_SOONEST);
+            activeFilters.add(FilterOption.CLOSING_DATE);
 
         } catch (DateTimeParseException e) {
             System.out.println("Invalid date format. Please use yyyy-MM-dd. Cancelling filter change.");
@@ -104,7 +104,7 @@ public class ApplicantProjectViewHandler {
         activeFilters.add(FilterOption.SEARCH_BY_NAME);
     }
 
-    public void displayFilterOptions() {
+    private void displayFilterOptions() {
         boolean continueFiltering = true;
         while (continueFiltering) {
             displayActiveFilters();
@@ -155,7 +155,7 @@ public class ApplicantProjectViewHandler {
             List<String> filterNames = new ArrayList<>();
             for (FilterOption filter : activeFilters) {
                 switch (filter) {
-                    case CLOSING_SOONEST -> filterNames.add("Closing Date Range");
+                    case CLOSING_DATE -> filterNames.add("Closing Date Range");
                     case FLAT_TYPE -> filterNames.add("Flat Type");
                     case PRICE -> filterNames.add("Price Range");
                     case SEARCH_BY_NAME -> filterNames.add("Project Name Search");

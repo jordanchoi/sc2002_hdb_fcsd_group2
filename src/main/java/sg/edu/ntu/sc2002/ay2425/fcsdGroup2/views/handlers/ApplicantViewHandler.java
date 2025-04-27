@@ -14,8 +14,8 @@ import java.util.Scanner;
 public class ApplicantViewHandler implements RoleHandler {
     private final HDBApplicant applicant;
     private final ApplicantController applicantController;
-    private ApplicantEnquiryService enquiryService = new EnquiryServiceImpl();
-    private Scanner scanner = new Scanner(System.in);
+    private final ApplicantEnquiryService enquiryService = new EnquiryServiceImpl();
+    private final Scanner scanner = new Scanner(System.in);
 
     public ApplicantViewHandler(HDBApplicant applicant, ApplicantController applicantController) {
         this.applicant = applicant;
@@ -46,7 +46,7 @@ public class ApplicantViewHandler implements RoleHandler {
             }
         } while (choice != 6);
     }
-    public void showAllEnquiries() {
+    private void showAllEnquiries() {
         List<Enquiry> applicantEnquiry = enquiryService.getEnquiriesByApplicant(applicant);
         if (applicantEnquiry.isEmpty()) {
             System.out.println("No enquiries found.");
@@ -65,7 +65,7 @@ public class ApplicantViewHandler implements RoleHandler {
         }
     }
 
-    public void submitEnquiry() {
+    private void submitEnquiry() {
         System.out.println("Enter the message for your enquiry (or 0 to return): ");
         String message = scanner.nextLine();
         if (message.equals("0")) {
@@ -84,7 +84,7 @@ public class ApplicantViewHandler implements RoleHandler {
         }
     }
 
-    public void submitExisting() {
+    private void submitExisting() {
         Integer enquiryId = promptForInt("Enter the Enquiry ID to add a message to (0 to return): ");
         if (enquiryId == null || enquiryId == 0) return;
 
@@ -101,7 +101,7 @@ public class ApplicantViewHandler implements RoleHandler {
         enquiryService.addMessage(enquiryId, message, applicant.getNric());
     }
 
-    public void editEnquiryMessage() {
+    private void editEnquiryMessage() {
         Integer enquiryId = promptForInt("Enter Enquiry ID to edit message (0 to return):");
         if (enquiryId == null || enquiryId == 0) return;
 
@@ -155,7 +155,7 @@ public class ApplicantViewHandler implements RoleHandler {
         System.out.println(success ? "Message updated successfully." : "Failed to update message.");
     }
 
-    public void deleteEnquiry() {
+    private void deleteEnquiry() {
         Integer enquiryId = promptForInt("Enter Enquiry ID to delete (0 to return):");
         if (enquiryId == null || enquiryId == 0) return;
 
