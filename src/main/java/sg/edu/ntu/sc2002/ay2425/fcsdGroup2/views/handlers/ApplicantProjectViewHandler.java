@@ -11,16 +11,28 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+/**
+ * Manage applicant's view project
+ * Allow applicants to view project, set filters on the list of eligible projects
+ */
 public class ApplicantProjectViewHandler {
     private final Set<FilterOption> activeFilters = new HashSet<>();
     private final ProjectFilterService filterService = new ProjectFilterService();
     private final Scanner scanner = new Scanner(System.in);
     private final ApplicantController appController;
 
+    /**
+     * Constructor
+     *
+     * @param applicantController the controller managing applicant operations
+     */
     public ApplicantProjectViewHandler(ApplicantController applicantController) {
         appController = applicantController;
     }
 
+    /**
+     * Displays the available flat types and allows the user to select one for filtering.
+     */
     private void handleFlatTypeFilter() {
         System.out.println("\nSelect a flat type to filter:");
         int index = 1;
@@ -38,6 +50,9 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Prompts the user to input minimum and maximum price range for filtering projects.
+     */
     private void handlePriceFilter() {
         try {
             System.out.print("Enter minimum price: ");
@@ -61,6 +76,9 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Prompts the user to input a date range for filtering projects based on application closing dates.
+     */
     private void handleDateRangeFilter() {
         try {
             System.out.print("Enter start date (yyyy-MM-dd): ");
@@ -84,6 +102,9 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Prompts the user to input a neighbourhood keyword for filtering projects.
+     */
     private void handleNeighbourhoodSearch() {
         System.out.print("Enter neighbourhood or part of it to search: ");
         String nbhInput = scanner.nextLine();
@@ -91,12 +112,18 @@ public class ApplicantProjectViewHandler {
         activeFilters.add(FilterOption.SEARCH_BY_NEIGHBOURHOOD);
     }
 
+    /**
+     * Clears all active filters applied to the project list.
+     */
     private void clearAllFilters() {
         filterService.clearAllFilters();
         activeFilters.clear();
         System.out.println("All filters cleared. Showing default view (alphabetical order).");
     }
 
+    /**
+     * Prompts the user to input a project name keyword for filtering projects.
+     */
     private void handleProjectNameSearch() {
         System.out.print("Enter project name or part of it to search: ");
         String nameInput = scanner.nextLine();
@@ -104,6 +131,9 @@ public class ApplicantProjectViewHandler {
         activeFilters.add(FilterOption.SEARCH_BY_NAME);
     }
 
+    /**
+     * Displays the filter options menu and allows the user to apply multiple filters.
+     */
     private void displayFilterOptions() {
         boolean continueFiltering = true;
         while (continueFiltering) {
@@ -147,6 +177,9 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Displays the list of currently active filters.
+     */
     public void displayActiveFilters() {
         if (activeFilters.isEmpty()) {
             System.out.print("(No filters applied)");
@@ -166,6 +199,11 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Retrieves and validates integer input from the user.
+     *
+     * @return the validated integer input
+     */
     private int getIntInput() {
         int input;
         while (true) {
@@ -181,6 +219,10 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Displays the list of eligible BTO projects after applying the active filters.
+     * If no projects match, a message is shown.
+     */
     public void viewEligibleProjects() {
         List<BTOProj> eligibleProjects = appController.getEligibleProjs();
         List<BTOProj> filteredProjects = filterService.applyFilters(eligibleProjects, new ArrayList<>(activeFilters));
@@ -218,6 +260,10 @@ public class ApplicantProjectViewHandler {
         }
     }
 
+    /**
+     * Asks the user if they would like to modify the current filters.
+     * If yes, redirects them to the filter options menu.
+     */
     public void askToChangeFilters() {
         System.out.println("Would you like to change the filters? (y/n)");
         String input = scanner.nextLine().trim();

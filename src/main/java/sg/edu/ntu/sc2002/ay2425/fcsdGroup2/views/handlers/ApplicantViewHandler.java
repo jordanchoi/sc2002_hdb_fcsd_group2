@@ -11,16 +11,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Handles the applicant's view for managing project enquiries.
+ * Allows applicants to create, view, add, edit and delete to enquiries.
+ */
 public class ApplicantViewHandler implements RoleHandler {
     private final HDBApplicant applicant;
     private final ApplicantController applicantController;
     private final ApplicantEnquiryService enquiryService = new EnquiryServiceImpl();
     private final Scanner scanner = new Scanner(System.in);
-
+    /**
+     * Constructs a new ApplicantViewHandler.
+     *
+     * @param applicant the HDB applicant using the system
+     * @param applicantController the controller to manage applicant-related operations
+     */
     public ApplicantViewHandler(HDBApplicant applicant, ApplicantController applicantController) {
         this.applicant = applicant;
         this.applicantController = applicantController;
     }
+
+    /**
+     * Displays the menu options for enquiry management and handles user interaction.
+     */
     @Override
     public void displayEnquiryOptions() {
         int choice;
@@ -46,6 +59,10 @@ public class ApplicantViewHandler implements RoleHandler {
             }
         } while (choice != 6);
     }
+
+    /**
+     * Displays all enquiries submitted by the current applicant.
+     */
     private void showAllEnquiries() {
         List<Enquiry> applicantEnquiry = enquiryService.getEnquiriesByApplicant(applicant);
         if (applicantEnquiry.isEmpty()) {
@@ -65,6 +82,10 @@ public class ApplicantViewHandler implements RoleHandler {
         }
     }
 
+    /**
+     * Submits a new enquiry linked to a selected eligible project.
+     * Prompts the applicant for a message and project selection.
+     */
     private void submitEnquiry() {
         System.out.println("Enter the message for your enquiry (or 0 to return): ");
         String message = scanner.nextLine();
@@ -84,6 +105,10 @@ public class ApplicantViewHandler implements RoleHandler {
         }
     }
 
+    /**
+     * Adds a new message to an existing enquiry.
+     * Applicant must provide a valid enquiry ID and a new message.
+     */
     private void submitExisting() {
         Integer enquiryId = promptForInt("Enter the Enquiry ID to add a message to (0 to return): ");
         if (enquiryId == null || enquiryId == 0) return;
@@ -101,6 +126,10 @@ public class ApplicantViewHandler implements RoleHandler {
         enquiryService.addMessage(enquiryId, message, applicant.getNric());
     }
 
+    /**
+     * Edits an existing message in an enquiry submitted by the applicant.
+     * Applicant must specify the Enquiry ID and Message ID to edit their own message.
+     */
     private void editEnquiryMessage() {
         Integer enquiryId = promptForInt("Enter Enquiry ID to edit message (0 to return):");
         if (enquiryId == null || enquiryId == 0) return;
@@ -155,6 +184,9 @@ public class ApplicantViewHandler implements RoleHandler {
         System.out.println(success ? "Message updated successfully." : "Failed to update message.");
     }
 
+    /**
+     * Deletes an enquiry created by the applicant, provided no officers or managers have replied to it.
+     */
     private void deleteEnquiry() {
         Integer enquiryId = promptForInt("Enter Enquiry ID to delete (0 to return):");
         if (enquiryId == null || enquiryId == 0) return;
@@ -184,7 +216,12 @@ public class ApplicantViewHandler implements RoleHandler {
         System.out.println(success ? "Enquiry deleted successfully." : "Failed to delete enquiry.");
     }
 
-
+    /**
+     * Prompts the user to enter an integer, validating input until a correct integer is entered.
+     *
+     * @param promptMessage the message displayed to prompt the user
+     * @return the integer value entered by the user
+     */
     private Integer promptForInt(String promptMessage) {
         while (true) {
             System.out.println(promptMessage);
