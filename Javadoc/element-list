@@ -1,0 +1,12 @@
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.controller.interfaces
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.factory
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.service
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.util
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.handlers
+sg.edu.ntu.sc2002.ay2425.fcsdGroup2.views.interfaces
