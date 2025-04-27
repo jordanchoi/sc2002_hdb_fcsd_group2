@@ -27,7 +27,7 @@ public class ProjectFilterService {
 
         for (FilterOption filter : filters) {
             switch (filter) {
-                case CLOSING_SOONEST -> filteredProjects = filterByDateRange(filteredProjects);
+                case CLOSING_DATE -> filteredProjects = filterByDateRange(filteredProjects);
                 case FLAT_TYPE -> filteredProjects = filterByFlatType(filteredProjects);
                 case PRICE -> filteredProjects = filterByPrice(filteredProjects);
                 case SEARCH_BY_NAME -> filteredProjects = filterByProjectName(filteredProjects);

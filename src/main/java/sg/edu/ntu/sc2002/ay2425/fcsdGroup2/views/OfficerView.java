@@ -21,6 +21,7 @@ import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBApplicant;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBManager;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.entities.HDBOfficer;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.ApplicationStatus;
+import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FilterOption;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatBookingStatus;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.model.enums.FlatTypes;
 import sg.edu.ntu.sc2002.ay2425.fcsdGroup2.repository.ApplicationRepository;
@@ -45,6 +46,7 @@ public class OfficerView implements UserView {
     List<HDBOfficer> officerList = user.getOfficers();
     HDBOfficer currentOfficer = null;
     List<HDBApplicant> applicantList = user.getApplicants();
+    private final Set<FilterOption> activeFilters = new HashSet<>();
 
     /**
      * Constructs a new OfficerView instance.
@@ -67,7 +69,7 @@ public class OfficerView implements UserView {
             }
         }
         int choice = 0;
-        while (choice != 10) {
+        while (choice != 6) {
             displayMenu();
             choice = handleUserInput();
         }
@@ -84,7 +86,7 @@ public class OfficerView implements UserView {
         System.out.println("3. Flat Booking");
         System.out.println("4. Receipt & Reports");
         System.out.println("5. Manage Enquiry");
-        System.out.println("10. Exit");
+        System.out.println("6. Exit");
     }
 
     /**
@@ -112,7 +114,7 @@ public class OfficerView implements UserView {
             }
             case 4 -> handleReceiptSubMenu();
             case 5 -> currentController.viewEnquiries();
-            case 10 -> System.out.println("Exiting Officer Menu...");
+            case 6 -> System.out.println("Exiting Officer Menu...");
             default -> System.out.println("Invalid choice. Please try again.");
         }
         return choice;
@@ -154,22 +156,62 @@ public class OfficerView implements UserView {
                 }
                 case 3 -> {
                     System.out.println("Register to handle BTO project as officer: ");
-                    BTOProj proj = findProject(projsController, exerciseController);
-                    if (proj != null) {
-                        if(currentController.submitApplication(proj)) {
-                            System.out.println("Successfully applied as officer for " + proj.getProjName());
-                        } else {
-                            System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
-                        }
+                    boolean backToMenu = registerProjectAsOfficer(projsController, exerciseController, currentController);
+                    if (!backToMenu) {
+                        // User entered -1, returning to project menu
+                        continue;
                     }
-                }
+                }   
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid selection. Try again.");
             }
         } while (subChoice != 0);
     }
 
-
+    private boolean registerProjectAsOfficer(BTOProjsController projsController, HDBBTOExerciseController exerciseController, HDBOfficerController currentController) {
+        boolean validResponse = false;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Register to handle BTO project as officer: ");
+    
+        do {
+            try {
+                BTOProj proj = findProject(projsController, exerciseController);
+    
+                if (proj == null) {
+                    // User wants to go back to project selection, returning false to indicate this.
+                    System.out.println("No project selected, returning to project menu...");
+                    return false;
+                }
+    
+                System.out.print("Register to handle this BTO project as officer? (y/n): ");
+                String confirmToRegister = scanner.nextLine().trim();
+    
+                if (confirmToRegister.equalsIgnoreCase("y")) {
+                    if (currentController.submitApplication(proj)) {
+                        System.out.println("Successfully applied as officer for " + proj.getProjName());
+                    } else {
+                        System.out.println("Not allowed to apply for " + proj.getProjName() + " as officer.");
+                    }
+                    validResponse = true;  // exit loop after successful registration
+                } else if (confirmToRegister.equalsIgnoreCase("n")) {
+                    System.out.println("Returning to the list of projects...");
+                    validResponse = false;  // continue loop to select new project
+                } else {
+                    throw new IllegalArgumentException("Invalid input, please enter 'y' or 'n'.");
+                }
+    
+            } catch (IllegalArgumentException e) {
+                // Handle invalid input exception here
+                System.out.println(e.getMessage());  // Print the error message
+                validResponse = false;  // Continue the loop for invalid input
+            }
+    
+        } while (!validResponse);
+    
+        return true;  // Successfully registered, return true
+    }
+    
+    
     /**
      * Handles the receipt submenu operations for generating receipts.
      */
@@ -273,28 +315,31 @@ public class OfficerView implements UserView {
         }
     }
 
-        /**
-         * Lists all available projects and returns the selected project.
-         *
-         * @param projsController the BTO projects controller
-         * @param exerciseController the BTO exercises controller
-         * @return the selected project or null
-         */
-        public BTOProj findProject(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
+    /**
+     * Lists all available projects and returns the selected project.
+     *
+     * @param projsController the BTO projects controller
+     * @param exerciseController the BTO exercises controller
+     * @return the selected project or null
+     */
+    public BTOProj findProject(BTOProjsController projsController, HDBBTOExerciseController exerciseController) {
         projsController.insertProjectsFromRepo();
         exerciseController.insertExercisesFromRepo();
         List<BTOProj> allProjects = projsController.viewAllProjs();
         List<BTOExercise> allExercises = exerciseController.viewAllExercises();
-        BTOProj selected = null;
+        BTOProj selectedProj = null;
 
         if (allProjects == null || allProjects.isEmpty()) {
             System.out.println("There are no projects available.");
-            return selected;
+            return selectedProj;
         }
-
-        return selectProjectFromTable(allProjects, allExercises);
+        //return selected;
+        selectedProj =  selectProjectFromTable(allProjects, allExercises);
+        if (selectedProj != null) {
+            displayProjectDetails(selectedProj);
+        } 
+        return selectedProj;
     }
-
 
     /**
      * Displays a table of projects with their associated exercises, prompts for selection.
