@@ -4,13 +4,17 @@ This system simulates the backend operations of Singapore's HDB Build-to-Order F
 
 ## Team Members
 [Choi Shu Yih, Jordan](https://github.com/jordanchoi)
+
 [Chin Jiaqi](https://github.com/ch11nn)
+
 [Desmond Koh Chye Ang](https://github.com/DesmondKCA)
+
 [Leong Hao Jie](https://github.com/Haxane)
+
 [Low Zhi Yang Nicholas](https://github.com/LZYNicholas)
 
 ## Tech Stack & Technologies Used
-![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)![Maven]((https://img.shields.io/badge/apachemaven-C71A36.svg?style=for-the-badge&logo=apachemaven&logoColor=white))![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)![Lucid](https://www.google.com/imgres?imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fen%2Fthumb%2Ff%2Ff2%2FLucidchart_logo_%2528September_2021%2529.svg%2F2560px-Lucidchart_logo_%2528September_2021%2529.svg.png&tbnid=-6mgsjJfQlgqHM&vet=10CAIQxiAoAGoXChMIqNvz2YX4jAMVAAAAAB0AAAAAEAc..i&imgrefurl=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FFile%3ALucidchart_logo_(September_2021).svg&docid=F17CLUV6ZBD1GM&w=2560&h=384&itg=1&q=lucidchart%20badge&ved=0CAIQxiAoAGoXChMIqNvz2YX4jAMVAAAAAB0AAAAAEAc)![Microsoft Excel](https://img.shields.io/badge/Microsoft_Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white)
+![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)![Maven](https://img.shields.io/badge/apachemaven-C71A36.svg?style=for-the-badge&logo=apachemaven&logoColor=white)![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)![Lucid](https://cdn-cashy-static-assets.lucidchart.com/lucid/logos/lucidchart.svg)![Microsoft Excel](https://img.shields.io/badge/Microsoft_Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white)
 
 ## Features
 ### General
